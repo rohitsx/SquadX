@@ -1,0 +1,11 @@
+import express from 'express';
+import AuthServices from '../services/authServices';
+
+const router = express.Router();
+
+router.post('/api/login', AuthServices.login);
+
+router.post('/api/signup', AuthServices.signup);
+
+
+export default router;
