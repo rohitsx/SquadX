@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Eye, EyeOff } from 'lucide-react';
-import bgVideo from '../assets/img/bg.mp4';
-import logo from '../assets/img/btc.png';
+import bgVideo from '../../assets/img/bg.mp4';
+import logo from '../../assets/img/btc.png';
 
 const RegisterPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,7 +14,18 @@ const RegisterPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Registration submitted', formData);
+    axios.post('http://localhost:3000/api/signup', {
+      username: formData.username,
+      password: formData.password,
+      email: formData.email,
+      dob: formData.dob
+    })
+    .then(res => {
+      console.log(res);
+    })
+    .catch(err => {
+      console.log(err);
+    });
   };
 
   const handleGoogleAuth = () => {
