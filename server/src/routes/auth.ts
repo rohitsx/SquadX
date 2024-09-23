@@ -7,5 +7,7 @@ router.post('/api/login', AuthServices.login);
 
 router.post('/api/signup', AuthServices.signup);
 
+router.post('/api/validateToken', AuthServices.validateToken);
+
 
 export default router;
