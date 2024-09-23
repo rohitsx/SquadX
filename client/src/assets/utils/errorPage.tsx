@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import bgVideo from '../assets/img/bg.mp4';
-import logo from '../assets/img/btc.png';
+import bgVideo from '../../assets/img/bg.mp4';
+import logo from '../../assets/img/btc.png';
 
 const ErrorPage: React.FC = () => {
   const navigate = useNavigate();
