@@ -11,8 +11,9 @@ export default async function getStreamMidea({ audioElement, pc }: WebRtcProps):
             echoCancellation: true,
             noiseSuppression: true,
             autoGainControl: true
-        }b
+        }
     }
+    
     try {
         const stream = await navigator.mediaDevices.getUserMedia(constraints)
         const audioTrack = stream.getAudioTracks()[0]
