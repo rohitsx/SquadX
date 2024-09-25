@@ -14,7 +14,7 @@ const RegisterPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    axios.post('http://localhost:3000/api/signup', {
+    axios.post(import.meta.env.VITE_API_URL + '/signup', {
       username: formData.username,
       password: formData.password,
       email: formData.email,
