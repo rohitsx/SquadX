@@ -1,7 +1,7 @@
 import express from "express";
 import client from "../config/database";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config/envirnoment";
+import { JWT_SECRET } from "../config/environment";
 
 class AuthServices {
   static async login(req: express.Request, res: express.Response) {
