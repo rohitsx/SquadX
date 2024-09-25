@@ -5,7 +5,7 @@ interface WebRtcProps {
     pc: RTCPeerConnection
 }
 
-export default async function getStreamMidea({ audioElement, pc }: WebRtcProps): Promise<MediaStream | undefined> {
+export default async function getStreamMedia({ audioElement, pc }: WebRtcProps): Promise<MediaStream | undefined> {
     const constraints = {
         'audio': {
             echoCancellation: true,

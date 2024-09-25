@@ -13,3 +13,7 @@ export const DB_URL =
   process.env.DB_URL ||
   `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 export const JWT_SECRET = process.env.JWT_SECRET || "";
+
+
+// socket
+export const PUBLIC_CLIENT_URL = process.env.PUBLIC_CLIENT_URL

@@ -1,53 +1,52 @@
-import { useEffect, useRef, useState } from 'react';
-import io from 'socket.io-client';
+import { useEffect, useMemo, useRef, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import usePcContext from "@/context/peerConnectionContext";
+// import { useSocketContext } from "@/context/socketContext";
+import { io } from "socket.io-client";
 
-function App() {
-  const [socket, setSocket] = useState(null)
-  const [strangerId, setStrangerId] = useState(null)
-  const localVideo = useRef(null)
-  const remoteVideo = useRef(null)
-  const polite = useRef(null)
-  const makingOffer = useRef(null)
-  const ignoreOffer = useRef(null)
+export default function VideoCall() {
+  const socket = useMemo(() => {    
+    return io(import.meta.env.VITE_APP_WEBSOCKET_URL, {
+      transports: ["websocket"],
+      auth: { username: localStorage.getItem("email") },
+    });
+
+  }, []);
+  const [strangerId, setStrangerId] = useState(null);
+  const localVideo = useRef<HTMLVideoElement| null>(null);
+  const remoteVideo = useRef<HTMLVideoElement | null>(null);
+  const polite = useRef(false);
+  const makingOffer = useRef(false);
+  const ignoreOffer = useRef(false);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:3001", {
-      transports: ['websocket'],
-    })
-    setSocket(newSocket)
-
-    return () => newSocket.close()
+    socket.on('disconnect', () => {console.log('socket not working')});
+    socket.on('connect', () => console.log('socket working'));
+    socket.emit('connectPeer')
+  
+    socket.on('peer', v => {
+      setStrangerId(v.strangerId)
+      polite.current = v.polite
+    });
   }, [])
 
-  useEffect(() => {
-    if (socket) {
-      socket.emit("connectPeer")
-      socket.on('peer', v => {
-        setStrangerId(v.strangerId)
-        polite.current = v.polite
-      });
-    }
-
-  }, [socket])
 
   useEffect(() => {
     if (strangerId) {
       async function getVideo() {
         const stream = await navigator.mediaDevices.getUserMedia({ 'video': true })
         for (const track of stream.getTracks()) { pc.addTrack(track, stream) }
-        localVideo.current.srcObject = stream
-        return stream
+        if (localVideo.current) localVideo.current.srcObject = stream
       }
       const config = { iceServers: [{ urls: "stun:stun.mystunserver.tld" }], }
       const pc = new RTCPeerConnection(config)
-      const stream = getVideo()
+      getVideo()
 
       pc.ontrack = ({ track, streams }) => {
         track.onunmute = () => {
           console.log("track unmuted");
-          if (remoteVideo.current.srcObject) {
-            return
-          }
+          if (!remoteVideo.current) return
+          if (remoteVideo.current.srcObject) return
           remoteVideo.current.srcObject = streams[0]
         }
       }
@@ -65,7 +64,6 @@ function App() {
         }
       }
       pc.onicecandidate = ({ candidate }) => socket.emit('message', { candidate, to: strangerId })
-
 
       socket.on('message', async (m) => {
         const [description, candidate] = [m['description'], m['candidate']]
@@ -108,10 +106,16 @@ function App() {
     }
   }, [strangerId, polite])
 
-  return (<>
-    <video ref={localVideo} id="localVideo" autoPlay playsInline muted /> <br/>
-    <video ref={remoteVideo} id="remoteVideo" autoPlay playsInline muted />
-  </>)
-}
 
-export default App;
+
+
+
+  return (
+    <>
+      <h1>don't worry if you see a blank page open two tab of the the page side by side and then try opening this page, one's it is connected don't refereshe the page you will stuck at loophole where only one cam work, due to incommplete server.</h1>
+      <video ref={localVideo} id="localVideo" autoPlay playsInline muted />{" "}
+      <br />
+      <video ref={remoteVideo} id="remoteVideo" autoPlay playsInline muted />
+    </>
+  );
+}

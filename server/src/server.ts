@@ -5,7 +5,8 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { PORT, PUBLIC_CLIENT_URL } from "./config/environment";
 import dbClient from "./config/database";
-import RedisClient from "./config/redis";
+// import RedisClient from "./config/redis";
+import { handleSocketConnection } from "./routes/socketHandler";
 
 const app = express();
 const httpServer = createServer(app);
@@ -24,12 +25,12 @@ app.use(express.json());
 app.use("/", authRoutes);
 
 io.on("connection", (socket) => {
-  // handleSocketConnection(socket, io);
+  handleSocketConnection(socket, io);
 });
 
-RedisClient.connect()
-  .then(() => console.log("redis connected"))
-  .catch((err) => console.log("error connecting redis", err));
+// RedisClient.connect()
+//   .then(() => console.log("redis connected"))
+//   .catch((err) => console.log("error connecting redis", err));
 
 dbClient.connect()
   .then(() => {

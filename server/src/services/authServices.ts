@@ -5,6 +5,8 @@ import { JWT_SECRET } from "../config/environment";
 
 class AuthServices {
   static async login(req: express.Request, res: express.Response) {
+    console.log('loggin in');
+    
     const { email, password } = req.body;
     const query = "SELECT * FROM users WHERE email = $1 AND password = $2";
     const result = await client.query(query, [email, password]);

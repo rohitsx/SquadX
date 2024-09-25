@@ -22,10 +22,10 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
         setSocket(newSocket);
 
-        return () => {
-            newSocket.disconnect();
-            setSocket(null);
-        };
+        // return () => {
+        //     newSocket.disconnect();
+        //     setSocket(null);
+        // };
     }, []);
 
     return (
