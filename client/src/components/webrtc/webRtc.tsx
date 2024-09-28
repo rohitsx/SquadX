@@ -5,48 +5,52 @@ import {
   Settings,
   HelpCircle,
   LogOut,
-  Video,
-  VideoOff,
-  Mic,
-  MicOff,
-  Send,
-  SkipForward,
+  SendHorizontal,
   Flag,
   PhoneOff,
   ChevronDown,
+  SkipForward,
 } from "lucide-react";
-import { io } from "socket.io-client";
+import { Socket, io } from "socket.io-client";
 
-export default function VideoCall() {
-  const socket = useMemo(() => {
+interface Message {
+  text: string;
+  sender: string;
+}
+
+interface PeerData {
+  strangerId: string;
+  polite: boolean;
+}
+
+export default function VideoCall(): JSX.Element {
+  const socket: Socket = useMemo(() => {
     return io(import.meta.env.VITE_APP_WEBSOCKET_URL, {
       transports: ["websocket"],
       auth: { username: localStorage.getItem("email") },
     });
   }, []);
 
-  const [strangerId, setStrangerId] = useState(null);
-  const [isNavOpen, setIsNavOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [isVideoOn, setIsVideoOn] = useState(true);
-  const [isAudioOn, setIsAudioOn] = useState(true);
-  const [isMatched, setIsMatched] = useState(false);
+  const [strangerId, setStrangerId] = useState<string | null>(null);
+  const [isNavOpen, setIsNavOpen] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isMatched, setIsMatched] = useState<boolean>(false);
 
-  const localVideo = useRef(null);
-  const remoteVideo = useRef(null);
-  const chatContainerRef = useRef(null);
-  const polite = useRef(false);
-  const makingOffer = useRef(false);
-  const ignoreOffer = useRef(false);
-  const pcRef = useRef(null);
+  const localVideo = useRef<HTMLVideoElement>(null);
+  const remoteVideo = useRef<HTMLVideoElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const polite = useRef<boolean>(false);
+  const makingOffer = useRef<boolean>(false);
+  const ignoreOffer = useRef<boolean>(false);
+  const pcRef = useRef<RTCPeerConnection | null>(null);
 
   useEffect(() => {
     socket.on("disconnect", () => console.log("socket not working"));
     socket.on("connect", () => console.log("socket working"));
     socket.emit("connectPeer");
 
-    socket.on("peer", (v) => {
+    socket.on("peer", (v: PeerData) => {
       setStrangerId(v.strangerId);
       polite.current = v.polite;
       setIsMatched(true);
@@ -62,7 +66,7 @@ export default function VideoCall() {
   useEffect(() => {
     if (!strangerId) return;
 
-    const config = { iceServers: [{ urls: "stun:stun.mystunserver.tld" }] };
+    const config: RTCConfiguration = { iceServers: [{ urls: "stun:stun.mystunserver.tld" }] };
     const pc = new RTCPeerConnection(config);
     pcRef.current = pc;
 
@@ -108,7 +112,7 @@ export default function VideoCall() {
       socket.emit("message", { candidate, to: strangerId });
     };
 
-    socket.on("message", async (m) => {
+    socket.on("message", async (m: { description?: RTCSessionDescriptionInit, candidate?: RTCIceCandidateInit }) => {
       if (!m) return;
       const { description, candidate } = m;
 
@@ -170,52 +174,39 @@ export default function VideoCall() {
     socket.emit("report", { strangerId });
   };
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim()) {
-      const newMessage = { text: message, sender: "You" };
+      const newMessage: Message = { text: message, sender: "You" };
       setMessages([...messages, newMessage]);
       socket.emit("chat", { message, to: strangerId });
       setMessage("");
     }
   };
-
-  const toggleVideo = () => {
-    const videoTrack = localVideo.current.srcObject.getVideoTracks()[0];
-    videoTrack.enabled = !videoTrack.enabled;
-    setIsVideoOn(!isVideoOn);
-  };
-
-  const toggleAudio = () => {
-    const audioTrack = localVideo.current.srcObject.getAudioTracks()[0];
-    audioTrack.enabled = !audioTrack.enabled;
-    setIsAudioOn(!isAudioOn);
-  };
-
   return (
-    <div className="flex flex-col h-screen bg-gray-100 text-gray-800">
-      <header className="bg-white shadow-sm p-4 flex justify-between items-center">
+    <div className="flex flex-col h-screen bg-gray-900 text-gray-100">
+      <header className="bg-gray-800 shadow-md p-4 flex justify-between items-center">
         <div className="flex items-center">
-          <img src={logo} alt="Logo" className="h-8 w-8 mr-2 rounded-md" />
-          <span className="font-bold text-xl text-indigo-600">
+          <img src={logo} alt="Logo" className="h-10 w-10 mr-3 rounded-md" />
+          <span className="font-bold text-2xl text-blue-400">
             VideoChat Pro
           </span>
         </div>
         <div className="relative">
           <button
             onClick={() => setIsNavOpen(!isNavOpen)}
-            className="flex items-center space-x-2 bg-gray-100 rounded-full py-2 px-4 hover:bg-gray-200 transition duration-200"
+            className="flex items-center space-x-2 bg-gray-700 rounded-full py-2 px-4 hover:bg-gray-600 transition duration-200"
           >
             <img
               src={logo}
               alt="User"
-              className="w-8 h-8 rounded-full border-2 border-white"
+              className="w-8 h-8 rounded-full border-2 border-blue-400"
             />
             <span className="font-medium">Username</span>
-            <ChevronDown size={16} className="text-gray-500" />
+            <ChevronDown size={16} className="text-gray-400" />
           </button>
           {isNavOpen && (
-            <nav className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-10">
+            <nav className="absolute right-0 mt-2 w-56 bg-gray-800 rounded-lg shadow-lg py-2 z-10">
               {[
                 { icon: User, text: "Profile" },
                 { icon: Settings, text: "Settings" },
@@ -225,9 +216,9 @@ export default function VideoCall() {
                 <a
                   key={text}
                   href="#"
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 transition duration-200"
+                  className="flex items-center px-4 py-2 hover:bg-gray-700 transition duration-200"
                 >
-                  <Icon className="mr-3 text-gray-500" size={18} />
+                  <Icon className="mr-3 text-blue-400" size={18} />
                   <span className="text-sm font-medium">{text}</span>
                 </a>
               ))}
@@ -237,7 +228,7 @@ export default function VideoCall() {
       </header>
 
       <div className="flex-1 flex p-6 space-x-6">
-        <div className="flex-1 flex flex-col bg-white rounded-2xl shadow-xl overflow-hidden relative">
+        <div className="flex-1 flex flex-col bg-gray-800 rounded-2xl shadow-xl overflow-hidden relative">
           <div className="flex-1 relative bg-gray-900">
             {isMatched ? (
               <video
@@ -247,13 +238,13 @@ export default function VideoCall() {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-700">
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-700">
                 <p className="text-3xl text-white font-semibold">
                   Finding your match...
                 </p>
               </div>
             )}
-            <div className="absolute top-4 left-4 flex space-x-2">
+            <div className="absolute top-4 right-4">
               <button
                 onClick={handleReport}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-full transition duration-200 shadow-md"
@@ -261,103 +252,76 @@ export default function VideoCall() {
                 <Flag size={20} />
               </button>
             </div>
-          </div>
-          <button
-            onClick={handleEndCall}
-            className="absolute bottom-6 left-6 bg-red-500 hover:bg-red-600 text-white p-4 rounded-full transition duration-200 shadow-lg flex items-center justify-center"
-          >
-            <PhoneOff size={28} />
-          </button>
-        </div>
 
-        <div className="w-1/3 flex flex-col bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="h-2/5 bg-gray-900 relative">
-            <video
-              ref={localVideo}
-              autoPlay
-              playsInline
-              muted
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute bottom-4 left-4 space-x-2">
+            <div className="absolute bottom-4 right-4 flex space-x-4">
               <button
-                onClick={toggleVideo}
-                className={`p-3 rounded-full transition duration-200 shadow-md ${
-                  isVideoOn
-                    ? "bg-green-500 hover:bg-green-600"
-                    : "bg-red-500 hover:bg-red-600"
-                }`}
+                onClick={handleEndCall}
+                className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-full transition duration-200 shadow-lg flex items-center justify-center"
               >
-                {isVideoOn ? (
-                  <Video size={22} className="text-white" />
-                ) : (
-                  <VideoOff size={22} className="text-white" />
-                )}
+                <PhoneOff size={28} />
               </button>
               <button
-                onClick={toggleAudio}
-                className={`p-3 rounded-full transition duration-200 shadow-md ${
-                  isAudioOn
-                    ? "bg-green-500 hover:bg-green-600"
-                    : "bg-red-500 hover:bg-red-600"
-                }`}
+                onClick={handleSkip}
+                className="bg-gray-600 hover:bg-gray-700 text-white rounded-full p-3 transition duration-200 shadow-md"
               >
-                {isAudioOn ? (
-                  <Mic size={22} className="text-white" />
-                ) : (
-                  <MicOff size={22} className="text-white" />
-                )}
+                <SkipForward size={18} />
               </button>
             </div>
           </div>
-          <div className="flex-1 flex flex-col">
+        </div>
+
+        <div className="w-1/2 flex flex-col bg-gray-800 rounded-2xl shadow-xl overflow-hidden relative">
+          <video
+            ref={localVideo}
+            autoPlay
+            playsInline
+            muted
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end">
             <div
               ref={chatContainerRef}
-              className="flex-1 p-4 space-y-4 overflow-y-auto"
+              className="p-4 space-y-4 overflow-y-auto max-h-[70%] scrollbar-hide"
             >
               {messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`flex ${
-                    msg.sender === "You" ? "justify-end" : "justify-start"
-                  }`}
-                >
+                <div key={index} className="flex items-start space-x-2">
+                  <img
+                    src={logo}
+                    alt="User"
+                    className="w-8 h-8 rounded-full border-2 border-gray-600 self-start"
+                  />
                   <div
                     className={`p-3 rounded-lg max-w-[75%] ${
                       msg.sender === "You"
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-100 text-gray-800"
-                    } shadow-md`}
+                        ? "bg-blue-500 bg-opacity-75 text-white"
+                        : "bg-gray-600 bg-opacity-75 text-gray-100"
+                    } shadow-md ml-2`}
                   >
                     <p className="text-sm leading-snug">{msg.text}</p>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="p-4 bg-gray-50">
+            <div className="p-4">
               <form
                 onSubmit={handleSendMessage}
                 className="flex items-center space-x-2"
               >
-                <input
-                  type="text"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  className="flex-1 bg-white border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-                />
-                <button
-                  type="submit"
-                  className="bg-blue-500 hover:bg-blue-600 text-white rounded-full p-3 transition duration-200 shadow-md"
-                >
-                  <Send size={22} />
-                </button>
-                <button
-                  onClick={handleSkip}
-                  className="bg-gray-500 hover:bg-gray-600 text-white rounded-full p-3 transition duration-200 shadow-md"
-                >
-                  <SkipForward size={22} />
-                </button>
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Type a message..."
+                    className="w-full bg-gray-700 border border-gray-600 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-gray-100 placeholder-gray-400 pr-12"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 hover:bg-blue-600 text-white rounded-full p-2 transition duration-200 shadow-md"
+                  >
+                    <SendHorizontal size={20} strokeWidth={1.5} />
+                  </button>
+                </div>
               </form>
             </div>
           </div>
