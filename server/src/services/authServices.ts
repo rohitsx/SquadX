@@ -1,31 +1,52 @@
 import express from "express";
 import client from "../config/database";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config/environment";
+import { JWT_SECRET, SALT_ROUNDS } from "../config/environment";
+import bcrypt from "bcrypt";
 
 class AuthServices {
   static async login(req: express.Request, res: express.Response) {
-    console.log('loggin in');
-    
     const { email, password } = req.body;
-    const query = "SELECT * FROM users WHERE email = $1 AND password = $2";
-    const result = await client.query(query, [email, password]);
 
-    if (result.rows.length > 0) {
-      try {
-        const token = jwt.sign({ email, password }, JWT_SECRET, {
-          expiresIn: "15d",
+    try {
+      const query = "SELECT * FROM users WHERE email = $1";
+      const result = await client.query(query, [email]);
+
+      if (result.rows.length > 0) {
+        const storedHashedPassword = result.rows[0].password;
+
+        const passwordMatch = await bcrypt.compare(
+          password,
+          storedHashedPassword
+        );
+
+        if (passwordMatch) {
+          console.log("Logging in");
+          const username = result.rows[0].username;
+
+          const token = jwt.sign({ email, username }, JWT_SECRET, {
+            expiresIn: "15d",
+          });
+
+          const refreshTokenQuery =
+            "INSERT INTO refresh_tokens (username, refresh_token) VALUES ($1, $2)";
+          await client.query(refreshTokenQuery, [username, token]);
+
+          res.json({ message: "Login successful", token, username, email });
+        } else {
+          res.status(401).send({
+            message: "Invalid password, please check your login details",
+          });
+        }
+      } else {
+        res.status(401).send({
+          message: "User not found, please check your email",
         });
-        const query =
-          "INSERT INTO refresh_tokens (username, refresh_token) VALUES ($1, $2)";
-        await client.query(query, [result.rows[0].username, token]);
-        res.json({ message: "Login successful", token, email });
-      } catch (error) {
-        console.log(error);
       }
-    } else {
-      res.status(401).send({
-        message: "Invalid user, please check your username and password",
+    } catch (error) {
+      console.log("Login error:", error);
+      res.status(500).send({
+        message: "Server error during login",
       });
     }
   }
@@ -33,12 +54,25 @@ class AuthServices {
   static async signup(req: express.Request, res: express.Response) {
     const { username, email, password, dob } = req.body;
     try {
-      const query =
-        "INSERT INTO users (username, email, password, dob) VALUES ($1, $2, $3, $4)";
-      await client.query(query, [username, email, password, dob]);
-      res.send("Signup successful");
+      const hashedPassword = await bcrypt.hash(password, Number(SALT_ROUNDS));
+      const result = await client.query(
+        "SELECT * FROM users WHERE email = $1",
+        [email]
+      );
+      if (result.rows.length > 0) {
+        res.send("User already exists, please login");
+        return;
+      } else {
+        console.log("this in is running");
+
+        const query =
+          "INSERT INTO users (username, email, password, dob) VALUES ($1, $2, $3, $4)";
+        await client.query(query, [username, email, hashedPassword, dob]);
+        res.send("Signup successful, please login");
+      }
     } catch (error) {
-      console.log(error);
+      console.log("singup error");
+      res.send("server error");
     }
   }
 

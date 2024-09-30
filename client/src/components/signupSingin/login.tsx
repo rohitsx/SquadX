@@ -10,13 +10,12 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [popMessage, setPopMessage] = useState("");
+  const [popMessage, setPopMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
-
-  
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
 
     axios
       .post(import.meta.env.VITE_API_URL + "/login", {
@@ -24,21 +23,24 @@ const LoginPage: React.FC = () => {
         password,
       })
       .then((res) => {
-        // console.log(res.data);
+    console.log('working');
+
         if (res.data.token) {
+
           localStorage.setItem("token", res.data.token);
-          localStorage.setItem("email", res.data.email);
+          localStorage.setItem("email", res.data.username);
           setPopMessage(res.data.message || "Login successful");
           navigate("/");
-        } else {          
+        } else {
           setPopMessage(res.data.message || "Login failed");
         }
       })
       .catch((err) => {
-        setPopMessage("An error occurred. Please try again.");
-        console.log(err);
+        setPopMessage(err.response.data.message || "Login failed");
+        console.log(err.response.data.message);
       });
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
@@ -56,7 +58,7 @@ const LoginPage: React.FC = () => {
         </video>
         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
       </div>
-      {popMessage && <PopUp message={popMessage} />}
+      {popMessage && <PopUp message={popMessage} setMessage={setPopMessage}/>}
 
       <div className="z-10 w-full max-w-md p-10 space-y-8 bg-black bg-opacity-50 rounded-xl backdrop-blur-md">
         <div className="text-center">
