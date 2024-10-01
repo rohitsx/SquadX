@@ -52,6 +52,8 @@ class AuthServices {
   }
 
   static async signup(req: express.Request, res: express.Response) {
+    console.log('singup');
+    
     const { username, email, password, dob } = req.body;
     try {
       const hashedPassword = await bcrypt.hash(password, Number(SALT_ROUNDS));

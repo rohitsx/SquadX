@@ -19,7 +19,7 @@ interface Message {
 }
 
 interface PeerData {
-  strangerId: string;
+  pairedUserId: string;
   polite: boolean;
 }
 
@@ -51,10 +51,18 @@ export default function VideoCall(): JSX.Element {
     socket.emit("connectPeer");
 
     socket.on("peer", (v: PeerData) => {
-      setStrangerId(v.strangerId);
+      setStrangerId(v.pairedUserId);
       polite.current = v.polite;
       setIsMatched(true);
     });
+
+    socket.on('strangerLeft', () => {
+      setIsMatched(false);
+      setMessages([]);
+      setStrangerId(null);
+      polite.current = false;
+      socket.emit('connectPeer')
+    })
 
     return () => {
       socket.off("disconnect");
@@ -161,7 +169,7 @@ export default function VideoCall(): JSX.Element {
   const handleSkip = () => {
     setIsMatched(false);
     setMessages([]);
-    socket.emit("skip");
+    socket.emit("skip", strangerId);
   };
 
   const handleEndCall = () => {
