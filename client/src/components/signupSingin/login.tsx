@@ -28,7 +28,7 @@ const LoginPage: React.FC = () => {
         if (res.data.token) {
 
           localStorage.setItem("token", res.data.token);
-          localStorage.setItem("email", res.data.username);
+          localStorage.setItem("username", res.data.username);
           setPopMessage(res.data.message || "Login successful");
           navigate("/");
         } else {

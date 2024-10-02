@@ -44,10 +44,21 @@ export default class socketServices {
   ): Promise<void> {
     try {
       await this.handleUserJoin(socketId, username);
-      this.io.to(pairedId).emit('strangerLeft');
+      this.io.to(pairedId).emit("strangerLeft");
     } catch (error) {
       console.error("Error in handleUserLeave:", error);
       throw error;
+    }
+  }
+
+  async handleCallEnd(pairedId: string, username: string, socketId : string): Promise<void> {
+    console.log("handel tab close working", pairedId);
+
+    try {
+      pairedId && this.io.to(pairedId).emit("strangerLeft");
+      await this.dbHelper.deleteFromActiveUsers(socketId, socketId);
+    } catch (err) {
+      console.log(err);
     }
   }
 

@@ -4,7 +4,7 @@ import socketDatabaseHelper from "../services/socketServiceHelper";
 export default async function makePair(username: string, socketId: string, activeUsersLen: number, io: Server) { 
     const dbHelper = new socketDatabaseHelper();
     try {
-        const randomUser = await dbHelper.getRandomUser();
+        const randomUser = await dbHelper.getRandomUser(username);
         
         console.log('randome usern', randomUser);
         

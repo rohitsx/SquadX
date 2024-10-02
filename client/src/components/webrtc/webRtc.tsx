@@ -20,6 +20,7 @@ interface Message {
 
 interface PeerData {
   pairedUserId: string;
+  strangerUsername: string;
   polite: boolean;
 }
 
@@ -27,11 +28,12 @@ export default function VideoCall(): JSX.Element {
   const socket: Socket = useMemo(() => {
     return io(import.meta.env.VITE_APP_WEBSOCKET_URL, {
       transports: ["websocket"],
-      auth: { username: localStorage.getItem("email") },
+      auth: { username: localStorage.getItem("username") },
     });
   }, []);
 
   const [strangerId, setStrangerId] = useState<string | null>(null);
+  const [strangerUsername, setStrangerUsername] = useState<string | null>(null);
   const [isNavOpen, setIsNavOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -46,35 +48,62 @@ export default function VideoCall(): JSX.Element {
   const pcRef = useRef<RTCPeerConnection | null>(null);
 
   useEffect(() => {
+    let pairId: null | string;
     socket.on("disconnect", () => console.log("socket not working"));
     socket.on("connect", () => console.log("socket working"));
     socket.emit("connectPeer");
 
     socket.on("peer", (v: PeerData) => {
+      pairId = v.pairedUserId;
       setStrangerId(v.pairedUserId);
+      setStrangerUsername(v.strangerUsername);
       polite.current = v.polite;
       setIsMatched(true);
     });
 
-    socket.on('strangerLeft', () => {
+    socket.on("strangerLeft", () => {
+      console.log("this one is workin");
+
       setIsMatched(false);
       setMessages([]);
       setStrangerId(null);
       polite.current = false;
-      socket.emit('connectPeer')
-    })
+      socket.emit("connectPeer");
+
+      // Stop the remote stream
+      if (remoteVideo.current && remoteVideo.current.srcObject) {
+        const stream = remoteVideo.current.srcObject as MediaStream;
+        stream.getTracks().forEach((track) => track.stop());
+        remoteVideo.current.srcObject = null;
+      }
+
+      // Close the existing peer connection
+      if (pcRef.current) {
+        pcRef.current.close();
+        pcRef.current = null;
+      }
+    });
+
+    const handleBeforeUnload = () => {
+      socket.emit("pairedclosedtab", pairId);
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
       socket.off("disconnect");
       socket.off("connect");
       socket.off("peer");
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [socket]);
 
   useEffect(() => {
     if (!strangerId) return;
 
-    const config: RTCConfiguration = { iceServers: [{ urls: "stun:stun.mystunserver.tld" }] };
+    const config: RTCConfiguration = {
+      iceServers: [{ urls: "stun:stun.mystunserver.tld" }],
+    };
     const pc = new RTCPeerConnection(config);
     pcRef.current = pc;
 
@@ -120,38 +149,44 @@ export default function VideoCall(): JSX.Element {
       socket.emit("message", { candidate, to: strangerId });
     };
 
-    socket.on("message", async (m: { description?: RTCSessionDescriptionInit, candidate?: RTCIceCandidateInit }) => {
-      if (!m) return;
-      const { description, candidate } = m;
+    socket.on(
+      "message",
+      async (m: {
+        description?: RTCSessionDescriptionInit;
+        candidate?: RTCIceCandidateInit;
+      }) => {
+        if (!m) return;
+        const { description, candidate } = m;
 
-      try {
-        if (description) {
-          const offerCollision =
-            description.type === "offer" &&
-            (makingOffer.current || pc.signalingState !== "stable");
+        try {
+          if (description) {
+            const offerCollision =
+              description.type === "offer" &&
+              (makingOffer.current || pc.signalingState !== "stable");
 
-          ignoreOffer.current = !polite.current && offerCollision;
-          if (ignoreOffer.current) return;
+            ignoreOffer.current = !polite.current && offerCollision;
+            if (ignoreOffer.current) return;
 
-          await pc.setRemoteDescription(description);
-          if (description.type === "offer") {
-            await pc.setLocalDescription();
-            socket.emit("message", {
-              description: pc.localDescription,
-              to: strangerId,
-            });
+            await pc.setRemoteDescription(description);
+            if (description.type === "offer") {
+              await pc.setLocalDescription();
+              socket.emit("message", {
+                description: pc.localDescription,
+                to: strangerId,
+              });
+            }
+          } else if (candidate) {
+            try {
+              await pc.addIceCandidate(candidate);
+            } catch (err) {
+              if (!ignoreOffer.current) throw err;
+            }
           }
-        } else if (candidate) {
-          try {
-            await pc.addIceCandidate(candidate);
-          } catch (err) {
-            if (!ignoreOffer.current) throw err;
-          }
+        } catch (err) {
+          console.error("Error processing message:", err);
         }
-      } catch (err) {
-        console.error("Error processing message:", err);
       }
-    });
+    );
 
     return () => {
       pc.close();
@@ -210,7 +245,9 @@ export default function VideoCall(): JSX.Element {
               alt="User"
               className="w-8 h-8 rounded-full border-2 border-blue-400"
             />
-            <span className="font-medium">Username</span>
+            <span className="font-medium">
+              {localStorage.getItem("username")}
+            </span>
             <ChevronDown size={16} className="text-gray-400" />
           </button>
           {isNavOpen && (
@@ -310,6 +347,7 @@ export default function VideoCall(): JSX.Element {
                 </div>
               ))}
             </div>
+            <div>{strangerUsername}</div>
             <div className="p-4">
               <form
                 onSubmit={handleSendMessage}

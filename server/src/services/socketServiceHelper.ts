@@ -13,8 +13,8 @@ export default class socketDatabaseHelper {
 
   async addToActiveUsers(socketId: string, username: string): Promise<void> {
     try {
-      console.log('username',username);
-      
+      console.log("username", username);
+
       await client.query(
         "INSERT INTO active_users (socket_id, username) VALUES ($1, $2)",
         [socketId, username]
@@ -26,48 +26,32 @@ export default class socketDatabaseHelper {
     }
   }
 
-  async updateActiveUser(
-    username: string,
-    socketId: string
-  ): Promise<void> {
+  async updateActiveUser(username: string, socketId: string): Promise<void> {
     try {
       //check if user exits
       const result = await client.query(
         "SELECT * FROM active_users WHERE username = $1",
         [username]
       );
-      
+
       if (result.rows.length === 1) {
         //update
         await client.query(
           "UPDATE active_users SET socket_id = $1 WHERE username = $2",
           [socketId, username]
         );
-      } 
+      }
     } catch {
       console.log("updateActiveUser error");
     }
-  }
-
-  async deleteFromActivePair(socketId: string): Promise<void> {
-    await client.query(
-      "DELETE FROM activepair WHERE socket_id1 = $1 OR socket_id2 = $1",
-      [socketId]
-    );
-  }
-
-  async getActivePair(socketId: string): Promise<any> {
-    const result = await client.query(
-      "SELECT * FROM activepair WHERE socket_id1 = $1 OR socket_id2 = $1",
-      [socketId]
-    );
-    return result.rows[0];
   }
 
   async deleteFromActiveUsers(
     username: string,
     socketId: string
   ): Promise<any> {
+    console.log("working", username, socketId);
+
     const result = await client.query(
       "DELETE FROM active_users WHERE username = $1 AND socket_id = $2",
       [username, socketId]
@@ -86,17 +70,30 @@ export default class socketDatabaseHelper {
   async getActiveUsersLength(): Promise<number | null> {
     try {
       const result = await client.query("SELECT COUNT(*) FROM active_users");
-      
+
       return result.rows[0].count;
     } catch (err) {
       return null;
     }
   }
 
-  async getRandomUser(): Promise<any> {
+  async getRandomUser(excludeUsername: string): Promise<any> {
     const result = await client.query(
-      "SELECT * FROM active_users ORDER BY RANDOM() LIMIT 1"
+      "SELECT * FROM active_users WHERE username != $1 ORDER BY RANDOM() LIMIT 1",
+      [excludeUsername]
     );
     return result.rows[0];
+  }
+
+  async checkUserExists(username: string): Promise<any> {
+    try {
+      const result = await client.query(
+        "SELECT * FROM active_users WHERE username = $1",
+        [username]
+      );
+      return result.rows[0];
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
