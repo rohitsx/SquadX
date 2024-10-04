@@ -1,5 +1,5 @@
-import { validateToken } from "@/lib/validateToken";
-import VideoCall from "../webrtc/webRtc";
+import { validateToken } from "@/utils/validateToken";
+import VideoCall from "./videoCall";
 
 export default function Home() {
   validateToken();
