@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import  { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import useSocket from "../hooks/useSocket";
 import ChatBox from "./chatInterface";

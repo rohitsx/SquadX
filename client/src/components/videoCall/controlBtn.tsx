@@ -1,7 +1,6 @@
 import { Flag, PhoneOff, SkipForward } from "lucide-react";
 import { Socket } from "socket.io-client";
 import { useStartPage } from "../home";
-import axios from "axios";
 
 interface Message {
     text: string;

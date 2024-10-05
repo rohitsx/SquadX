@@ -11,7 +11,6 @@ import "./index.css";
 import ProfilePage from "./components/profile";
 import SettingsPage from "./components/setting";
 import AboutSection from "./components/about";
-import Koki from "./components/logout";
 
 function App() {
   return (
