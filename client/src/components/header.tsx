@@ -9,7 +9,7 @@ export default function Header() {
     <header className="bg-gray-800 shadow-md p-4 flex justify-between items-center">
       <div className="flex items-center">
         <img src={logo} alt="Logo" className="h-10 w-10 mr-3 rounded-md" />
-        <span className="font-bold text-2xl text-blue-400">VideoChat Pro</span>
+        <span className="font-bold text-2xl text-blue-400">Criminal.lol</span>
       </div>
       <div className="relative">
         <button
@@ -31,12 +31,12 @@ export default function Header() {
             {[
               { icon: User, text: "Profile" },
               { icon: Settings, text: "Settings" },
-              { icon: HelpCircle, text: "Help" },
+              { icon: HelpCircle, text: "about" },
               { icon: LogOut, text: "Logout" },
             ].map(({ icon: Icon, text }) => (
               <a
                 key={text}
-                href="#"
+                href={text}
                 className="flex items-center px-4 py-2 hover:bg-gray-700 transition duration-200"
               >
                 <Icon className="mr-3 text-blue-400" size={18} />

@@ -17,6 +17,8 @@ export default class socketServices {
 
   async handleUserJoin(socketId: string, username: string): Promise<void> {
     try {
+      console.log('send request', username);
+      
       const checkSocketUpdate = await this.dbHelper.updateActiveUser(
         username,
         socketId
@@ -56,78 +58,9 @@ export default class socketServices {
 
     try {
       pairedId && this.io.to(pairedId).emit("strangerLeft");
-      await this.dbHelper.deleteFromActiveUsers(socketId, socketId);
+      await this.dbHelper.deleteFromActiveUsers(username, socketId);
     } catch (err) {
       console.log(err);
     }
   }
-
-  // async removeUser(socketId: string, username: string): Promise<void> {
-  //   try {
-  //     let deleteResult = await this.dbHelper.removeUserFromActiveUsers(username, socketId);
-  //     if (deleteResult === 0) {
-  //       deleteResult = await this.dbHelper.removeUserBySocketId(socketId);
-  //       if (deleteResult === 0) {
-  //         throw new Error('No user found');
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error('Error in removeUser:', error);
-  //     throw error;
-  //   }
-  // }
-
-  // async updateUserSocketId(username: string, newSocketId: string): Promise<void> {
-  //   try {
-  //     await this.dbHelper.updateSocketId(username, newSocketId);
-  //   } catch (error) {
-  //     console.error('Error in updateUserSocketId:', error);
-  //     throw error;
-  //   }
-  // }
-
-  // async handleUserLeave(socketId: string): Promise<void> {
-  //   try {
-  //     const pair = await this.dbHelper.getActivePair(socketId);
-  //     if (pair) {
-  //       const otherSocketId = pair.socketid1 === socketId ? pair.socketid2 : pair.socketid1;
-  //       const otherUsername = pair.socketid1 === socketId ? pair.username2 : pair.username1;
-
-  //       this.io.to(otherSocketId).emit('userLeftTheChat');
-  //       await this.dbHelper.deleteFromActivePair(socketId);
-
-  //       const activeUsers = await this.dbHelper.getActiveUsers();
-  //       if (activeUsers.length > 0) {
-  //         await makePair(otherUsername, otherSocketId);
-  //       } else {
-  //         await this.dbHelper.addToActiveUsers(otherSocketId, otherUsername);
-  //         this.emitWaitingStatus(otherSocketId);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error('Error in handleUserLeave:', error);
-  //     throw error;
-  //   }
-  // }
-
-  // async handleReconnect(socketId: string, username: string): Promise<void> {
-  //   try {
-  //     const pair = await this.dbHelper.getActivePair(socketId);
-  //     if (!pair) {
-  //       const activeUsers = await this.dbHelper.getActiveUsers();
-  //       const existingUser = activeUsers.find(user => user.username === username);
-  //       if (existingUser) {
-  //         await this.dbHelper.updateSocketId(username, socketId);
-  //       } else {
-  //         await this.dbHelper.addToActiveUsers(socketId, username);
-  //       }
-  //     } else {
-  //       await this.handleUserLeave(socketId);
-  //       await this.handleUserJoin(socketId, username);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error in handleReconnect:', error);
-  //     throw error;
-  //   }
-  // }
 }

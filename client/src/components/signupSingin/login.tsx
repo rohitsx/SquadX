@@ -15,6 +15,7 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('working');
     
 
     axios

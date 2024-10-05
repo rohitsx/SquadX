@@ -41,8 +41,8 @@ export default class socketDatabaseHelper {
           [socketId, username]
         );
       }
-    } catch {
-      console.log("updateActiveUser error");
+    } catch(err) {
+      console.log("updateActiveUser error",err);
     }
   }
 
@@ -53,7 +53,7 @@ export default class socketDatabaseHelper {
     console.log("working", username, socketId);
 
     const result = await client.query(
-      "DELETE FROM active_users WHERE username = $1 AND socket_id = $2",
+      "DELETE FROM active_users WHERE username = $1 OR socket_id = $2",
       [username, socketId]
     );
     return result.rowCount;

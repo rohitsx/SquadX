@@ -8,6 +8,10 @@ import Dashboard from "./components/landing/dashboard";
 import Passcode from "./assets/utils/passcode";
 import ErrorPage from "./assets/utils/errorPage";
 import "./index.css";
+import ProfilePage from "./components/profile";
+import SettingsPage from "./components/setting";
+import AboutSection from "./components/about";
+import Koki from "./components/logout";
 
 function App() {
   return (
@@ -20,6 +24,9 @@ function App() {
         <Route path="/logout" element={<Logout />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/passcode" element={<Passcode />} />
+        <Route path="profile" element={<ProfilePage />} />
+        <Route path="/Settings" element={<SettingsPage />} />
+        <Route path="/about" element={<AboutSection />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </Router>

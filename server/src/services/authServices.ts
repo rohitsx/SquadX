@@ -3,9 +3,11 @@ import client from "../config/database";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET, SALT_ROUNDS } from "../config/environment";
 import bcrypt from "bcrypt";
+import { AsyncLocalStorage } from "async_hooks";
 
 class AuthServices {
   static async login(req: express.Request, res: express.Response) {
+    
     const { email, password } = req.body;
 
     try {
