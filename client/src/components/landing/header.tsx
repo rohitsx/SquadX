@@ -1,5 +1,5 @@
 import { useState } from "react";
-import logo from "../assets/img/btc.png";
+import logo from "../../assets/img/btc.png"
 import { User, Settings, HelpCircle, LogOut, ChevronDown } from "lucide-react";
 
 export default function Header() {

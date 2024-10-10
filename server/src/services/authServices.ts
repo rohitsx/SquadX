@@ -3,7 +3,7 @@ import client from "../config/database";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET, SALT_ROUNDS } from "../config/environment";
 import bcrypt from "bcrypt";
-import { AsyncLocalStorage } from "async_hooks";
+let count = 0;
 
 class AuthServices {
   static async login(req: express.Request, res: express.Response) {
@@ -30,9 +30,9 @@ class AuthServices {
             expiresIn: "15d",
           });
 
-          const refreshTokenQuery =
-            "INSERT INTO refresh_tokens (username, refresh_token) VALUES ($1, $2)";
-          await client.query(refreshTokenQuery, [username, token]);
+          //const refreshTokenQuery =
+          //"INSERT INTO refresh_tokens (username, refresh_token) VALUES ($1, $2)";
+          //await client.query(refreshTokenQuery, [username, token]);
 
           res.json({ message: "Login successful", token, username, email });
         } else {
@@ -83,14 +83,18 @@ class AuthServices {
   static async validateToken(req: express.Request, res: express.Response) {
     const { token } = req.body;
 
-    if (!token) {
-      return res.status(401).json({ valid: false });
-    }
+   // if (!token) {
+   //   return res.status(401).json({ valid: false });
+   // }
 
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
+	  if(decoded) res.json({ valid: true });  
+	  count += 1;
+	  console.log(count);
     } catch (error) {
       res.json({ valid: false });
+	  console.log('error in validate token', error);
     }
   }
 }

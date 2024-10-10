@@ -13,12 +13,11 @@ export default class socketDatabaseHelper {
 
   async addToActiveUsers(socketId: string, username: string): Promise<void> {
     try {
-      console.log("username", username);
-
       await client.query(
         "INSERT INTO active_users (socket_id, username) VALUES ($1, $2)",
         [socketId, username]
       );
+	  console.log('user', username, "added to db")
     } catch (err) {
       console.log(err);
 
@@ -50,8 +49,6 @@ export default class socketDatabaseHelper {
     username: string,
     socketId: string
   ): Promise<any> {
-    console.log("working", username, socketId);
-
     const result = await client.query(
       "DELETE FROM active_users WHERE username = $1 OR socket_id = $2",
       [username, socketId]

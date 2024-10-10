@@ -1,7 +1,7 @@
 import React, { useState, createContext, useContext } from "react";
-import { useValidateToken } from "./hooks/useValidateToken";
-import StartPage from "./videoCall/startVideoCall";
-import VideoCall from "./videoCall/videoCall";
+import { useValidateToken } from "../../hooks/useValidateToken";
+import StartPage from "../videoCall/startCall";
+import Call from "../videoCall/solocall";
 
 interface StartPageContextType {
   startPage: boolean;
@@ -25,7 +25,7 @@ const Home: React.FC = () => {
 
   return (
     <StartPageContext.Provider value={{ startPage, setStartPage }}>
-      {startPage ? <VideoCall /> : <StartPage/>}
+      {startPage ? <Call /> : <StartPage/>}
     </StartPageContext.Provider>
   );
 };

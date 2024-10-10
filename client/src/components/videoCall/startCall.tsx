@@ -1,7 +1,7 @@
-import Header from '../header';
-import { useStartPage } from '../home';
+import Header from '../landing/header'
+import { useStartPage } from '../landing/home';
 
-export default function StartPage() {
+export default function StartCall() {
   const { setStartPage } = useStartPage();
   
 

@@ -3,7 +3,7 @@ import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import bgVideo from "../../assets/img/bg.mp4";
 import logo from "../../assets/img/btc.png";
-import PopUp from "@/assets/utils/popUp";
+import PopUp from "../../utils/popUp";
 
 const RegisterPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);

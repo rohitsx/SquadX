@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useValidateToken } from "../hooks/useValidateToken";
+import { useValidateToken } from "../../hooks/useValidateToken";
 
 export default function Logout() {
     useValidateToken();

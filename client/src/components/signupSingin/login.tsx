@@ -3,7 +3,7 @@ import { Eye, EyeOff } from "lucide-react";
 import bgVideo from "../../assets/img/bg.mp4";
 import logo from "../../assets/img/btc.png";
 import axios from "axios";
-import PopUp from "../../assets/utils/popUp";
+import PopUp from "../../utils/popUp"
 import { useNavigate } from "react-router-dom";
 
 const LoginPage: React.FC = () => {
@@ -15,8 +15,6 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('working');
-    
 
     axios
       .post(import.meta.env.VITE_API_URL + "/login", {
@@ -24,7 +22,6 @@ const LoginPage: React.FC = () => {
         password,
       })
       .then((res) => {
-    console.log('working');
 
         if (res.data.token) {
 

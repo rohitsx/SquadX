@@ -17,12 +17,9 @@ export default class socketServices {
 
   async handleUserJoin(socketId: string, username: string): Promise<void> {
     try {
-      console.log('send request', username);
-      
-      const checkSocketUpdate = await this.dbHelper.updateActiveUser(
-        username,
-        socketId
-      );
+      console.log("username:", username);
+
+      await this.dbHelper.updateActiveUser(username, socketId);
 
       const activeUsersLen = await this.dbHelper.getActiveUsersLength();
 
@@ -31,7 +28,7 @@ export default class socketServices {
       if (Number(activeUsersLen) === 0) {
         await this.dbHelper.addToActiveUsers(socketId, username);
       } else {
-        await makePair(username, socketId, activeUsersLen, this.io);
+        await makePair(username, socketId, this.io);
       }
     } catch (error) {
       console.error("Error in handleUserJoin:", error);
@@ -42,7 +39,7 @@ export default class socketServices {
   async handleUserSkip(
     pairedId: string,
     socketId: string,
-    username: string
+    username: string,
   ): Promise<void> {
     try {
       await this.handleUserJoin(socketId, username);
@@ -53,7 +50,11 @@ export default class socketServices {
     }
   }
 
-  async handleCallEnd(pairedId: string, username: string, socketId : string): Promise<void> {
+  async handleCallEnd(
+    pairedId: string,
+    username: string,
+    socketId: string,
+  ): Promise<void> {
     console.log("handel tab close working", pairedId);
 
     try {

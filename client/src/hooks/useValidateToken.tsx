@@ -5,6 +5,12 @@ import { useNavigate } from "react-router-dom";
 export const useValidateToken = () => {
   const navigate = useNavigate();
 
+  function logout() {
+	console.log('logging out')
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    navigate("/login");
+  }
   useEffect(() => {
     const token = localStorage.getItem("token");
     const username = localStorage.getItem("username");
@@ -20,17 +26,13 @@ export const useValidateToken = () => {
         token,
       })
       .then((response) => {
-        if (!response.data.valid) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("username");
-          navigate("/login");
-        }
+        const valid = response.data.valid;
+        if (!valid) logout
+		return
       })
       .catch((err) => {
         console.log("Error during token validation:", err);
-        localStorage.removeItem("token");
-        localStorage.removeItem("username");
-        navigate("/login");
+		logout();
       });
-  }, [navigate]); 
+  }, []);
 };

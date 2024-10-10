@@ -37,7 +37,7 @@ export default function Controls({
             video: true,
         });
         streams.getTracks().forEach((track) => track.stop());
-        console.log("koki");
+       
         socket?.on("connect", () => console.log("working"));
 
         socket && socket.emit("pairedclosedtab", strangerId);
