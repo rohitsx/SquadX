@@ -1,5 +1,5 @@
-import Header from '../landing/header'
-import { useStartPage } from '../landing/home';
+import { useStartPage } from '@/context/startPageContext';
+import Header from '../pages/header'
 
 export default function StartCall() {
   const { setStartPage } = useStartPage();

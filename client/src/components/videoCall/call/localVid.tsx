@@ -23,7 +23,6 @@ export default function LocalVid({ stream }: LocalVidProps): JSX.Element {
         muted
         className="w-full h-full object-cover"
       />
-      <button onClick={() => Media.Close()}>CloseStream</button>
     </>
   );
 }

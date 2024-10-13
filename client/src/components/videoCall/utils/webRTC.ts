@@ -15,11 +15,14 @@ export class WebRTC {
   public PeerConnection: RTCPeerConnection;
   private MakingOffer: boolean;
   private IgnoreOffer: boolean;
+  public polite: boolean;
+	
 
   constructor() {
     this.PeerConnection = new RTCPeerConnection();
     this.MakingOffer = false;
     this.IgnoreOffer = false;
+	this.polite = false;
   }
 
   public async start() {
@@ -33,11 +36,9 @@ export class WebRTC {
   public async sendOffer(socket: Socket, strangerId: string) {
     for (const track of Media.Stream.getTracks()) {
       this.PeerConnection.addTrack(track, Media.Stream);
-      console.log("added track");
     }
     this.PeerConnection.onicecandidate = ({ candidate }) => {
       socket.emit("message", { candidate, to: strangerId });
-      console.log("send candidate");
     };
 
     this.PeerConnection.onnegotiationneeded = async () => {
@@ -48,7 +49,6 @@ export class WebRTC {
           description: this.PeerConnection.localDescription,
           to: strangerId,
         });
-        console.log("send offer");
       } catch (err) {
         console.error("error sending offer", err);
       } finally {
@@ -58,7 +58,7 @@ export class WebRTC {
   }
 
   public async handelOffer({ socket, message, strangerId, polite }: handelOfferProp) {
-    console.log("recived offer");
+	this.polite = polite
     const { description, candidate } = message;
     try {
       if (description) {
@@ -66,8 +66,8 @@ export class WebRTC {
           description.type === "offer" &&
           (this.MakingOffer || this.PeerConnection.signalingState !== "stable");
 
-		console.log('polite', polite)
-        this.IgnoreOffer = !polite && offerCollision;
+		console.log('polite', this.polite)
+        this.IgnoreOffer = !this.polite && offerCollision;
         if (this.IgnoreOffer) return;
 
         await this.PeerConnection.setRemoteDescription(description);

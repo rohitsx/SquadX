@@ -1,7 +1,4 @@
-import React, { useState, createContext, useContext } from "react";
-import { useValidateToken } from "../../hooks/useValidateToken";
-import StartPage from "../videoCall/startCall";
-import Call from "../videoCall/solocall";
+import React, { createContext, useContext, useState } from "react";
 
 interface StartPageContextType {
   startPage: boolean;
@@ -18,16 +15,12 @@ export const useStartPage = () => {
   return context;
 };
 
-const Home: React.FC = () => {
-  useValidateToken();
-
+export const StartPageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [startPage, setStartPage] = useState<boolean>(false);
 
   return (
     <StartPageContext.Provider value={{ startPage, setStartPage }}>
-      {startPage ? <Call /> : <StartPage/>}
+      {children}
     </StartPageContext.Provider>
   );
 };
-
-export default Home;

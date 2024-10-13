@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { Socket, io } from "socket.io-client";
 
 export default function useSocket(): Socket | null {
@@ -9,6 +9,14 @@ export default function useSocket(): Socket | null {
       auth: { username: localStorage.getItem("username") },
     });
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [socket]);
 
   return socket;
 }

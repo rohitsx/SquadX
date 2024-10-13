@@ -1,15 +1,15 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Home from "./components/landing/home";
+import Home from "./components/pages/home";
 import Login from "./components/signupSingin/login";
 import Register from "./components/signupSingin/register";
 import ForgotPassword from "./utils/forgotPassword"
 import Logout from "./components/signupSingin/logout";
-import Dashboard from "./components/landing/dashboard";
+import Dashboard from "./components/pages/dashboard";
 import Passcode from "./utils/passcode";
 import ErrorPage from "./utils/passcode"
-import ProfilePage from "./components/landing/profile";
-import SettingsPage from  "./components/landing/setting";
-import AboutSection from  "./components/landing/about";
+import ProfilePage from "./components/pages/profile";
+import SettingsPage from  "./components/pages/setting";
+import AboutSection from  "./components/pages/about";
 import "./index.css";
 
 function App() {

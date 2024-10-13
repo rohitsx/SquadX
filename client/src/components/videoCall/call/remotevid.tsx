@@ -9,10 +9,10 @@ export default function RemoteVid({ pc }: RemoteVidProp): JSX.Element {
 
   useEffect(() => {
     if (!pc) return;
+
     pc.ontrack = (event) => {
       if (vid.current && event.streams && event.streams[0]) {
         vid.current.srcObject = event.streams[0];
-        console.log("event stream", event.streams);
       }
     };
   }, [pc]);

@@ -17,11 +17,12 @@ export default class socketServices {
 
   async handleUserJoin(socketId: string, username: string): Promise<void> {
     try {
-      console.log("username:", username);
+      console.log("username", username,"socektId", socketId);
 
       await this.dbHelper.updateActiveUser(username, socketId);
 
       const activeUsersLen = await this.dbHelper.getActiveUsersLength();
+	  console.log('activeUsersLen', activeUsersLen)
 
       if (!activeUsersLen) return;
 
@@ -55,11 +56,10 @@ export default class socketServices {
     username: string,
     socketId: string,
   ): Promise<void> {
-    console.log("handel tab close working", pairedId);
-
     try {
-      pairedId && this.io.to(pairedId).emit("strangerLeft");
       await this.dbHelper.deleteFromActiveUsers(username, socketId);
+      pairedId && this.io.to(pairedId).emit("strangerLeft");
+	  console.log('user', username, "deleted from db")
     } catch (err) {
       console.log(err);
     }

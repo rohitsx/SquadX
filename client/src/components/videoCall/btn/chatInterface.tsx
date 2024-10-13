@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { SendHorizontal } from "lucide-react";
-import logo from "../../assets/img/btc.png";
+import logo from "../../../assets/img/btc.png"
 
 interface Message {
     text: string;
@@ -10,7 +10,7 @@ interface Message {
 
 interface ChatBoxProps {
     socket: Socket | null;
-    strangerId: string | null;
+    strangerId: string | undefined;
     messages: Message[];
     setMessages: (value: Message[]) => void;
 }
