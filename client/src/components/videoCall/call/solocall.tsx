@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import LocalVid from "./localVid";
 import RemoteVid from "./remotevid";
-import Media from "../utils/MediaStream";
-import { WebRTC } from "../utils/webRTC";
 import ChatBox from "../btn/chatInterface";
 import Controls from "../btn/controlBtn";
 import { io } from "socket.io-client";
+import { useWebRTC } from "@/hooks/useWebRTC";
+import useMedia from "@/hooks/useMedia";
+import useSoloCallUtils from "@/hooks/useSoloCallUtils";
 
 type strangerProp = {
-
   pairId: string;
   pairName: string;
   polite: boolean;
@@ -20,90 +20,53 @@ interface messageProp {
 }
 
 export default function SoloCall() {
-  const [stream, setStream] = useState<MediaStream | null>(null);
   const [stranger, setStranger] = useState<strangerProp | null>(null);
-  const webRTC = useMemo(() => new WebRTC(), [])
-  const socket = useMemo(
-    () =>
-      io(import.meta.env.VITE_APP_WEBSOCKET_URL, {
-        transports: ["websocket"],
-        auth: { username: localStorage.getItem("username") },
-      }),
-    [],
-  );
-  const pc = useMemo(() => webRTC.PeerConnection, [stream, socket, stranger]);
   const [isMatched, setIsMatched] = useState(false);
   const [messages, setMessages] = useState<messageProp[]>([]);
-
-  async function media() {
-    await webRTC.start(); //start the stream too from Media class
-    setStream(Media.Stream);
-  }
-
-  function handelPeer(data: strangerProp) {
-    console.log("recieved strgaer id and username", socket?.id);
-    setStranger({
-      pairId: data.pairId,
-      pairName: data.pairName,
-      polite: data.polite,
+  const { stream, closeStream } = useMedia();
+  const { peerConnection, start, sendOffer, handleOffer, restPc } = useWebRTC(stream);
+  const socket = useMemo(() => {
+    return io(import.meta.env.VITE_APP_WEBSOCKET_URL, {
+      transports: ["websocket"],
+      auth: { username: localStorage.getItem("username") },
     });
-    setIsMatched(true);
-  }
+  }, []);
 
-  function handelCallEnd() {
-    setMessages([]);
-    setStranger(null);
-    webRTC.polite = false;
-  }
-
-  function strangerLeft() {
-    handelCallEnd();
-    socket?.emit("connectPeer");
-    console.log(socket?.id);
-    setIsMatched(false);
-
-    console.log("recieved stranger left");
-  }
-
-  const handleBeforeUnload = () => {
-    socket?.emit("pairedclosedtab", stranger?.pairId);
-    socket?.disconnect();
-  };
+  const { handlePeer, handleCallEnd, strangerLeft, handleBeforeUnload } =
+    useSoloCallUtils(
+      setStranger,
+      socket,
+      setMessages,
+      setIsMatched,
+	  restPc
+    );
 
   useEffect(() => {
-	  media()
+    start();
   }, []);
 
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("connect", () => console.log("socket connected"));
-    socket.emit("connectPeer");
-    socket.on("peer", handelPeer);
+    console.log(socket, isMatched);
+    !isMatched && socket.emit("connectPeer");
+    socket.on("peer", handlePeer);
     socket.on("strangerLeft", strangerLeft);
-    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("beforeunload", () => handleBeforeUnload(stranger?.pairId));
 
     return () => {
-      socket.off("peer", handelPeer);
+      socket.off("peer", handlePeer);
       socket.off("strangerLeft", strangerLeft);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("beforeunload",() => handleBeforeUnload(stranger?.pairId));
     };
   }, [socket, isMatched]);
 
   useEffect(() => {
-    stranger?.pairId ? setIsMatched(true) : setIsMatched(false);
-
-    console.log("isMatched", isMatched);
-    return () => setIsMatched(false);
-  }, [stranger]);
-
-  useEffect(() => {
-    if (pc && socket && stranger) {
-      console.log(stranger.pairName);
-      webRTC.sendOffer(socket, stranger.pairId);
+    if (peerConnection && socket && stranger) {
+      sendOffer(socket, stranger.pairId);
 
       socket.on("message", (m) =>
-        webRTC.handelOffer({
+        handleOffer({
           socket: socket,
           message: m,
           strangerId: stranger.pairId,
@@ -127,11 +90,7 @@ export default function SoloCall() {
         socket.off("peer");
       };
     }
-  }, [pc, socket, stranger]);
-
-  useEffect(() => {
-    if (!socket) return;
-  }, [socket]);
+  }, [peerConnection, socket, stranger]);
 
   return (
     <>
@@ -139,7 +98,7 @@ export default function SoloCall() {
         <div className="flex-1 relative bg-gray-900">
           {isMatched ? (
             <>
-              <RemoteVid pc={pc} />
+              <RemoteVid pc={peerConnection} />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
                 <p className="text-xl font-semibold text-white">
                   {stranger?.pairName}
@@ -150,7 +109,8 @@ export default function SoloCall() {
                 setMessages={setMessages}
                 strangerId={stranger?.pairId}
                 socket={socket}
-                endCall={handelCallEnd}
+                endCall={handleCallEnd}
+				closeStream={closeStream}
               />
             </>
           ) : (
@@ -174,3 +134,4 @@ export default function SoloCall() {
     </>
   );
 }
+

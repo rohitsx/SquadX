@@ -1,4 +1,3 @@
-import Media from "../utils/MediaStream";
 import { useEffect, useRef } from "react";
 
 type LocalVidProps = {

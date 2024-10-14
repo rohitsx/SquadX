@@ -22,10 +22,10 @@ export default async function makePair(username: string, socketId: string, io: S
         };
 
         dbHelper.deleteFromActiveUsers(randomUser.username, randomUser.socket_id);
-		console.log('created pair', user1.name, user2.name)
+		console.log('pair', user1.name, user1.id)
+		console.log('pair', user2.name, user2.id)
         io.to(user1.id).emit("peer", user1);
         io.to(user2.id).emit("peer", user2);
-
     } catch (err) {
         console.log(err);
     }    

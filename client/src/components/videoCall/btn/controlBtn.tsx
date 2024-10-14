@@ -1,6 +1,5 @@
 import { Flag, PhoneOff, SkipForward } from "lucide-react";
 import { Socket } from "socket.io-client";
-import Media from "../utils/MediaStream";
 import { FormEvent } from "react";
 import { useStartPage } from "@/context/startPageContext";
 
@@ -15,6 +14,7 @@ interface ChatBoxProps {
   strangerId: string | undefined;
   socket: Socket | null;
   endCall: () => void;
+  closeStream: () => void;
 }
 
 export default function Controls({
@@ -23,20 +23,22 @@ export default function Controls({
   strangerId,
   socket,
   endCall,
+  closeStream,
 }: ChatBoxProps) {
-  const { setStartPage } =  useStartPage();
+  const { setStartPage } = useStartPage();
   const handleSkip = () => {
+    endCall();
     setIsMatched(false);
     setMessages([]);
     socket && socket.emit("skip", strangerId);
   };
 
   const handleEndCall = async (e: FormEvent) => {
-	e.preventDefault();
-    Media.Close();
+    e.preventDefault();
     socket && socket.emit("pairedclosedtab", strangerId);
     endCall();
     setStartPage(false);
+    closeStream();
   };
   const handleReport = () => {
     console.log();

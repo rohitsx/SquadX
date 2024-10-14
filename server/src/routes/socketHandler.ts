@@ -19,6 +19,7 @@ export function handleSocketConnection(socket: Socket, io: Server) {
     io.to(m.to).emit("chat", m.message),
   );
   socket.on("disconnect", () => {
+	  console.log(username, 'disconnect')
     users = users.filter((id: any) => id !== socket.id);
     io.to(users[0]).emit("strangerLeft");
   });

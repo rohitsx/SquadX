@@ -17,7 +17,7 @@ export default class socketServices {
 
   async handleUserJoin(socketId: string, username: string): Promise<void> {
     try {
-      console.log("username", username,"socektId", socketId);
+      console.log("username", username, "connected");
 
       await this.dbHelper.updateActiveUser(username, socketId);
 
