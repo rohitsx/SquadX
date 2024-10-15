@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import LocalVid from "./localVid";
 import RemoteVid from "./remotevid";
 import ChatBox from "../btn/chatInterface";
 import Controls from "../btn/controlBtn";
-import { io } from "socket.io-client";
 import { useWebRTC } from "@/hooks/useWebRTC";
 import useMedia from "@/hooks/useMedia";
 import useSoloCallUtils from "@/hooks/useSoloCallUtils";
+import useSocket from "@/hooks/useSocket";
+import { toFormData } from "node_modules/axios/index.d.cts";
+import { Turtle } from "lucide-react";
 
 type strangerProp = {
   pairId: string;
@@ -24,72 +26,77 @@ export default function SoloCall() {
   const [isMatched, setIsMatched] = useState(false);
   const [messages, setMessages] = useState<messageProp[]>([]);
   const { stream, closeStream } = useMedia();
-  const { peerConnection, start, sendOffer, handleOffer, restPc } = useWebRTC(stream);
-  const socket = useMemo(() => {
-    return io(import.meta.env.VITE_APP_WEBSOCKET_URL, {
-      transports: ["websocket"],
-      auth: { username: localStorage.getItem("username") },
-    });
-  }, []);
-
-  const { handlePeer, handleCallEnd, strangerLeft, handleBeforeUnload } =
-    useSoloCallUtils(
-      setStranger,
-      socket,
-      setMessages,
-      setIsMatched,
-	  restPc
-    );
+  const { peerConnection, start, sendOffer, handleOffer, resetPc } =
+    useWebRTC(stream);
+  const hasEmittedConnectPeer = useRef(false);
+  const socket = useSocket();
+  const {
+    handlePeer,
+    handleCallEnd,
+    strangerLeft,
+    handleBeforeUnload,
+    handleChat,
+  } = useSoloCallUtils({
+    setStranger,
+    socket,
+    setMessages,
+    setIsMatched,
+    resetPc,
+    hasEmittedConnectPeer,
+  });
 
   useEffect(() => {
     start();
   }, []);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || stranger ) return;
 
-    console.log(socket, isMatched);
-    !isMatched && socket.emit("connectPeer");
+    console.log("working, from secound useEffect");
+    socket.emit("connectPeer");
+    hasEmittedConnectPeer.current = true;
     socket.on("peer", handlePeer);
-    socket.on("strangerLeft", strangerLeft);
-    window.addEventListener("beforeunload", () => handleBeforeUnload(stranger?.pairId));
-
     return () => {
       socket.off("peer", handlePeer);
-      socket.off("strangerLeft", strangerLeft);
-      window.removeEventListener("beforeunload",() => handleBeforeUnload(stranger?.pairId));
     };
-  }, [socket, isMatched]);
+  }, [socket, stranger]);
 
   useEffect(() => {
-    if (peerConnection && socket && stranger) {
-      sendOffer(socket, stranger.pairId);
+    if (!socket || !stranger) return;
 
-      socket.on("message", (m) =>
-        handleOffer({
-          socket: socket,
-          message: m,
-          strangerId: stranger.pairId,
-          polite: stranger.polite,
-        }),
+    socket.on("strangerLeft", strangerLeft);
+    window.addEventListener("beforeunload", () =>
+      handleBeforeUnload(stranger?.pairId),
+    );
+
+    return () => {
+      socket.off("strangerLeft", strangerLeft);
+      window.removeEventListener("beforeunload", () =>
+        handleBeforeUnload(stranger?.pairId),
       );
+    };
+  }, [socket, stranger]);
 
-      socket.on("chat", (m: string) => {
-        console.log("chat", socket.id);
-        const chat = m.trim();
-        const newMessage: messageProp = {
-          text: chat,
-          sender: "stranger",
-        };
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      });
+  useEffect(() => {
+    if (!peerConnection || !socket || !stranger) return;
+    sendOffer(socket, stranger.pairId);
 
-      return () => {
-        socket.off("disconnect");
-        socket.off("connect");
-        socket.off("peer");
-      };
-    }
+    socket.on("message", (m) =>
+      handleOffer({
+        socket: socket,
+        message: m,
+        strangerId: stranger.pairId,
+        polite: stranger.polite,
+      }),
+    );
+
+    socket.on("chat", handleChat);
+
+    return () => {
+      socket.off("disconnect");
+      socket.off("connect");
+      socket.off("peer");
+    };
   }, [peerConnection, socket, stranger]);
 
   return (
@@ -110,7 +117,7 @@ export default function SoloCall() {
                 strangerId={stranger?.pairId}
                 socket={socket}
                 endCall={handleCallEnd}
-				closeStream={closeStream}
+                closeStream={closeStream}
               />
             </>
           ) : (
@@ -134,4 +141,3 @@ export default function SoloCall() {
     </>
   );
 }
-

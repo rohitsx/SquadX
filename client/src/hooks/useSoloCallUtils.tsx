@@ -1,4 +1,5 @@
 import { Socket } from "socket.io-client";
+import { Dispatch, SetStateAction, useCallback } from "react";
 
 type StrangerProp = {
   pairId: string;
@@ -6,38 +7,74 @@ type StrangerProp = {
   polite: boolean;
 };
 
-export default function useSoloCallUtils(
-  setStranger: any,
-  socket: Socket,
-  setMessages: any,
-  setIsMatched: any,
-  restpc : () => void
-) {
-  const handlePeer = (data: StrangerProp) => {
-    console.log(data.pairName, "connected");
-    setStranger({
-      pairId: data.pairId,
-      pairName: data.pairName,
-      polite: data.polite,
-    });
-    setIsMatched(true);
-  };
+type MessageProp = {
+  text: string;
+  sender: string;
+};
 
-  const handleCallEnd = () => {
+type UseSoloCallUtilsProps = {
+  setStranger: Dispatch<SetStateAction<StrangerProp | null>>;
+  socket: Socket | null;
+  setMessages: Dispatch<SetStateAction<MessageProp[]>>;
+  setIsMatched: Dispatch<SetStateAction<boolean>>;
+  resetPc: () => void;
+  hasEmittedConnectPeer: React.MutableRefObject<boolean>;
+};
+
+export default function useSoloCallUtils({
+  setStranger,
+  socket,
+  setMessages,
+  setIsMatched,
+  resetPc,
+  hasEmittedConnectPeer
+}: UseSoloCallUtilsProps) {
+  const handlePeer = useCallback(
+    (data: StrangerProp) => {
+      console.log(data.pairName, "connected");
+      setStranger(data);
+      setIsMatched(true);
+    },
+    [setStranger, setIsMatched],
+  );
+
+  const handleCallEnd = useCallback(() => {
     setMessages([]);
     setStranger(null);
-	restpc();
-  };
-
-  const strangerLeft = () => {
-    handleCallEnd();
-    console.log(socket);
+    resetPc();
     setIsMatched(false);
-  };
+  }, [setMessages, setStranger, resetPc, setIsMatched]);
 
-  const handleBeforeUnload = (pairId: any) => {
-    socket?.emit("pairedclosedtab", pairId);
-  };
+  const strangerLeft = useCallback(() => {
+    handleCallEnd();
+	hasEmittedConnectPeer.current = false;
+  }, [handleCallEnd, socket]);
 
-  return { handlePeer, handleCallEnd, strangerLeft, handleBeforeUnload };
+  const handleBeforeUnload = useCallback(
+    (pairId: string) => {
+      socket?.emit("pairedclosedtab", pairId);
+    },
+    [socket],
+  );
+
+  const handleChat = useCallback(
+    (m: string) => {
+      console.log("chat", socket?.id);
+      const chat = m.trim();
+      const newMessage: MessageProp = {
+        text: chat,
+        sender: "stranger",
+      };
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    },
+    [socket, setMessages],
+  );
+
+  return {
+    handlePeer,
+    handleCallEnd,
+    strangerLeft,
+    handleBeforeUnload,
+    handleChat,
+  };
 }

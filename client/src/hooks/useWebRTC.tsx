@@ -96,7 +96,7 @@ export const useWebRTC = (stream: MediaStream | null) => {
     [peerConnection],
   );
 
-  const restPc = useCallback(() => {
+  const resetPc = useCallback(() => {
 	if (!peerConnection) return;
 	peerConnection.close();
 	setPeerConnection(null);
@@ -115,6 +115,6 @@ export const useWebRTC = (stream: MediaStream | null) => {
     start,
     sendOffer,
     handleOffer,
-	restPc
+	resetPc
   };
 };
