@@ -3,11 +3,9 @@ import client from "../config/database";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET, SALT_ROUNDS } from "../config/environment";
 import bcrypt from "bcrypt";
-let count = 0;
 
 class AuthServices {
   static async login(req: express.Request, res: express.Response) {
-    
     const { email, password } = req.body;
 
     try {
@@ -19,7 +17,7 @@ class AuthServices {
 
         const passwordMatch = await bcrypt.compare(
           password,
-          storedHashedPassword
+          storedHashedPassword,
         );
 
         if (passwordMatch) {
@@ -54,14 +52,14 @@ class AuthServices {
   }
 
   static async signup(req: express.Request, res: express.Response) {
-    console.log('singup');
-    
+    console.log("singup");
+
     const { username, email, password, dob } = req.body;
     try {
       const hashedPassword = await bcrypt.hash(password, Number(SALT_ROUNDS));
       const result = await client.query(
         "SELECT * FROM users WHERE email = $1",
-        [email]
+        [email],
       );
       if (result.rows.length > 0) {
         res.send("User already exists, please login");
@@ -83,18 +81,12 @@ class AuthServices {
   static async validateToken(req: express.Request, res: express.Response) {
     const { token } = req.body;
 
-   // if (!token) {
-   //   return res.status(401).json({ valid: false });
-   // }
-
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
-	  if(decoded) res.json({ valid: true });  
-	  count += 1;
-	  console.log(count);
+      if (decoded) res.json({ valid: true });
     } catch (error) {
       res.json({ valid: false });
-	  console.log('error in validate token', error);
+      console.log("error in validate token", error);
     }
   }
 }

@@ -6,13 +6,10 @@ export function handleSocketConnection(socket: Socket, io: Server) {
   const username = socket.handshake.auth.username;
 
   socket.on("connectPeer", () => {
-    console.log("recived connection request");
+    console.log("recived connectPeer");
     skService.handleUserJoin(socket.id, username);
   });
-  socket.on("message", (m) => {
-    console.log("recived connection request");
-    io.to(m.to).emit("message", m);
-  });
+  socket.on("message", (m) => io.to(m.to).emit("message", m));
   socket.on("skip", (pairedId: string) => {
     console.log("recived skip request"),
       skService.handleUserSkip(pairedId, socket.id, username);
