@@ -7,8 +7,6 @@ import { useWebRTC } from "@/hooks/useWebRTC";
 import useMedia from "@/hooks/useMedia";
 import useSoloCallUtils from "@/hooks/useSoloCallUtils";
 import useSocket from "@/hooks/useSocket";
-import { toFormData } from "node_modules/axios/index.d.cts";
-import { Turtle } from "lucide-react";
 
 type strangerProp = {
   pairId: string;
