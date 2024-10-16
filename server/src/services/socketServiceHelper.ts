@@ -15,9 +15,9 @@ export default class socketDatabaseHelper {
     try {
       await client.query(
         "INSERT INTO active_users (socket_id, username) VALUES ($1, $2)",
-        [socketId, username]
+        [socketId, username],
       );
-	  console.log('user', username, "added to db")
+      console.log("user", username, "added to db");
     } catch (err) {
       console.log(err);
     }
@@ -28,28 +28,27 @@ export default class socketDatabaseHelper {
       //check if user exits
       const result = await client.query(
         "SELECT * FROM active_users WHERE username = $1",
-        [username]
+        [username],
       );
+      if (result.rows.length === 0) return;
 
-      if (result.rows.length === 1) {
-        //update
-        await client.query(
-          "UPDATE active_users SET socket_id = $1 WHERE username = $2",
-          [socketId, username]
-        );
-      }
-    } catch(err) {
-      console.log("updateActiveUser error",err);
+      //update
+      await client.query(
+        "UPDATE active_users SET socket_id = $1 WHERE username = $2",
+        [socketId, username],
+      );
+    } catch (err) {
+      console.log("updateActiveUser error", err);
     }
   }
 
   async deleteFromActiveUsers(
     username: string,
-    socketId: string
+    socketId: string,
   ): Promise<any> {
     const result = await client.query(
       "DELETE FROM active_users WHERE username = $1 OR socket_id = $2",
-      [username, socketId]
+      [username, socketId],
     );
     return result.rowCount;
   }
@@ -57,7 +56,7 @@ export default class socketDatabaseHelper {
   async removeUserBySocketId(socketId: string): Promise<any> {
     const result = await client.query(
       "DELETE FROM active_users WHERE socket_id = $1",
-      [socketId]
+      [socketId],
     );
     return result.rowCount;
   }
@@ -66,7 +65,7 @@ export default class socketDatabaseHelper {
     try {
       const result = await client.query("SELECT COUNT(*) FROM active_users");
 
-      return result.rows[0].count;
+      return Number(result.rows[0].count);
     } catch (err) {
       return null;
     }
@@ -75,7 +74,7 @@ export default class socketDatabaseHelper {
   async getRandomUser(excludeUsername: string): Promise<any> {
     const result = await client.query(
       "SELECT * FROM active_users WHERE username != $1 ORDER BY RANDOM() LIMIT 1",
-      [excludeUsername]
+      [excludeUsername],
     );
     return result.rows[0];
   }
@@ -84,7 +83,7 @@ export default class socketDatabaseHelper {
     try {
       const result = await client.query(
         "SELECT * FROM active_users WHERE username = $1",
-        [username]
+        [username],
       );
       return result.rows[0];
     } catch (err) {

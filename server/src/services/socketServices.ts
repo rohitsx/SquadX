@@ -17,12 +17,10 @@ export default class socketServices {
 
   async handleUserJoin(socketId: string, username: string): Promise<void> {
     try {
-      await this.dbHelper.updateActiveUser(username, socketId);
+     await this.dbHelper.updateActiveUser(username, socketId);
       const activeUsersLen = await this.dbHelper.getActiveUsersLength();
 
-      if (!activeUsersLen) return;
-
-      if (Number(activeUsersLen) === 0) {
+      if (activeUsersLen === 0) {
         await this.dbHelper.addToActiveUsers(socketId, username);
       } else {
         await makePair(username, socketId, this.io);
@@ -53,9 +51,10 @@ export default class socketServices {
     socketId: string,
   ): Promise<void> {
     try {
+      console.log("this one is running");
       await this.dbHelper.deleteFromActiveUsers(username, socketId);
       pairedId && this.io.to(pairedId).emit("strangerLeft");
-	  console.log('user', username, "deleted from db")
+      console.log("user", username, "deleted from db");
     } catch (err) {
       console.log(err);
     }

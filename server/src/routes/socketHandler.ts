@@ -6,7 +6,7 @@ export function handleSocketConnection(socket: Socket, io: Server) {
   const username = socket.handshake.auth.username;
 
   socket.on("connectPeer", () => {
-    console.log("recived connectPeer");
+    console.log("recived connectPeer", username);
     skService.handleUserJoin(socket.id, username);
   });
   socket.on("message", (m) => io.to(m.to).emit("message", m));

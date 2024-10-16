@@ -26,7 +26,6 @@ export default function SoloCall() {
   const { stream, closeStream } = useMedia();
   const { peerConnection, start, sendOffer, handleOffer, resetPc } =
     useWebRTC(stream);
-  const hasEmittedConnectPeer = useRef(false);
   const socket = useSocket();
   const {
     handlePeer,
@@ -40,7 +39,6 @@ export default function SoloCall() {
     setMessages,
     setIsMatched,
     resetPc,
-    hasEmittedConnectPeer,
   });
 
   useEffect(() => {
@@ -48,11 +46,10 @@ export default function SoloCall() {
   }, []);
 
   useEffect(() => {
-    if (!socket || stranger ) return;
+    if (!socket || stranger) return;
 
     console.log("working, from secound useEffect");
     socket.emit("connectPeer");
-    hasEmittedConnectPeer.current = true;
     socket.on("peer", handlePeer);
     return () => {
       socket.off("peer", handlePeer);
@@ -60,7 +57,7 @@ export default function SoloCall() {
   }, [socket, stranger]);
 
   useEffect(() => {
-    if (!socket || !stranger) return;
+    if (!socket) return;
 
     socket.on("strangerLeft", strangerLeft);
     window.addEventListener("beforeunload", () =>

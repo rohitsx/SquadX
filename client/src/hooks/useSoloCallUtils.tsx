@@ -18,7 +18,6 @@ type UseSoloCallUtilsProps = {
   setMessages: Dispatch<SetStateAction<MessageProp[]>>;
   setIsMatched: Dispatch<SetStateAction<boolean>>;
   resetPc: () => void;
-  hasEmittedConnectPeer: React.MutableRefObject<boolean>;
 };
 
 export default function useSoloCallUtils({
@@ -27,7 +26,6 @@ export default function useSoloCallUtils({
   setMessages,
   setIsMatched,
   resetPc,
-  hasEmittedConnectPeer
 }: UseSoloCallUtilsProps) {
   const handlePeer = useCallback(
     (data: StrangerProp) => {
@@ -47,11 +45,11 @@ export default function useSoloCallUtils({
 
   const strangerLeft = useCallback(() => {
     handleCallEnd();
-	hasEmittedConnectPeer.current = false;
   }, [handleCallEnd, socket]);
 
   const handleBeforeUnload = useCallback(
-    (pairId: string) => {
+    (pairId: string | undefined) => {
+		console.log("beforeunload", pairId);
       socket?.emit("pairedclosedtab", pairId);
     },
     [socket],
