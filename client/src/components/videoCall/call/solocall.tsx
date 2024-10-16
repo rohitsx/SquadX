@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import LocalVid from "./localVid";
 import RemoteVid from "./remotevid";
 import ChatBox from "../btn/chatInterface";
