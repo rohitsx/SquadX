@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import LocalVid from "./localVid";
 import RemoteVid from "./remotevid";
 import ChatBox from "../btn/chatInterface";
@@ -54,7 +54,7 @@ export default function SoloCall() {
 
     socket.on("strangerLeft", handleCallEnd);
 
-	const handleBeforeUnload = () =>
+    const handleBeforeUnload = () =>
       socket?.emit("pairedclosedtab", stranger?.pairId);
     window.addEventListener("beforeunload", handleBeforeUnload);
 
@@ -99,7 +99,6 @@ export default function SoloCall() {
                 </p>
               </div>
               <Controls
-                setIsMatched={setIsMatched}
                 setMessages={setMessages}
                 strangerId={stranger?.pairId}
                 socket={socket}

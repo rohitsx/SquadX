@@ -1,6 +1,6 @@
 import { Flag, PhoneOff, SkipForward } from "lucide-react";
 import { Socket } from "socket.io-client";
-import { FormEvent, useCallback } from "react";
+import {  useCallback } from "react";
 import { useStartPage } from "@/context/startPageContext";
 
 interface Message {
@@ -32,7 +32,7 @@ export default function Controls({
   const handleEndCall = useCallback(() => {
     socket?.emit("pairedclosedtab", strangerId);
     endCall();
-    setStartPage(false);
+    setStartPage('start');
     closeStream();
   }, [socket, strangerId]);
 

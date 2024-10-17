@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState } from "react";
 
 interface StartPageContextType {
-  startPage: boolean;
-  setStartPage: (value: boolean) => void;
+  startPage: "start" | "duo" | "solo";
+  setStartPage: (value: "start" | "duo" | "solo") => void;
 }
 
-const StartPageContext = createContext<StartPageContextType | undefined>(undefined);
+const StartPageContext = createContext<StartPageContextType | undefined>(
+  undefined,
+);
 
 export const useStartPage = () => {
   const context = useContext(StartPageContext);
@@ -15,8 +17,10 @@ export const useStartPage = () => {
   return context;
 };
 
-export const StartPageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [startPage, setStartPage] = useState<boolean>(false);
+export const StartPageProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [startPage, setStartPage] = useState<"start" | "duo" | "solo">("start");
 
   return (
     <StartPageContext.Provider value={{ startPage, setStartPage }}>
