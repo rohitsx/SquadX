@@ -11,20 +11,21 @@ export default class socketServices {
     this.dbHelper = new socketDatabaseHelper();
   }
 
-  private emitWaitingStatus(socketId: string): void {
-    this.io.to(socketId).emit("waitingForOtherToJoin");
-  }
-
   async handleUserJoin(socketId: string, username: string): Promise<void> {
-	  console.log('running handleUserJoin');
     try {
      await this.dbHelper.updateActiveUser(username, socketId);
       const activeUsersLen = await this.dbHelper.getActiveUsersLength();
 
       if (activeUsersLen === 0) {
         await this.dbHelper.addToActiveUsers(socketId, username);
+		return;
       } else {
-        await makePair(username, socketId, this.io);
+        const check = await makePair(username, socketId, this.io);
+		if (check === false) {
+			console.log('running handleUserJoin inside of handeljoin');
+			this.handleUserJoin(socketId, username);
+		}
+		return;
       }
     } catch (error) {
       console.error("Error in handleUserJoin:", error);
@@ -34,12 +35,8 @@ export default class socketServices {
 
   async handleUserSkip(
     pairedId: string,
-    socketId: string,
-    username: string,
   ): Promise<void> {
     try {
-
-		
       this.io.to(pairedId).emit("strangerLeft");
     } catch (error) {
       console.error("Error in handleUserLeave:", error);
@@ -53,7 +50,6 @@ export default class socketServices {
     socketId: string,
   ): Promise<void> {
     try {
-      console.log("this one is running");
       await this.dbHelper.deleteFromActiveUsers(username, socketId);
       pairedId && this.io.to(pairedId).emit("strangerLeft");
       console.log("user", username, "deleted from db");

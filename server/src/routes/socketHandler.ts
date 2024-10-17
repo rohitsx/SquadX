@@ -7,14 +7,11 @@ export function handleSocketConnection(socket: Socket, io: Server) {
 
   socket.on("connectPeer", () => skService.handleUserJoin(socket.id, username));
   socket.on("message", (m) => io.to(m.to).emit("message", m));
-  socket.on("skip", (pairedId: string) =>
-    skService.handleUserSkip(pairedId, socket.id, username),
-  );
+  socket.on("skip", (pairedId: string) => skService.handleUserSkip(pairedId));
   socket.on("pairedclosedtab", (pairedId: string) =>
     skService.handleCallEnd(pairedId, username, socket.id),
   );
   socket.on("chat", (m: { message: string; to: string }) =>
     io.to(m.to).emit("chat", m.message),
   );
-  socket.on("disconnect", () => console.log("socket disconnect"));
 }
