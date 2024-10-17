@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import LocalVid from "./localVid";
 import RemoteVid from "./remotevid";
 import ChatBox from "../btn/chatInterface";
@@ -27,13 +27,7 @@ export default function SoloCall() {
   const { peerConnection, start, sendOffer, handleOffer, resetPc } =
     useWebRTC(stream);
   const socket = useSocket();
-  const {
-    handlePeer,
-    handleCallEnd,
-    strangerLeft,
-    handleBeforeUnload,
-    handleChat,
-  } = useSoloCallUtils({
+  const { handlePeer, handleCallEnd, handleChat } = useSoloCallUtils({
     setStranger,
     socket,
     setMessages,
@@ -48,7 +42,6 @@ export default function SoloCall() {
   useEffect(() => {
     if (!socket || stranger) return;
 
-    console.log("working, from secound useEffect");
     socket.emit("connectPeer");
     socket.on("peer", handlePeer);
     return () => {
@@ -59,16 +52,15 @@ export default function SoloCall() {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("strangerLeft", strangerLeft);
-    window.addEventListener("beforeunload", () =>
-      handleBeforeUnload(stranger?.pairId),
-    );
+    socket.on("strangerLeft", handleCallEnd);
+
+	const handleBeforeUnload = () =>
+      socket?.emit("pairedclosedtab", stranger?.pairId);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
-      socket.off("strangerLeft", strangerLeft);
-      window.removeEventListener("beforeunload", () =>
-        handleBeforeUnload(stranger?.pairId),
-      );
+      socket.off("strangerLeft", handleCallEnd);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [socket, stranger]);
 

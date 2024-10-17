@@ -43,18 +43,6 @@ export default function useSoloCallUtils({
     setIsMatched(false);
   }, [setMessages, setStranger, resetPc, setIsMatched]);
 
-  const strangerLeft = useCallback(() => {
-    handleCallEnd();
-  }, [handleCallEnd, socket]);
-
-  const handleBeforeUnload = useCallback(
-    (pairId: string | undefined) => {
-		console.log("beforeunload", pairId);
-      socket?.emit("pairedclosedtab", pairId);
-    },
-    [socket],
-  );
-
   const handleChat = useCallback(
     (m: string) => {
       console.log("chat", socket?.id);
@@ -71,8 +59,6 @@ export default function useSoloCallUtils({
   return {
     handlePeer,
     handleCallEnd,
-    strangerLeft,
-    handleBeforeUnload,
     handleChat,
   };
 }

@@ -1,6 +1,6 @@
 import { Flag, PhoneOff, SkipForward } from "lucide-react";
 import { Socket } from "socket.io-client";
-import { FormEvent } from "react";
+import { FormEvent, useCallback } from "react";
 import { useStartPage } from "@/context/startPageContext";
 
 interface Message {
@@ -9,7 +9,6 @@ interface Message {
 }
 
 interface ChatBoxProps {
-  setIsMatched: (value: boolean) => void;
   setMessages: (value: Message[]) => void;
   strangerId: string | undefined;
   socket: Socket | null;
@@ -18,31 +17,28 @@ interface ChatBoxProps {
 }
 
 export default function Controls({
-  setIsMatched,
-  setMessages,
   strangerId,
   socket,
   endCall,
   closeStream,
 }: ChatBoxProps) {
   const { setStartPage } = useStartPage();
-  const handleSkip = () => {
-    endCall();
-    setIsMatched(false);
-    setMessages([]);
-    socket && socket.emit("skip", strangerId);
-  };
 
-  const handleEndCall = async (e: FormEvent) => {
-    e.preventDefault();
-    socket && socket.emit("pairedclosedtab", strangerId);
+  const handleSkip = useCallback(() => {
+    endCall();
+    socket?.emit("skip", strangerId);
+  }, [socket, strangerId]);
+
+  const handleEndCall = useCallback(() => {
+    socket?.emit("pairedclosedtab", strangerId);
     endCall();
     setStartPage(false);
     closeStream();
-  };
-  const handleReport = () => {
-    console.log();
-  };
+  }, [socket, strangerId]);
+
+  const handleReport = useCallback(() => {
+    console.log("added report");
+  }, []);
 
   return (
     <>

@@ -9,6 +9,7 @@ export default async function makePair(
   const dbHelper = new socketDatabaseHelper();
   try {
     const randomUser = await dbHelper.getRandomUser(username);
+	if (!randomUser) return;
     const strangerUsername = randomUser.username;
     const user1 = {
       id: socketId,
@@ -27,10 +28,9 @@ export default async function makePair(
 
     dbHelper.deleteFromActiveUsers(randomUser.username, randomUser.socket_id);
 	dbHelper.deleteFromActiveUsers(username, socketId);
-    console.log("pair", user1.name, user1.id);
-    console.log("pair", user2.name, user2.id);
     io.to(user1.id).emit("peer", user1);
     io.to(user2.id).emit("peer", user2);
+	console.log('selected pair', user1.name, user2.name);
   } catch (err) {
     console.log("error with", username, err);
   }

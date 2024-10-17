@@ -16,6 +16,7 @@ export default class socketServices {
   }
 
   async handleUserJoin(socketId: string, username: string): Promise<void> {
+	  console.log('running handleUserJoin');
     try {
      await this.dbHelper.updateActiveUser(username, socketId);
       const activeUsersLen = await this.dbHelper.getActiveUsersLength();
@@ -37,7 +38,8 @@ export default class socketServices {
     username: string,
   ): Promise<void> {
     try {
-      await this.handleUserJoin(socketId, username);
+
+		
       this.io.to(pairedId).emit("strangerLeft");
     } catch (error) {
       console.error("Error in handleUserLeave:", error);
