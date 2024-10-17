@@ -13,19 +13,31 @@ export default class socketServices {
 
   async handleUserJoin(socketId: string, username: string): Promise<void> {
     try {
-     await this.dbHelper.updateActiveUser(username, socketId);
+      await this.dbHelper.updateActiveUser(username, socketId);
       const activeUsersLen = await this.dbHelper.getActiveUsersLength();
 
       if (activeUsersLen === 0) {
         await this.dbHelper.addToActiveUsers(socketId, username);
-		return;
-      } else {
+        return;
+      }
+
+      let pairFound = false;
+      let attempts = 0;
+      const maxAttempts = 5;
+
+      while (!pairFound && attempts < maxAttempts) {
         const check = await makePair(username, socketId, this.io);
-		if (check === false) {
-			console.log('running handleUserJoin inside of handeljoin');
-			this.handleUserJoin(socketId, username);
-		}
-		return;
+        if (check === true) {
+          pairFound = true;
+        } else {
+          attempts++;
+          await new Promise((resolve) => setTimeout(resolve, 1000));         }
+      }
+
+      if (!pairFound) {
+        console.log(
+          `Failed to find a pair for ${username} after ${maxAttempts} attempts`,
+        );
       }
     } catch (error) {
       console.error("Error in handleUserJoin:", error);
@@ -33,9 +45,7 @@ export default class socketServices {
     }
   }
 
-  async handleUserSkip(
-    pairedId: string,
-  ): Promise<void> {
+  async handleUserSkip(pairedId: string): Promise<void> {
     try {
       this.io.to(pairedId).emit("strangerLeft");
     } catch (error) {
