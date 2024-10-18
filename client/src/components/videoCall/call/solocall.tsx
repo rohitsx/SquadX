@@ -6,7 +6,7 @@ import Controls from "../btn/controlBtn";
 import { useWebRTC } from "@/hooks/useWebRTC";
 import useMedia from "@/hooks/useMedia";
 import useSoloCallUtils from "@/hooks/useSoloCallUtils";
-import useSocket from "@/hooks/useSocket";
+import { useSocket } from "@/context/socketContext";
 
 type strangerProp = {
   pairId: string;
@@ -80,9 +80,7 @@ export default function SoloCall() {
     socket.on("chat", handleChat);
 
     return () => {
-      socket.off("disconnect");
-      socket.off("connect");
-      socket.off("peer");
+      socket.off("message");
     };
   }, [peerConnection, socket, stranger]);
 

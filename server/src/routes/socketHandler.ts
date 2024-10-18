@@ -14,4 +14,10 @@ export function handleSocketConnection(socket: Socket, io: Server) {
   socket.on("chat", (m: { message: string; to: string }) =>
     io.to(m.to).emit("chat", m.message),
   );
+
+  socket.on("startDuoCall", (to) =>{
+    io.to(to).emit("connectDuoCall", { name: username, socketId: socket.id }),
+	console.log('recived startDuoCall', to)
+  }
+  );
 }
