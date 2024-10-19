@@ -62,7 +62,7 @@ export default class socketServices {
     try {
       await this.dbHelper.deleteFromActiveUsers(username, socketId);
       pairedId && this.io.to(pairedId).emit("strangerLeft");
-      console.log("user", username, "deleted from db");
+      console.log("sduser", username, "deleted from db");
     } catch (err) {
       console.log(err);
     }

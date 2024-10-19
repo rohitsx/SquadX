@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import RemoteVid from "./remotevid";
 import Controls from "../btn/controlBtn";
 import { useWebRTC } from "@/hooks/useWebRTC";
 import useMedia from "@/hooks/useMedia";
-import useSoloCallUtils from "@/hooks/useSoloCallUtils";
 import { useSocket } from "@/context/socketContext";
 import FriendCall from "./duoCall/friendCall";
+import { useParams } from "react-router-dom";
+import { useFriend } from "@/context/friendContext";
 
 type strangerProp = {
   pairId: string;
@@ -18,7 +19,7 @@ interface messageProp {
   sender: string;
 }
 
-export default function duoCall(){
+export default function duoCall() {
   const [stranger, setStranger] = useState<strangerProp | null>(null);
   const [isMatched, setIsMatched] = useState(false);
   const [messages, setMessages] = useState<messageProp[]>([]);
@@ -26,30 +27,55 @@ export default function duoCall(){
   const { peerConnection, start, sendOffer, handleOffer, resetPc } =
     useWebRTC(stream);
   const socket = useSocket();
-  const { handlePeer, handleCallEnd, handleChat } = useSoloCallUtils({
-    setStranger,
-    socket,
-    setMessages,
-    setIsMatched,
-    resetPc,
-  });
+  const { duoId } = useParams();
+  const { friend } = useFriend();
 
   useEffect(() => {
     start();
   }, []);
 
+  const handlePeer = useCallback(
+    (data: strangerProp) => {
+      console.log(data.pairName, "connected");
+      setStranger(data);
+      setIsMatched(true);
+      socket?.emit("sendDuoStranger", { stranger: data, to: friend?.socketId });
+    },
+    [socket, friend],
+  );
+
+  const handleCallEnd = useCallback(() => {
+    setMessages([]);
+    setStranger(null);
+    resetPc();
+    setIsMatched(false);
+  }, [stranger, messages, friend]);
+
+  const handleChat = useCallback(
+    (m: string) => {
+      console.log("chat", socket?.id);
+      const chat = m.trim();
+      const newMessage: messageProp = {
+        text: chat,
+        sender: "stranger",
+      };
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    },
+    [socket, messages],
+  );
+
   useEffect(() => {
     if (!socket || stranger) return;
 
-    // socket.emit("connectPeer");
+    if (!duoId && friend) socket.emit("connectPeer");
     socket.on("peer", handlePeer);
     return () => {
       socket.off("peer", handlePeer);
     };
-  }, [socket, stranger]);
+  }, [socket, stranger, duoId, friend]);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !stranger) return;
 
     socket.on("strangerLeft", handleCallEnd);
 
@@ -58,8 +84,8 @@ export default function duoCall(){
     window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
-      socket.off("strangerLeft", handleCallEnd);
       window.removeEventListener("beforeunload", handleBeforeUnload);
+      socket.off("strangerLeft", handleCallEnd);
     };
   }, [socket, stranger]);
 
@@ -121,6 +147,7 @@ export default function duoCall(){
         messages={messages}
         setMessages={setMessages}
         stream={stream}
+        closeStream={closeStream}
       />
     </>
   );

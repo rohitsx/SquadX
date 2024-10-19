@@ -27,7 +27,7 @@ export const useWebRTC = (stream: MediaStream | null) => {
 
   const sendOffer = useCallback(
     (socket: Socket, strangerId: string) => {
-      console.log("working");
+
       if (!peerConnection || !stream) return;
 
       stream.getTracks().forEach((track) => {
@@ -36,7 +36,6 @@ export const useWebRTC = (stream: MediaStream | null) => {
 
       peerConnection.onicecandidate = ({ candidate }) => {
         socket.emit("message", { candidate, to: strangerId });
-        console.log("iceSend");
       };
 
       peerConnection.onnegotiationneeded = async () => {
@@ -47,7 +46,6 @@ export const useWebRTC = (stream: MediaStream | null) => {
             description: peerConnection.localDescription,
             to: strangerId,
           });
-          console.log("offerSend");
         } catch (err) {
           console.error("error sending offer", err);
         } finally {
@@ -61,7 +59,6 @@ export const useWebRTC = (stream: MediaStream | null) => {
   const handleOffer = useCallback(
     async ({ socket, message, strangerId, polite }: HandleOfferProps) => {
       if (!peerConnection) return;
-      console.log("offer recived");
 
       politeRef.current = polite;
       const { description, candidate } = message;

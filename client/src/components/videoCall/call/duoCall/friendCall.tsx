@@ -2,10 +2,11 @@ import { Socket } from "socket.io-client";
 import ChatBox from "../../btn/chatInterface";
 import LocalVid from "../localVid";
 import RemoteVid from "../remotevid";
-import { useWebRTC } from "@/hooks/useWebRTCForDuo";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect } from "react";
 import { useFriend } from "@/context/friendContext";
+import { useWebRTC } from "@/hooks/useWebRTC";
+import { useStartPage } from "@/context/startPageContext";
+import { useNavigate } from "react-router-dom";
 
 type strangerProp = {
   pairId: string;
@@ -24,6 +25,7 @@ interface friendCallprop {
   messages: messageProp[];
   setMessages: React.Dispatch<React.SetStateAction<messageProp[]>>;
   stream: MediaStream | null;
+  closeStream: () => void;
 }
 
 export default function FriendCall({
@@ -32,14 +34,23 @@ export default function FriendCall({
   messages,
   setMessages,
   stream,
+  closeStream,
 }: friendCallprop) {
   const { peerConnection, start, sendOffer, handleOffer } = useWebRTC(stream);
-  const { friend } = useFriend();
+  const { friend, setFriend } = useFriend();
+  const { setStartPage } = useStartPage();
   const nav = useNavigate();
 
-  useEffect(() => {
-    if (!socket || !friend) return;
-    socket.emit("startDuoCall", friend.socketId);
+  const handelCallEnd = useCallback(() => {
+    closeStream();
+    setMessages([]);
+    setFriend(null);
+    setStartPage("start");
+    nav("/");
+  }, [stream, friend, messages]);
+
+  const handelBeforeUnload = useCallback(() => {
+    socket?.emit("pairedclosedtab", friend?.socketId);
   }, [socket, friend]);
 
   useEffect(() => {
@@ -48,37 +59,44 @@ export default function FriendCall({
 
   useEffect(() => {
     if (!socket || !friend) return;
-    const handelCallEnd = () => {
-      nav("/");
-      window.location.reload();
-    };
-    const handelBeforeUnload = () =>
-      socket.emit("pairedclosedtab", friend.socketId);
+    socket.emit("startDuoCall", friend.socketId);
+  }, [socket, friend]);
+
+  useEffect(() => {
+    if (!socket || !friend) return;
 
     socket.on("strangerLeft", handelCallEnd);
     window.addEventListener("beforeunload", handelBeforeUnload);
 
     return () => {
-      socket.off("strangerLeft", handelCallEnd);
       window.removeEventListener("beforeunload", handelBeforeUnload);
+      socket.off("strangerLeft", handelCallEnd);
     };
-  }, [socket, friend]);
+  }, [socket, friend, stream]);
 
   useEffect(() => {
     if (!peerConnection || !socket || !friend) return;
-
-	console.log('sending offer', friend.socketId)
     sendOffer(socket, friend.socketId);
 
-    socket.on("messages", (m) =>
+    const checkFriend = setTimeout(() => {
+      handelCallEnd();
+    }, 1000);
+
+    socket.on("message", (m) => {
+      clearTimeout(checkFriend);
       handleOffer({
         socket: socket,
         message: m,
         strangerId: friend.socketId,
         polite: friend.polite,
-      }),
-    );
-  }, [peerConnection, socket]);
+      });
+    });
+
+    return () => {
+      socket.off("message");
+      clearTimeout(checkFriend);
+    };
+  }, [peerConnection, socket, stream]);
 
   return (
     <>
