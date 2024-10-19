@@ -17,7 +17,6 @@ type UseSoloCallUtilsProps = {
   socket: Socket | null;
   setMessages: Dispatch<SetStateAction<MessageProp[]>>;
   setIsMatched: Dispatch<SetStateAction<boolean>>;
-  resetPc: () => void;
 };
 
 export default function useSoloCallUtils({
@@ -25,7 +24,6 @@ export default function useSoloCallUtils({
   socket,
   setMessages,
   setIsMatched,
-  resetPc,
 }: UseSoloCallUtilsProps) {
   const handlePeer = useCallback(
     (data: StrangerProp) => {
@@ -39,9 +37,8 @@ export default function useSoloCallUtils({
   const handleCallEnd = useCallback(() => {
     setMessages([]);
     setStranger(null);
-    resetPc();
     setIsMatched(false);
-  }, [setMessages, setStranger, resetPc, setIsMatched]);
+  }, [setMessages, setStranger, setIsMatched]);
 
   const handleChat = useCallback(
     (m: string) => {
