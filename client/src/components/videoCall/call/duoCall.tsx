@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import RemoteVid from "./remotevid";
+import RemoteVid from "../videoElement/remotevid";
 import Controls from "../btn/controlBtn";
 import { useWebRTC } from "@/hooks/useWebRTC";
 import useMedia from "@/hooks/useMedia";
@@ -124,9 +124,7 @@ export default function duoCall() {
                 </p>
               </div>
               <Controls
-                setMessages={setMessages}
                 strangerId={stranger?.pairId}
-                socket={socket}
                 endCall={handleCallEnd}
                 closeStream={closeStream}
               />

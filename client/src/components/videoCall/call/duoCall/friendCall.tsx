@@ -1,7 +1,7 @@
 import { Socket } from "socket.io-client";
 import ChatBox from "../../btn/chatInterface";
-import LocalVid from "../localVid";
-import RemoteVid from "../remotevid";
+import LocalVid from "../../videoElement/localVid";
+import RemoteVid from "../../videoElement/remotevid";
 import { useCallback, useEffect } from "react";
 import { useFriend } from "@/context/friendContext";
 import { useWebRTC } from "@/hooks/useWebRTC";

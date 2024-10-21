@@ -19,7 +19,7 @@ export default class socketDatabaseHelper {
       );
       console.log("user", username, "added to db");
     } catch (err) {
-      console.log('err, while added the user',err);
+      console.log("err, while added the user", err);
     }
   }
 

@@ -1,5 +1,5 @@
 import { useWebRTC } from "@/hooks/useWebRTC";
-import RemoteVid from "./videoElement/remotevid";
+import RemoteVid from "../videoElement/remotevid";
 import { useSocket } from "@/context/socketContext";
 import { useEffect } from "react";
 type strangerProp = {

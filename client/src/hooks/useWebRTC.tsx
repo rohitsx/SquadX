@@ -19,15 +19,17 @@ export const useWebRTC = (stream: MediaStream | null) => {
   const politeRef = useRef(false);
 
   const start = useCallback(async () => {
+    if (peerConnection && peerConnection.connectionState === "connected") {
+      peerConnection.close();
+    }
     const newPeerConnection = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.mystunserver.tld" }],
     });
     setPeerConnection(newPeerConnection);
-  }, []);
+  }, [peerConnection]);
 
   const sendOffer = useCallback(
     (socket: Socket, strangerId: string) => {
-
       if (!peerConnection || !stream) return;
 
       stream.getTracks().forEach((track) => {
@@ -101,7 +103,7 @@ export const useWebRTC = (stream: MediaStream | null) => {
     if (!peerConnection) return;
     peerConnection.close();
     setPeerConnection(null);
-    console.log("resseting pc");
+    console.log("reseting pc");
     start();
   }, [peerConnection]);
 

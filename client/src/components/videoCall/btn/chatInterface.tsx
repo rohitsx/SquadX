@@ -1,28 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Socket } from "socket.io-client";
 import { SendHorizontal } from "lucide-react";
 import logo from "../../../assets/img/btc.png";
+import { useSocket } from "@/context/socketContext";
 
 interface Message {
   text: string;
   sender: string;
 }
 
-interface ChatBoxProps {
-  socket: Socket | null;
-  strangerId: string | undefined;
-  messages: Message[];
-  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-}
-
-export default function ChatBox({
-  socket,
-  strangerId,
-  messages,
-  setMessages,
-}: ChatBoxProps) {
+export default function ChatBox({ strangerId }: { strangerId: string | undefined }) {
   const [message, setMessage] = useState<string>("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const socket = useSocket();
   const handleChat = useCallback(
     (m: string) => {
       const chat = m.trim();

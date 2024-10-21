@@ -27,7 +27,6 @@ export default async function makePair(
     };
 
     const check = await dbHelper.deleteFromActiveUsers(randomUser.username, randomUser.socket_id);
-	console.log('check delete user', check, randomUser.username);
 	if (check === 0) return false;
     io.to(user1.id).emit("peer", user1);
     io.to(user2.id).emit("peer", user2);

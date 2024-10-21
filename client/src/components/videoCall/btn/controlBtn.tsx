@@ -2,27 +2,21 @@ import { Flag, PhoneOff, SkipForward } from "lucide-react";
 import { Socket } from "socket.io-client";
 import {  useCallback } from "react";
 import { useStartPage } from "@/context/startPageContext";
-
-interface Message {
-  text: string;
-  sender: string;
-}
+import { useSocket } from "@/context/socketContext";
 
 interface ChatBoxProps {
-  setMessages: (value: Message[]) => void;
   strangerId: string | undefined;
-  socket: Socket | null;
   endCall: () => void;
   closeStream: () => void;
 }
 
 export default function Controls({
   strangerId,
-  socket,
   endCall,
   closeStream,
 }: ChatBoxProps) {
   const { setStartPage } = useStartPage();
+  const socket = useSocket();
 
   const handleSkip = useCallback(() => {
     endCall();
