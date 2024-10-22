@@ -16,7 +16,7 @@ const HomeContent = () => {
 
   useEffect(() => {
     if (duoId && duoName) {
-      setFriend({ name: duoName, socketId: duoId, polite: true });
+      setFriend({ pairName: duoName, pairId: duoId, polite: true });
       setStartPage("duo");
     }
   }, [duoId, duoName]);

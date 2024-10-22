@@ -1,5 +1,4 @@
 import { Flag, PhoneOff, SkipForward } from "lucide-react";
-import { Socket } from "socket.io-client";
 import {  useCallback } from "react";
 import { useStartPage } from "@/context/startPageContext";
 import { useSocket } from "@/context/socketContext";

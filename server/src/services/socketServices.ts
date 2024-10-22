@@ -13,8 +13,8 @@ export default class socketServices {
 
   async handleUserJoin(socketId: string, username: string): Promise<void> {
     try {
-      console.log("recvied peer connection request from ", username);
-	  const delay = Math.floor(Math.random() * (1000 - 0 + 1)) + 0;
+      console.log("connection request from ", username);
+      const delay = Math.floor(Math.random() * (1000 - 0 + 1)) + 0;
       await this.dbHelper.updateActiveUser(username, socketId);
       const activeUsersLen = await this.dbHelper.getActiveUsersLength();
 

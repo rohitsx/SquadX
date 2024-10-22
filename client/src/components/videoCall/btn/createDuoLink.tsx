@@ -3,42 +3,42 @@ import { useFriend } from "@/context/friendContext";
 import { useSocket } from "@/context/socketContext";
 import { useStartPage } from "@/context/startPageContext";
 import { Clipboard } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface hostDuoProp {
   name: string;
   socketId: string;
 }
 
-export default function DuoCallSwitch() {
+export default function CreateDuoLink() {
   const socket = useSocket();
   const [copied, setCopied] = useState(false);
   const { setStartPage } = useStartPage();
   const { setFriend } = useFriend();
 
-  const copyToClipboard = () => {
-    if (socket?.id) {
-      navigator.clipboard.writeText(
-        import.meta.env.VITE_API_DOMAIN +
-          "/duo/" +
-          localStorage.getItem("username") +
-          "/" +
-          socket.id,
-      );
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
+  const copyToClipboard = useCallback(() => {
+    if (!socket) return;
+    navigator.clipboard.writeText(
+      import.meta.env.VITE_API_DOMAIN +
+        "/duo/" +
+        localStorage.getItem("username") +
+        "/" +
+        socket.id,
+    );
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, []);
+
+  const handleConnectDuoCall = useCallback((data: hostDuoProp) => {
+    setFriend({ pairName: data.name, pairId: data.socketId, polite: false });
+    setStartPage("duo");
+  }, []);
 
   useEffect(() => {
     if (!socket) return;
-    socket.on("connectDuoCall", (m: hostDuoProp) => {
-      setFriend({ name: m.name, socketId: m.socketId, polite: false });
-      setStartPage("duo");
-    });
-
+    socket.on("connectDuoCall", handleConnectDuoCall);
     return () => {
-      socket.off("connectDuoCall");
+      socket.off("connectDuoCall", handleConnectDuoCall);
     };
   }, [socket]);
 

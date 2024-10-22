@@ -1,5 +1,5 @@
 import { useWebRTC } from "@/hooks/useWebRTC";
-import RemoteVid from "../videoElement/remotevid";
+import RemoteVid from "../videoElement/remotevidElement";
 import { useSocket } from "@/context/socketContext";
 import { useEffect } from "react";
 type strangerProp = {
@@ -60,7 +60,7 @@ export default function RemoteCall({
   return (
     <>
       <RemoteVid pc={peerConnection} />
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+      <div className="bg-gradient-to-t from-black to-transparent p-4">
         <p className="text-xl font-semibold text-white">{stranger?.pairName}</p>
       </div>
     </>

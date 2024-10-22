@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import LocalVid from "../videoElement/localVid"
+import LocalVid from "../videoElement/localVidElement"
 import ChatBox from "../btn/chatInterface";
 import Controls from "../btn/controlBtn";
 import useMedia from "@/hooks/useMedia";

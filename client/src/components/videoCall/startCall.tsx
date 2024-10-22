@@ -1,10 +1,9 @@
 import { useStartPage } from "@/context/startPageContext";
-import SwitchSoloDuo from "./btn/switchSoloDuo";
+import SwitchSoloDuo from "./btn/modeSwitch"
 import { useState } from "react";
-import DuoCallSwtich from "./call/duoCall/duoCallSwtich";
+import CreateDuoLink from "./btn/createDuoLink";
 
-
-export default function StartCall(){
+export default function StartCall() {
   const { setStartPage } = useStartPage();
   const [switchMode, setSwitchMode] = useState<"solo" | "duo">("solo");
   return (
@@ -34,7 +33,7 @@ export default function StartCall(){
               </button>
             </div>
           ) : (
-            <DuoCallSwtich />
+            <CreateDuoLink />
           )}
         </div>
       </div>

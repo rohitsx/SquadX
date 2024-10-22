@@ -19,9 +19,13 @@ export function handleSocketConnection(socket: Socket, io: Server) {
 
   socket.on("startDuoCall", (to) => {
     io.to(to).emit("connectDuoCall", { name: username, socketId: socket.id });
+    io.to(to).emit("duoLive");
+    console.log("send duoLive", to);
   });
 
   socket.on("sendDuoStranger", (m: { stranger: any; to: string }) =>
     socket.to(m.to).emit("peer", m.stranger),
   );
+
+  socket.on("duoClosedTab", (to: string) => io.to(to).emit("duoClosedTab"));
 }

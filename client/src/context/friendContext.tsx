@@ -1,9 +1,8 @@
-
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface FriendsProp {
-  name: string;
-  socketId: string;
+  pairId: string;
+  pairName: string;
   polite: boolean;
 }
 
@@ -14,7 +13,9 @@ interface FriendContextType {
 
 const FriendContext = createContext<FriendContextType | undefined>(undefined);
 
-export const FriendProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const FriendProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [friend, setFriend] = useState<FriendsProp | null>(null);
 
   return (
@@ -27,7 +28,7 @@ export const FriendProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 export const useFriend = () => {
   const context = useContext(FriendContext);
   if (context === undefined) {
-    throw new Error('useFriend must be used within a FriendProvider');
+    throw new Error("useFriend must be used within a FriendProvider");
   }
   return context;
 };
