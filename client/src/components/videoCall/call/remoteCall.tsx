@@ -28,6 +28,7 @@ export default function RemoteCall({
   }, []);
 
   useEffect(() => {
+    console.log("stranger from remoteCall",stranger)
     resetPc();
   }, [stranger]);
 

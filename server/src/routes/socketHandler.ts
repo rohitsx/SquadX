@@ -5,9 +5,11 @@ export function handleSocketConnection(socket: Socket, io: Server) {
   const skService = new socketServices(io);
   const username = socket.handshake.auth.username;
 
-  socket.on("connectPeer", () => {
-    skService.handleUserJoin(socket.id, username);
+  socket.on("connectPeer", (data = {}) => {
+    const { duoSocketId, duoUsername } = data
+    skService.handleUserJoin(duoSocketId || socket.id, duoUsername || username);
   });
+
   socket.on("message", (m) => io.to(m.to).emit("message", m));
   socket.on("skip", (pairedId: string) => io.to(pairedId).emit("strangerLeft"));
   socket.on("pairedclosedtab", (pairedId: string) => {
@@ -19,13 +21,17 @@ export function handleSocketConnection(socket: Socket, io: Server) {
 
   socket.on("startDuoCall", (to) => {
     io.to(to).emit("connectDuoCall", { name: username, socketId: socket.id });
-    io.to(to).emit("duoLive");
-    console.log("send duoLive", to);
   });
 
-  socket.on("sendDuoStranger", (m: { stranger: any; to: string }) =>
-    socket.to(m.to).emit("peer", m.stranger),
-  );
+  socket.on("duoLive", (to: string) => {
+    console.log("recived duoLive from", username, "to", to);
+    io.to(to).emit("duoLive");
+  });
+
+  socket.on("sendDuoStranger", (m: { stranger: any; to: string }) => {
+    console.log(m);
+    socket.to(m.to).emit("duoPeer", m.stranger);
+  });
 
   socket.on("duoClosedTab", (to: string) => io.to(to).emit("duoClosedTab"));
 }

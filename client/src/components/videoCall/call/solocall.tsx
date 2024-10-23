@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import LocalVid from "../videoElement/localVidElement"
+import LocalVid from "../videoElement/localVidElement";
 import ChatBox from "../btn/chatInterface";
 import Controls from "../btn/controlBtn";
 import useMedia from "@/hooks/useMedia";
@@ -20,15 +20,22 @@ export default function SoloCall() {
   const socket = useSocket();
 
   const handlePeer = useCallback((data?: strangerProp) => {
-    console.log(data?.pairName, "added or removed");
-    setStranger(data || null);
     setIsMatched(!!data);
-  }, []);
+    if (!data) {
+      console.log("data reset");
+      setStranger(null);
+      setDuo(null);
+      return;
+    }
+    const [strangerId, duoId] = data?.pairId.split(",");
+    const [strangerName, duoName] = data?.pairName.split(",");
+    setStranger({
+      pairName: strangerName,
+      pairId: strangerId,
+      polite: data.polite,
+    });
 
-  const handleDuo = useCallback((data?: strangerProp) => {
-    console.log(data?.pairName, "added or removed");
-    setDuo(data || null);
-    setIsMatched(!!data);
+    duoId && setDuo({ pairName: duoName, pairId: duoId, polite: data.polite });
   }, []);
 
   const handleBeforeUnload = useCallback(() => {
@@ -39,7 +46,6 @@ export default function SoloCall() {
     if (!socket || stranger) return;
     socket.emit("connectPeer");
     socket.on("peer", handlePeer);
-    socket.on("duo", handleDuo);
 
     return () => {
       socket.off("peer", handlePeer);
@@ -62,11 +68,13 @@ export default function SoloCall() {
           {isMatched ? (
             <>
               {duo && (
-                <RemoteCall
-                  stream={stream}
-                  handleCallEnd={handleDuo}
-                  stranger={duo}
-                />
+                <>
+                  <RemoteCall
+                    stream={stream}
+                    handleCallEnd={handlePeer}
+                    stranger={duo}
+                  />
+                </>
               )}
               <RemoteCall
                 stream={stream}

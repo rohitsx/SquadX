@@ -1,11 +1,13 @@
 import { useStartPage } from "@/context/startPageContext";
 import SwitchSoloDuo from "./btn/modeSwitch"
-import { useState } from "react";
+import {  useState } from "react";
 import CreateDuoLink from "./btn/createDuoLink";
 
 export default function StartCall() {
   const { setStartPage } = useStartPage();
   const [switchMode, setSwitchMode] = useState<"solo" | "duo">("solo");
+
+
   return (
     <>
       <div className="flex-1 bg-gradient-to-br from-blue-600 to-purple-700 rounded-2xl shadow-xl overflow-hidden relative">

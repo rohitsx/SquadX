@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { JWT_SECRET, SALT_ROUNDS } from "../config/environment";
 import bcrypt from "bcrypt";
 
-class AuthServices {
+class ApiService {
   static async login(req: express.Request, res: express.Response) {
     const { email, password } = req.body;
 
@@ -89,6 +89,7 @@ class AuthServices {
       console.log("error in validate token", error);
     }
   }
+
 }
 
-export default AuthServices;
+export default ApiService;

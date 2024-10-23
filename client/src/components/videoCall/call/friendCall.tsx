@@ -7,14 +7,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import RemoteCall from "./remoteCall";
 import { useSocket } from "@/context/socketContext";
 
-type strangerProp = {
+type StrangerProp = {
   pairId: string;
   pairName: string;
   polite: boolean;
 };
 
-interface friendCallprop {
-  stranger: strangerProp | null;
+interface FriendCallProp {
+  stranger: StrangerProp | null;
   stream: MediaStream | null;
   closeStream: () => void;
 }
@@ -23,22 +23,22 @@ export default function FriendCall({
   stranger,
   stream,
   closeStream,
-}: friendCallprop) {
+}: FriendCallProp) {
   const { friend, setFriend } = useFriend();
   const { setStartPage } = useStartPage();
   const nav = useNavigate();
   const socket = useSocket();
   const { duoId } = useParams();
 
-  const handelCallEnd = useCallback(() => {
+  const handleCallEnd = useCallback(() => {
     console.log("stranger left");
     closeStream();
     setFriend(null);
     setStartPage("start");
     nav("/");
-  }, [stream]);
+  }, [closeStream, setFriend, setStartPage, nav]);
 
-  const handelBeforeUnload = useCallback(() => {
+  const handleBeforeUnload = useCallback(() => {
     socket?.emit("duoClosedTab", friend?.pairId);
   }, [socket, friend]);
 
@@ -47,46 +47,28 @@ export default function FriendCall({
     socket.emit("startDuoCall", friend.pairId);
   }, [socket, friend, duoId]);
 
-  useEffect(() => {
-    if (!stream || !socket) return;
-    //    const checkFriend = setTimeout(() => {
-    //    handelCallEnd();
-    // }, 5000);
-
-    return () => {
-      // socket.off("duoLive");
-      //clearTimeout(checkFriend);
-    };
-  }, [socket, stream, duoId]);
-
-  useEffect(() => {
-    socket?.on("duoLive", () => console.log("duoLive"));
-  }, [socket]);
 
   useEffect(() => {
     if (!socket || !friend) return;
 
-    socket.on("duoClosedTab", handelCallEnd);
-
-    window.addEventListener("beforeunload", handelBeforeUnload);
+    socket.on("duoClosedTab", handleCallEnd);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
-      window.removeEventListener("beforeunload", handelBeforeUnload);
-      socket.off("duoClosedTab", handelCallEnd);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      socket.off("duoClosedTab", handleCallEnd);
     };
-  }, [socket, friend, stream]);
+  }, [socket, friend, handleCallEnd, handleBeforeUnload]);
 
   return (
-    <>
-      <div className="w-1/2 flex flex-col bg-gray-800 rounded-2xl shadow-xl overflow-hidden relative">
-        <RemoteCall
-          stream={stream}
-          handleCallEnd={handelCallEnd}
-          stranger={friend}
-        />
-        <LocalVid stream={stream} />
-        <ChatBox strangerId={stranger?.pairId} />
-      </div>
-    </>
+    <div className="w-1/2 flex flex-col bg-gray-800 rounded-2xl shadow-xl overflow-hidden relative">
+      <RemoteCall
+        stream={stream}
+        handleCallEnd={handleCallEnd}
+        stranger={friend}
+      />
+      <LocalVid stream={stream} />
+      <ChatBox strangerId={stranger?.pairId} />
+    </div>
   );
 }

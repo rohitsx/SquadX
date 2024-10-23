@@ -1,11 +1,10 @@
 import express from "express";
 import cors from "cors";
-import authRoutes from "./routes/auth";
+import authRoutes from "./routes/apiHandler";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { PORT, PUBLIC_CLIENT_URL } from "./config/environment";
 import dbClient from "./config/database";
-// import RedisClient from "./config/redis";
 import { handleSocketConnection } from "./routes/socketHandler";
 
 const app = express();
@@ -27,10 +26,6 @@ app.use("/", authRoutes);
 io.on("connection", (socket) => {
   handleSocketConnection(socket, io);
 });
-
-// RedisClient.connect()
-//   .then(() => console.log("redis connected"))
-//   .catch((err) => console.log("error connecting redis", err));
 
 dbClient.connect()
   .then(() => {

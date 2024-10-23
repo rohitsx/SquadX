@@ -30,9 +30,10 @@ export default function useMedia() {
   }, [stream]);
 
   useEffect(() => {
-    getStream();
+    const initializeStream = async () => await getStream();
+    initializeStream();
     return () => closeStream();
   }, []);
 
-  return  {stream, closeStream}
+  return { stream, closeStream };
 }

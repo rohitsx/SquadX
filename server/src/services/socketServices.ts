@@ -13,22 +13,22 @@ export default class socketServices {
 
   async handleUserJoin(socketId: string, username: string): Promise<void> {
     try {
-      console.log("connection request from ", username);
       const delay = Math.floor(Math.random() * (1000 - 0 + 1)) + 0;
-      await this.dbHelper.updateActiveUser(username, socketId);
-      const activeUsersLen = await this.dbHelper.getActiveUsersLength();
-
-      console.log("active users length", activeUsersLen);
-      if (activeUsersLen === 0) {
-        await this.dbHelper.addToActiveUsers(socketId, username);
-        return;
-      }
-
       let pairFound = false;
       let attempts = 0;
       const maxAttempts = 3;
 
       while (!pairFound && attempts < maxAttempts) {
+        await this.dbHelper.updateActiveUser(username, socketId);
+
+        console.log("connected", username, socketId);
+        const activeUsersLen = await this.dbHelper.getActiveUsersLength();
+
+        console.log("active users length", activeUsersLen);
+        if (activeUsersLen === 0) {
+          await this.dbHelper.addToActiveUsers(socketId, username);
+          break;
+        }
         const check = await makePair(username, socketId, this.io);
         if (check === true) {
           pairFound = true;
@@ -41,7 +41,7 @@ export default class socketServices {
       if (!pairFound) {
         await this.dbHelper.addToActiveUsers(socketId, username);
         console.log(
-          `Failed to find a pair for ${username} after ${maxAttempts} attempts`,
+          `Failed to find a pair for ${username} after ${attempts} attempts`,
         );
       }
     } catch (error) {

@@ -21,19 +21,63 @@ export default function duoCall() {
   const { duoId } = useParams();
   const socket = useSocket();
 
-    const handlePeer = useCallback((data?: strangerProp) => {
-    console.log(data?.pairName, "added or removed");
-    setStranger(data || null);
-    setIsMatched(!!data);
-  }, []);
+  const handlePeer = useCallback(
+    (data?: strangerProp) => {
+      setIsMatched(!!data);
+      if (!data) {
+        console.log("data reset");
+        setStranger(null);
+        return;
+      }
+      const strangerId = data.pairId.split(",")[0];
+      const strangerName = data.pairName.split(",")[0];
+      setStranger({
+        pairId: strangerId,
+        pairName: strangerName,
+        polite: data.polite,
+      });
+      !duoId &&
+        socket?.emit("sendDuoStranger", {
+          stranger: {
+            pairId: strangerId,
+            pairName: strangerName,
+            polite: data.polite,
+          },
+          to: friend?.pairId,
+        });
+    },
+    [socket, friend],
+  );
+
+  const handleBeforeUnload = useCallback(() => {
+    socket?.emit("pairedclosedtab", stranger?.pairId);
+  }, [socket, stranger]);
 
   useEffect(() => {
-	  if(!socket || !friend || !duoId) return;
-//	  socket.emit('connectPeer', friend);
+    socket?.on("duoPeer", handlePeer);
+    if (stranger || !friend || duoId) return;
+    socket?.emit("connectPeer", {
+      duoSocketId: socket?.id + "," + friend?.pairId,
+      duoUsername: localStorage.getItem("username") + "," + friend?.pairName,
+    });
+    socket?.on("peer", handlePeer);
 
-  }, [friend])
+    return () => {
+      socket?.off("peer", handlePeer);
+      socket?.off("duoPeer", handlePeer);
+    };
+  }, [socket, stranger, friend]);
 
-   return (
+  useEffect(() => {
+    if (!socket) return;
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [socket, stranger]);
+
+  return (
     <>
       <div className="flex-1 flex flex-col bg-gray-800 rounded-2xl shadow-xl overflow-hidden relative">
         <div className="flex-1 relative bg-gray-900">

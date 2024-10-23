@@ -2,6 +2,7 @@ import logo from "@/assets/img/btc.png";
 import { useFriend } from "@/context/friendContext";
 import { useSocket } from "@/context/socketContext";
 import { useStartPage } from "@/context/startPageContext";
+import axios from "axios";
 import { Clipboard } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -29,10 +30,13 @@ export default function CreateDuoLink() {
     setTimeout(() => setCopied(false), 2000);
   }, []);
 
-  const handleConnectDuoCall = useCallback((data: hostDuoProp) => {
-    setFriend({ pairName: data.name, pairId: data.socketId, polite: false });
-    setStartPage("duo");
-  }, []);
+  const handleConnectDuoCall = useCallback(
+    (data: hostDuoProp) => {
+      setFriend({ pairName: data.name, pairId: data.socketId, polite: false });
+      setStartPage("duo");
+    },
+    [socket],
+  );
 
   useEffect(() => {
     if (!socket) return;

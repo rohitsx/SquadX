@@ -1,4 +1,6 @@
+import { console } from "inspector";
 import client from "../config/database";
+import express from "express";
 
 export default class socketDatabaseHelper {
   async getActiveUsers(): Promise<any[] | void> {
