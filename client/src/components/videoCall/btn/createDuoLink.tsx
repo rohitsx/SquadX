@@ -2,7 +2,6 @@ import logo from "@/assets/img/btc.png";
 import { useFriend } from "@/context/friendContext";
 import { useSocket } from "@/context/socketContext";
 import { useStartPage } from "@/context/startPageContext";
-import axios from "axios";
 import { Clipboard } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
