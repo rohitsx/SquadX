@@ -12,6 +12,15 @@ type strangerProp = {
   polite: boolean;
 };
 
+interface userProps {
+  id: string;
+  name: string;
+  pairId: string;
+  pairName: string;
+  duoId?: string;
+  duoName?: string;
+  polite: boolean;
+}
 export default function SoloCall() {
   const [stranger, setStranger] = useState<strangerProp | null>(null);
   const [duo, setDuo] = useState<strangerProp | null>(null);
@@ -19,7 +28,7 @@ export default function SoloCall() {
   const { stream, closeStream } = useMedia();
   const socket = useSocket();
 
-  const handlePeer = useCallback((data?: strangerProp) => {
+  const handlePeer = useCallback((data?: userProps) => {
     setIsMatched(!!data);
     if (!data) {
       console.log("data reset");
@@ -27,15 +36,19 @@ export default function SoloCall() {
       setDuo(null);
       return;
     }
-    const [strangerId, duoId] = data?.pairId.split(",");
-    const [strangerName, duoName] = data?.pairName.split(",");
     setStranger({
-      pairName: strangerName,
-      pairId: strangerId,
+      pairName: data.pairName,
+      pairId: data.pairId,
       polite: data.polite,
     });
 
-    duoId && setDuo({ pairName: duoName, pairId: duoId, polite: data.polite });
+    if (data.duoId && data.duoName) {
+      setDuo({
+        pairName: data.duoName,
+        pairId: data.duoId,
+        polite: data.polite,
+      });
+    }
   }, []);
 
   const handleBeforeUnload = useCallback(() => {
@@ -67,15 +80,11 @@ export default function SoloCall() {
         <div className="flex-1 relative bg-gray-900">
           {isMatched ? (
             <>
-              {duo && (
-                <>
-                  <RemoteCall
-                    stream={stream}
-                    handleCallEnd={handlePeer}
-                    stranger={duo}
-                  />
-                </>
-              )}
+              <RemoteCall
+                stream={stream}
+                handleCallEnd={handlePeer}
+                stranger={duo}
+              />
               <RemoteCall
                 stream={stream}
                 handleCallEnd={handlePeer}

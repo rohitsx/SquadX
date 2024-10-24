@@ -1,6 +1,12 @@
 import { console } from "inspector";
 import client from "../config/database";
-import express from "express";
+
+type handleUserJoinProp = {
+  socketId: string;
+  username: string;
+  duoSocketId?: string;
+  duoUsername?: string;
+};
 
 export default class socketDatabaseHelper {
   async getActiveUsers(): Promise<any[] | void> {
@@ -13,11 +19,16 @@ export default class socketDatabaseHelper {
     }
   }
 
-  async addToActiveUsers(socketId: string, username: string): Promise<void> {
+  async addToActiveUsers({
+    socketId,
+    username,
+    duoSocketId,
+    duoUsername,
+  }: handleUserJoinProp): Promise<void> {
     try {
       await client.query(
-        "INSERT INTO active_users (socket_id, username) VALUES ($1, $2)",
-        [socketId, username],
+        "INSERT INTO active_users (socket_id, username, duo_socket_id, duo_username) VALUES ($1, $2, $3, $4)",
+        [socketId, username, duoSocketId, duoUsername],
       );
       console.log("user", username, "added to db");
     } catch (err) {
@@ -25,7 +36,12 @@ export default class socketDatabaseHelper {
     }
   }
 
-  async updateActiveUser(username: string, socketId: string): Promise<void> {
+  async updateActiveUser({
+    socketId,
+    username,
+    duoSocketId,
+    duoUsername,
+  }: handleUserJoinProp): Promise<void> {
     try {
       //check if user exits
       const result = await client.query(
@@ -36,8 +52,8 @@ export default class socketDatabaseHelper {
 
       //update
       await client.query(
-        "UPDATE active_users SET socket_id = $1 WHERE username = $2",
-        [socketId, username],
+        "UPDATE active_users SET socket_id = $1, duo_socket_id = $2, duo_username = $3 WHERE username = $4",
+        [socketId, duoSocketId, duoUsername, username],
       );
     } catch (err) {
       console.log("updateActiveUser error", err);

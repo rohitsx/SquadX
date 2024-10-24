@@ -2,6 +2,13 @@ import { Server } from "socket.io";
 import socketDatabaseHelper from "./socketServiceHelper";
 import makePair from "../utils/makePair";
 
+type handleUserJoinProp = {
+  socketId: string;
+  username: string;
+  duoSocketId?: string;
+  duoUsername?: string;
+};
+
 export default class socketServices {
   private io: Server;
   private dbHelper: socketDatabaseHelper;
@@ -11,7 +18,12 @@ export default class socketServices {
     this.dbHelper = new socketDatabaseHelper();
   }
 
-  async handleUserJoin(socketId: string, username: string): Promise<void> {
+  async handleUserJoin({
+    socketId,
+    username,
+    duoSocketId,
+    duoUsername,
+  }: handleUserJoinProp): Promise<void> {
     try {
       const delay = Math.floor(Math.random() * (1000 - 0 + 1)) + 0;
       let pairFound = false;
@@ -19,17 +31,17 @@ export default class socketServices {
       const maxAttempts = 3;
 
       while (!pairFound && attempts < maxAttempts) {
-        await this.dbHelper.updateActiveUser(username, socketId);
+        await this.dbHelper.updateActiveUser({socketId, username ,duoSocketId, duoUsername});
 
-        console.log("connected", username, socketId);
+        console.log("connected", username);
         const activeUsersLen = await this.dbHelper.getActiveUsersLength();
 
         console.log("active users length", activeUsersLen);
         if (activeUsersLen === 0) {
-          await this.dbHelper.addToActiveUsers(socketId, username);
+          await this.dbHelper.addToActiveUsers({socketId, username, duoSocketId, duoUsername});
           break;
         }
-        const check = await makePair(username, socketId, this.io);
+        const check = await makePair({username, socketId, io : this.io, duoSocketId, duoUsername});
         if (check === true) {
           pairFound = true;
         } else {
@@ -39,7 +51,7 @@ export default class socketServices {
       }
 
       if (!pairFound) {
-        await this.dbHelper.addToActiveUsers(socketId, username);
+        await this.dbHelper.addToActiveUsers({socketId, username});
         console.log(
           `Failed to find a pair for ${username} after ${attempts} attempts`,
         );

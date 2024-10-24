@@ -6,8 +6,13 @@ export function handleSocketConnection(socket: Socket, io: Server) {
   const username = socket.handshake.auth.username;
 
   socket.on("connectPeer", (data = {}) => {
-    const { duoSocketId, duoUsername } = data
-    skService.handleUserJoin(duoSocketId || socket.id, duoUsername || username);
+    const { duoSocketId, duoUsername } = data;
+    skService.handleUserJoin({
+      socketId: socket.id,
+      username,
+      duoSocketId,
+      duoUsername,
+    });
   });
 
   socket.on("message", (m) => io.to(m.to).emit("message", m));
@@ -27,11 +32,5 @@ export function handleSocketConnection(socket: Socket, io: Server) {
     console.log("recived duoLive from", username, "to", to);
     io.to(to).emit("duoLive");
   });
-
-  socket.on("sendDuoStranger", (m: { stranger: any; to: string }) => {
-    console.log(m);
-    socket.to(m.to).emit("duoPeer", m.stranger);
-  });
-
   socket.on("duoClosedTab", (to: string) => io.to(to).emit("duoClosedTab"));
 }

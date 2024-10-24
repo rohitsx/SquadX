@@ -31,6 +31,7 @@ export const useWebRTC = (stream: MediaStream | null) => {
   const sendOffer = useCallback(
     (socket: Socket, strangerId: string) => {
       if (!peerConnection || !stream) return;
+	  console.log('sending offer', strangerId)
 
       stream.getTracks().forEach((track) => {
         peerConnection.addTrack(track, stream);

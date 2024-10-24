@@ -24,27 +24,17 @@ export default function duoCall() {
   const handlePeer = useCallback(
     (data?: strangerProp) => {
       setIsMatched(!!data);
+      console.log("handlePeer", data);
       if (!data) {
         console.log("data reset");
         setStranger(null);
         return;
       }
-      const strangerId = data.pairId.split(",")[0];
-      const strangerName = data.pairName.split(",")[0];
       setStranger({
-        pairId: strangerId,
-        pairName: strangerName,
+        pairId: data.pairId,
+        pairName: data.pairName,
         polite: data.polite,
       });
-      !duoId &&
-        socket?.emit("sendDuoStranger", {
-          stranger: {
-            pairId: strangerId,
-            pairName: strangerName,
-            polite: data.polite,
-          },
-          to: friend?.pairId,
-        });
     },
     [socket, friend],
   );
@@ -54,13 +44,13 @@ export default function duoCall() {
   }, [socket, stranger]);
 
   useEffect(() => {
-    socket?.on("duoPeer", handlePeer);
+    socket?.on("peer", handlePeer);
+
     if (stranger || !friend || duoId) return;
     socket?.emit("connectPeer", {
-      duoSocketId: socket?.id + "," + friend?.pairId,
-      duoUsername: localStorage.getItem("username") + "," + friend?.pairName,
+      duoSocketId: friend?.pairId,
+      duoUsername: friend?.pairName,
     });
-    socket?.on("peer", handlePeer);
 
     return () => {
       socket?.off("peer", handlePeer);
@@ -88,11 +78,6 @@ export default function duoCall() {
                 handleCallEnd={handlePeer}
                 stranger={stranger}
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
-                <p className="text-xl font-semibold text-white">
-                  {stranger?.pairName}
-                </p>
-              </div>
               <Controls
                 strangerId={stranger?.pairId}
                 endCall={handlePeer}
