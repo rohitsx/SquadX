@@ -47,9 +47,8 @@ export default function FriendCall({
     socket.emit("startDuoCall", friend.pairId);
   }, [socket, friend, duoId]);
 
-
   useEffect(() => {
-    if (!socket || !friend) return;
+    if (!socket || !friend || !duoId) return;
 
     socket.on("duoClosedTab", handleCallEnd);
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -62,11 +61,13 @@ export default function FriendCall({
 
   return (
     <div className="w-1/2 flex flex-col bg-gray-800 rounded-2xl shadow-xl overflow-hidden relative">
-      <RemoteCall
-        stream={stream}
-        handleCallEnd={handleCallEnd}
-        stranger={friend}
-      />
+      {friend && (
+        <RemoteCall
+          stream={stream}
+          handleCallEnd={handleCallEnd}
+          stranger={friend}
+        />
+      )}
       <LocalVid stream={stream} />
       <ChatBox strangerId={stranger?.pairId} />
     </div>

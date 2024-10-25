@@ -19,18 +19,14 @@ export default class socketDatabaseHelper {
     }
   }
 
-  async addToActiveUsers({
-    socketId,
-    username,
-    duoSocketId,
-    duoUsername,
-  }: handleUserJoinProp): Promise<void> {
+  async addToActiveUsers(user: handleUserJoinProp): Promise<void> {
     try {
+		console.log(user)
       await client.query(
         "INSERT INTO active_users (socket_id, username, duo_socket_id, duo_username) VALUES ($1, $2, $3, $4)",
-        [socketId, username, duoSocketId, duoUsername],
+        [user.socketId, user.username, user.duoSocketId, user.duoUsername],
       );
-      console.log("user", username, "added to db");
+      console.log("user", user.username, "added to db");
     } catch (err) {
       console.log("err, while added the user", err);
     }

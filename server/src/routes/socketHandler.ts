@@ -5,14 +5,14 @@ export function handleSocketConnection(socket: Socket, io: Server) {
   const skService = new socketServices(io);
   const username = socket.handshake.auth.username;
 
-  socket.on("connectPeer", (data = {}) => {
-    const { duoSocketId, duoUsername } = data;
-    skService.handleUserJoin({
+  socket.on("connectPeer", ({ duoSocketId, duoUsername }) => {
+    const user = {
       socketId: socket.id,
-      username,
-      duoSocketId,
-      duoUsername,
-    });
+      username: username,
+      duoSocketId: duoSocketId,
+      duoUsername: duoUsername,
+    };
+    skService.handleUserJoin(user);
   });
 
   socket.on("message", (m) => io.to(m.to).emit("message", m));

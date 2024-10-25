@@ -32,7 +32,7 @@ export default function CreateDuoLink() {
   const handleConnectDuoCall = useCallback(
     (data: hostDuoProp) => {
       setFriend({ pairName: data.name, pairId: data.socketId, polite: false });
-      setStartPage("duo");
+      setStartPage("solo");
     },
     [socket],
   );

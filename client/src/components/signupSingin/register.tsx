@@ -20,7 +20,6 @@ const RegisterPage: React.FC = () => {
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("send");
 
     e.preventDefault();
     axios

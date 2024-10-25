@@ -5,7 +5,6 @@ import socketDatabaseHelper from "../services/socketServiceHelper";
 interface MakePairProps {
   username: string;
   socketId: string;
-  io: Server;
   duoSocketId?: string;
   duoUsername?: string;
 }
@@ -18,9 +17,8 @@ interface RandomUser {
   duo_username?: string;
 }
 
-interface User {
-  id: string;
-  name: string;
+interface emitUserProp {
+  currentUserId: string;
   pairId: string;
   pairName: string;
   duoId?: string;
@@ -33,60 +31,86 @@ interface User {
  * @param props - Object containing user information and Socket.io instance
  * @returns Promise<boolean | undefined> - Success status of the pairing operation
  */
-export default async function makePair({
-  username,
-  socketId,
-  io,
-  duoSocketId,
-  duoUsername,
-}: MakePairProps): Promise<boolean | undefined> {
+export default async function makePair(
+  user: MakePairProps,
+  io: Server,
+): Promise<boolean | undefined> {
   const dbHelper = new socketDatabaseHelper();
 
   try {
     // Get random user to pair with
-    const randomUser: RandomUser = await dbHelper.getRandomUser(username);
+    const randomUser: RandomUser = await dbHelper.getRandomUser(user.username);
+	console.log({randomUser: randomUser});
     if (!randomUser) return false;
 
-    // Create user objects
-    const currentUser: User = {
-      id: socketId,
-      name: username,
+	sendPair(randomUser, user, dbHelper, io);
+
+    return true;
+  } catch (error) {
+    console.error(`Error making pair for user ${user.username}:`, error);
+    return undefined;
+  }
+}
+
+async function sendPair(
+  randomUser: RandomUser,
+  currentUser: MakePairProps,
+  dbHelper: socketDatabaseHelper, 
+  io: Server,
+) {
+  let currentUserDuoEmit: emitUserProp | null;
+  let randomUserDuoEmit: emitUserProp | null;
+  console.log({currentUser: currentUser, randomUser: randomUser});
+
+  const currentUserEmit: emitUserProp = {
+    currentUserId: currentUser.socketId,
+    pairId: randomUser.socket_id,
+    pairName: randomUser.username,
+    duoId: randomUser.duo_socket_id,
+    duoName: randomUser.duo_username,
+    polite: false,
+  };
+
+  const randomUserEmit: emitUserProp = {
+    currentUserId: randomUser.socket_id,
+    pairId: currentUser.socketId,
+    pairName: currentUser.username,
+    duoId: currentUser.duoSocketId,
+    duoName: currentUser.duoUsername,
+    polite: true,
+  };
+
+  const deleteSuccess = await dbHelper.deleteFromActiveUsers(
+    randomUser.username,
+    randomUser.socket_id,
+  );
+  if (deleteSuccess === 0) return false;
+
+  io.to(currentUserEmit.currentUserId).emit("peer", currentUserEmit);
+  io.to(randomUserEmit.currentUserId).emit("peer", randomUserEmit);
+
+  if (currentUser.duoSocketId && currentUser.duoUsername) {
+    currentUserDuoEmit = {
+      currentUserId: currentUser.duoSocketId,
       pairId: randomUser.socket_id,
       pairName: randomUser.username,
       duoId: randomUser.duo_socket_id,
       duoName: randomUser.duo_username,
-      polite: true,
-    };
-
-    const stranger: User = {
-      id: randomUser.socket_id,
-      name: randomUser.username,
-      pairId: socketId,
-      pairName: username,
-      duoId: duoSocketId,
-      duoName: duoUsername,
       polite: false,
     };
 
-    // Remove paired user from active users
-    const deleteSuccess = await dbHelper.deleteFromActiveUsers(
-      randomUser.username,
-      randomUser.socket_id,
-    );
-    if (deleteSuccess === 0) return false;
+    io.to(currentUserDuoEmit.currentUserId).emit("peer", currentUserDuoEmit);
+  }
 
-	console.log(stranger, currentUser)
-
-    // Emit peer events to all relevant users
-	io.to(currentUser.id).emit("peer", currentUser);
-	currentUser.duoId && io.to(currentUser.duoId).emit("peer", currentUser);
-	io.to(stranger.id).emit("peer", stranger);
-	stranger.duoId && io.to(stranger.duoId).emit("peer", stranger);
-
-
-    return true;
-  } catch (error) {
-    console.error(`Error making pair for user ${username}:`, error);
-    return undefined;
+  if (randomUser.duo_socket_id && randomUser.duo_username) {
+    randomUserDuoEmit = {
+      currentUserId: randomUser.duo_socket_id,
+      pairId: currentUser.socketId,
+      pairName: currentUser.username,
+      duoId: currentUser.duoSocketId,
+      duoName: currentUser.duoUsername,
+      polite: true,
+    };
+    io.to(randomUserDuoEmit.currentUserId).emit("peer", randomUserDuoEmit);
   }
 }

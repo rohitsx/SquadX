@@ -1,7 +1,6 @@
 import { useValidateToken } from "../../hooks/useValidateToken";
 import StartPage from "../videoCall/startCall";
 import { StartPageProvider, useStartPage } from "@/context/startPageContext";
-import DuoCall from "../videoCall/call/duoCall";
 import Header from "./header";
 import SoloCall from "../videoCall/call/solocall";
 import { SocketProvider } from "@/context/socketContext";
@@ -17,7 +16,7 @@ const HomeContent = () => {
   useEffect(() => {
     if (duoId && duoName) {
       setFriend({ pairName: duoName, pairId: duoId, polite: true });
-      setStartPage("duo");
+      setStartPage("solo");
     }
   }, [duoId, duoName]);
 
@@ -25,7 +24,7 @@ const HomeContent = () => {
     <>
       {startPage === "start" && <StartPage />}
       {startPage === "solo" && <SoloCall />}
-      {startPage === "duo" && <DuoCall />}
+      {startPage === "duo" && <SoloCall />}
     </>
   );
 };

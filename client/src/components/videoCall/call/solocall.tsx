@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import LocalVid from "../videoElement/localVidElement";
-import ChatBox from "../btn/chatInterface";
 import Controls from "../btn/controlBtn";
 import useMedia from "@/hooks/useMedia";
 import { useSocket } from "@/context/socketContext";
 import RemoteCall from "./remoteCall";
+import { useParams } from "react-router-dom";
+import FriendCall from "./friendCall";
+import { useFriend } from "@/context/friendContext";
 
 type strangerProp = {
   pairId: string;
@@ -27,38 +28,49 @@ export default function SoloCall() {
   const [isMatched, setIsMatched] = useState(false);
   const { stream, closeStream } = useMedia();
   const socket = useSocket();
+  const { duoId } = useParams();
+  const { friend } = useFriend();
 
-  const handlePeer = useCallback((data?: userProps) => {
-    setIsMatched(!!data);
-    if (!data) {
-      console.log("data reset");
-      setStranger(null);
-      setDuo(null);
-      return;
-    }
-    setStranger({
-      pairName: data.pairName,
-      pairId: data.pairId,
-      polite: data.polite,
-    });
-
-    if (data.duoId && data.duoName) {
-      setDuo({
-        pairName: data.duoName,
-        pairId: data.duoId,
+  const handlePeer = useCallback(
+    (data?: userProps) => {
+		console.log("handlePeer", data);
+      setIsMatched(!!data);
+      if (!data) {
+        console.log("data reset");
+        setStranger(null);
+        setDuo(null);
+        return;
+      }
+      setStranger({
+        pairName: data.pairName,
+        pairId: data.pairId,
         polite: data.polite,
       });
-    }
-  }, []);
+
+      if (data.duoId && data.duoName) {
+        setDuo({
+          pairName: data.duoName,
+          pairId: data.duoId,
+          polite: data.polite,
+        });
+      }
+    },
+    [socket],
+  );
 
   const handleBeforeUnload = useCallback(() => {
     socket?.emit("pairedclosedtab", stranger?.pairId);
   }, [socket, stranger]);
 
   useEffect(() => {
+    socket?.on("peer", handlePeer);
+
     if (!socket || stranger) return;
-    socket.emit("connectPeer");
-    socket.on("peer", handlePeer);
+    !duoId &&
+      socket.emit("connectPeer", {
+        duoSocketId: friend?.pairId,
+        duoUsername: friend?.pairName,
+      });
 
     return () => {
       socket.off("peer", handlePeer);
@@ -80,11 +92,13 @@ export default function SoloCall() {
         <div className="flex-1 relative bg-gray-900">
           {isMatched ? (
             <>
-              <RemoteCall
-                stream={stream}
-                handleCallEnd={handlePeer}
-                stranger={duo}
-              />
+              {duo && (
+                <RemoteCall
+                  stream={stream}
+                  handleCallEnd={handlePeer}
+                  stranger={duo}
+                />
+              )}
               <RemoteCall
                 stream={stream}
                 handleCallEnd={handlePeer}
@@ -105,10 +119,11 @@ export default function SoloCall() {
           )}
         </div>
       </div>
-      <div className="w-1/2 flex flex-col bg-gray-800 rounded-2xl shadow-xl overflow-hidden relative">
-        <LocalVid stream={stream} />
-        <ChatBox strangerId={stranger?.pairId} />
-      </div>
+      <FriendCall
+        stranger={stranger}
+        stream={stream}
+        closeStream={closeStream}
+      />
     </>
   );
 }
