@@ -22,7 +22,7 @@ interface userProps {
   duoName?: string;
   polite: boolean;
 }
-export default function SoloCall() {
+export default function Call() {
   const [stranger, setStranger] = useState<strangerProp | null>(null);
   const [duo, setDuo] = useState<strangerProp | null>(null);
   const [isMatched, setIsMatched] = useState(false);

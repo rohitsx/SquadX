@@ -2,7 +2,7 @@ import { useValidateToken } from "../../hooks/useValidateToken";
 import StartPage from "../videoCall/startCall";
 import { StartPageProvider, useStartPage } from "@/context/startPageContext";
 import Header from "./header";
-import SoloCall from "../videoCall/call/solocall";
+import Call from "../videoCall/call/call";
 import { SocketProvider } from "@/context/socketContext";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
@@ -23,8 +23,8 @@ const HomeContent = () => {
   return (
     <>
       {startPage === "start" && <StartPage />}
-      {startPage === "solo" && <SoloCall />}
-      {startPage === "duo" && <SoloCall />}
+      {startPage === "solo" && <Call />}
+      {startPage === "duo" && <Call/>}
     </>
   );
 };

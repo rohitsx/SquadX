@@ -1,0 +1,25 @@
+
+version: "3.8"  
+
+services:  
+  client:
+    build:
+      context: ./client  
+      dockerfile: Dockerfile 
+    ports:
+      - "5173:5173"  
+    environment:
+      - VITE_API_URL=http://localhost:3000/api  
+      - VITE_APP_WEBSOCKET_URL=http://localhost:3000  
+      - VITE_API_DOMAIN=http://localhost:5173  
+    depends_on:
+      - backend  
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  
+    environment:
+
