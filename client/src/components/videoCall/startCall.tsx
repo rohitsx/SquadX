@@ -13,7 +13,7 @@ export default function StartCall() {
       <div className="flex-1 bg-gradient-to-br from-blue-600 to-purple-700 rounded-2xl shadow-xl overflow-hidden relative">
         <div className="w-full h-full flex items-center justify-center">
           <p className="text-3xl text-white font-semibold">
-            Welcome to Video Chat
+            Welcome to Video Chat  
           </p>
         </div>
       </div>
