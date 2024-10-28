@@ -1,10 +1,5 @@
-import pg from "pg";
-import { DB_URL } from "./environment";
+import { PrismaClient } from '@prisma/client';
 
-const dbClient = new pg.Client(DB_URL);
+const prisma = new PrismaClient();
 
-dbClient.on("error", (err) => {
-  console.error("Unexpected error on idle client", err);
-});
-
-export default dbClient;
+export default prisma;

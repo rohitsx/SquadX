@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [popMessage, setPopMessage] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const LoginPage: React.FC = () => {
 
     axios
       .post(import.meta.env.VITE_API_URL + "/login", {
-        email,
+        username,
         password,
       })
       .then((res) => {
@@ -82,13 +82,13 @@ const LoginPage: React.FC = () => {
               htmlFor="email"
               className="text-sm font-medium block mb-2 text-neutral-300"
             >
-              Email
+              Username
             </label>
             <input
               id="email"
               type="text"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
               className="w-full px-4 py-3 text-sm bg-white bg-opacity-10 rounded-lg border border-neutral-700 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition duration-300"
             />

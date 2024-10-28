@@ -1,19 +1,21 @@
 import express from "express";
-import client from "../config/database";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET, SALT_ROUNDS } from "../config/environment";
 import bcrypt from "bcrypt";
+import prisma from "../config/database";
 
 class ApiService {
   static async login(req: express.Request, res: express.Response) {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
     try {
-      const query = "SELECT * FROM users WHERE email = $1";
-      const result = await client.query(query, [email]);
+      // Use Prisma to find the user by email
+      const user = await prisma.user.findUnique({
+        where: { username },
+      });
 
-      if (result.rows.length > 0) {
-        const storedHashedPassword = result.rows[0].password;
+      if (user) {
+        const storedHashedPassword = user.password;
 
         const passwordMatch = await bcrypt.compare(
           password,
@@ -21,18 +23,12 @@ class ApiService {
         );
 
         if (passwordMatch) {
-          console.log("Logging in");
-          const username = result.rows[0].username;
-
-          const token = jwt.sign({ email, username }, JWT_SECRET, {
+          const token = jwt.sign({ username }, JWT_SECRET, {
             expiresIn: "15d",
           });
 
-          //const refreshTokenQuery =
-          //"INSERT INTO refresh_tokens (username, refresh_token) VALUES ($1, $2)";
-          //await client.query(refreshTokenQuery, [username, token]);
-
-          res.json({ message: "Login successful", token, username, email });
+          res.json({ message: "Login successful", token, username });
+          console.log(username, "login successful");
         } else {
           res.status(401).send({
             message: "Invalid password, please check your login details",
@@ -52,29 +48,39 @@ class ApiService {
   }
 
   static async signup(req: express.Request, res: express.Response) {
-    console.log("singup");
+    console.log("Signup");
 
-    const { username, email, password, dob } = req.body;
+    const { dob, gender, email, username, password } = req.body;
+
     try {
       const hashedPassword = await bcrypt.hash(password, Number(SALT_ROUNDS));
-      const result = await client.query(
-        "SELECT * FROM users WHERE email = $1",
-        [email],
-      );
-      if (result.rows.length > 0) {
+      // Check if the user already exists using Prisma
+      const existingUser = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (existingUser) {
         res.send("User already exists, please login");
         return;
       } else {
-        console.log("this in is running");
+        console.log("Creating new user");
 
-        const query =
-          "INSERT INTO users (username, email, password, dob) VALUES ($1, $2, $3, $4)";
-        await client.query(query, [username, email, hashedPassword, dob]);
+        // Create the new user using Prisma
+        const newUser = await prisma.user.create({
+          data: {
+            dob: new Date(dob),
+            gender,
+            email,
+            username,
+            password: hashedPassword,
+          },
+        });
+
         res.send("Signup successful, please login");
       }
     } catch (error) {
-      console.log("singup error");
-      res.send("server error");
+      console.log("Signup error:", error);
+      res.status(500).send("Server error");
     }
   }
 
@@ -86,10 +92,9 @@ class ApiService {
       if (decoded) res.json({ valid: true });
     } catch (error) {
       res.json({ valid: false });
-      console.log("error in validate token", error);
+      console.log("Error in validate token:", error);
     }
   }
-
 }
 
 export default ApiService;
