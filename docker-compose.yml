@@ -34,7 +34,7 @@ services:
 
   postgres:
     image: postgres:latest
-    container_name: host
+    container_name: postgres
     environment:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: dummyPass

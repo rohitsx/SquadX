@@ -72,7 +72,9 @@ const RegisterPage: React.FC = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    // Format the date to remove time component if it's the date field
+    const formattedValue = name === "dob" ? value.split("T")[0] : value;
+    setFormData({ ...formData, [name]: formattedValue });
     if (errors[name as keyof FormErrors]) {
       setErrors({ ...errors, [name]: "" });
     }

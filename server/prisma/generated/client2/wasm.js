@@ -115,32 +115,10 @@ Prisma.NullTypes = {
  * Enums
  */
 
-exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
-  ReadUncommitted: 'ReadUncommitted',
-  ReadCommitted: 'ReadCommitted',
-  RepeatableRead: 'RepeatableRead',
-  Serializable: 'Serializable'
-});
-
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
-  email: 'email',
   username: 'username',
-  password: 'password',
-  dob: 'dob',
-  gender: 'gender',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.ActiveUserScalarFieldEnum = {
-  id: 'id',
-  socketId: 'socketId',
-  username: 'username',
-  duoSocketId: 'duoSocketId',
-  duoUsername: 'duoUsername',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  image: 'image'
 };
 
 exports.Prisma.SortOrder = {
@@ -153,15 +131,9 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
-};
-
 
 exports.Prisma.ModelName = {
-  User: 'User',
-  ActiveUser: 'ActiveUser'
+  User: 'User'
 };
 
 /**

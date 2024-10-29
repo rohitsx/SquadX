@@ -18,11 +18,6 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  * 
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
-/**
- * Model ActiveUser
- * 
- */
-export type ActiveUser = $Result.DefaultSelection<Prisma.$ActiveUserPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -81,53 +76,6 @@ export class PrismaClient<
   $use(cb: Prisma.Middleware): void
 
 /**
-   * Executes a prepared raw query and returns the number of affected rows.
-   * @example
-   * ```
-   * const result = await prisma.$executeRaw`UPDATE User SET cool = ${true} WHERE email = ${'user@email.com'};`
-   * ```
-   * 
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
-   */
-  $executeRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<number>;
-
-  /**
-   * Executes a raw query and returns the number of affected rows.
-   * Susceptible to SQL injections, see documentation.
-   * @example
-   * ```
-   * const result = await prisma.$executeRawUnsafe('UPDATE User SET cool = $1 WHERE email = $2 ;', true, 'user@email.com')
-   * ```
-   * 
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
-   */
-  $executeRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<number>;
-
-  /**
-   * Performs a prepared raw query and returns the `SELECT` data.
-   * @example
-   * ```
-   * const result = await prisma.$queryRaw`SELECT * FROM User WHERE id = ${1} OR email = ${'user@email.com'};`
-   * ```
-   * 
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
-   */
-  $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<T>;
-
-  /**
-   * Performs a raw query and returns the `SELECT` data.
-   * Susceptible to SQL injections, see documentation.
-   * @example
-   * ```
-   * const result = await prisma.$queryRawUnsafe('SELECT * FROM User WHERE id = $1 OR email = $2;', 1, 'user@email.com')
-   * ```
-   * 
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
-   */
-  $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<T>;
-
-
-  /**
    * Allows the running of a sequence of read/write operations that are guaranteed to either succeed or fail as a whole.
    * @example
    * ```
@@ -140,10 +88,24 @@ export class PrismaClient<
    * 
    * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
    */
-  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
+  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P]): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
-  $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>
+  $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number }): $Utils.JsPromise<R>
 
+  /**
+   * Executes a raw MongoDB command and returns the result of it.
+   * @example
+   * ```
+   * const user = await prisma.$runCommandRaw({
+   *   aggregate: 'User',
+   *   pipeline: [{ $match: { name: 'Bob' } }, { $project: { email: true, _id: false } }],
+   *   explain: false,
+   * })
+   * ```
+   * 
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   */
+  $runCommandRaw(command: Prisma.InputJsonObject): Prisma.PrismaPromise<Prisma.JsonObject>
 
   $extends: $Extensions.ExtendsHook<"extends", Prisma.TypeMapCb, ExtArgs>
 
@@ -156,16 +118,6 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs>;
-
-  /**
-   * `prisma.activeUser`: Exposes CRUD operations for the **ActiveUser** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more ActiveUsers
-    * const activeUsers = await prisma.activeUser.findMany()
-    * ```
-    */
-  get activeUser(): Prisma.ActiveUserDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -607,8 +559,7 @@ export namespace Prisma {
 
 
   export const ModelName: {
-    User: 'User',
-    ActiveUser: 'ActiveUser'
+    User: 'User'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -624,8 +575,8 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "activeUser"
-      txIsolationLevel: Prisma.TransactionIsolationLevel
+      modelProps: "user"
+      txIsolationLevel: never
     }
     model: {
       User: {
@@ -660,10 +611,6 @@ export namespace Prisma {
             args: Prisma.UserCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
-          createManyAndReturn: {
-            args: Prisma.UserCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$UserPayload>[]
-          }
           delete: {
             args: Prisma.UserDeleteArgs<ExtArgs>
             result: $Utils.PayloadToResult<Prisma.$UserPayload>
@@ -692,79 +639,17 @@ export namespace Prisma {
             args: Prisma.UserGroupByArgs<ExtArgs>
             result: $Utils.Optional<UserGroupByOutputType>[]
           }
+          findRaw: {
+            args: Prisma.UserFindRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          aggregateRaw: {
+            args: Prisma.UserAggregateRawArgs<ExtArgs>
+            result: JsonObject
+          }
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
-          }
-        }
-      }
-      ActiveUser: {
-        payload: Prisma.$ActiveUserPayload<ExtArgs>
-        fields: Prisma.ActiveUserFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.ActiveUserFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ActiveUserPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.ActiveUserFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ActiveUserPayload>
-          }
-          findFirst: {
-            args: Prisma.ActiveUserFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ActiveUserPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.ActiveUserFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ActiveUserPayload>
-          }
-          findMany: {
-            args: Prisma.ActiveUserFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ActiveUserPayload>[]
-          }
-          create: {
-            args: Prisma.ActiveUserCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ActiveUserPayload>
-          }
-          createMany: {
-            args: Prisma.ActiveUserCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.ActiveUserCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ActiveUserPayload>[]
-          }
-          delete: {
-            args: Prisma.ActiveUserDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ActiveUserPayload>
-          }
-          update: {
-            args: Prisma.ActiveUserUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ActiveUserPayload>
-          }
-          deleteMany: {
-            args: Prisma.ActiveUserDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.ActiveUserUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          upsert: {
-            args: Prisma.ActiveUserUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ActiveUserPayload>
-          }
-          aggregate: {
-            args: Prisma.ActiveUserAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateActiveUser>
-          }
-          groupBy: {
-            args: Prisma.ActiveUserGroupByArgs<ExtArgs>
-            result: $Utils.Optional<ActiveUserGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.ActiveUserCountArgs<ExtArgs>
-            result: $Utils.Optional<ActiveUserCountAggregateOutputType> | number
           }
         }
       }
@@ -773,21 +658,9 @@ export namespace Prisma {
     other: {
       payload: any
       operations: {
-        $executeRaw: {
-          args: [query: TemplateStringsArray | Prisma.Sql, ...values: any[]],
-          result: any
-        }
-        $executeRawUnsafe: {
-          args: [query: string, ...values: any[]],
-          result: any
-        }
-        $queryRaw: {
-          args: [query: TemplateStringsArray | Prisma.Sql, ...values: any[]],
-          result: any
-        }
-        $queryRawUnsafe: {
-          args: [query: string, ...values: any[]],
-          result: any
+        $runCommandRaw: {
+          args: Prisma.InputJsonObject,
+          result: Prisma.JsonObject
         }
       }
     }
@@ -833,7 +706,6 @@ export namespace Prisma {
     transactionOptions?: {
       maxWait?: number
       timeout?: number
-      isolationLevel?: Prisma.TransactionIsolationLevel
     }
   }
 
@@ -924,36 +796,6 @@ export namespace Prisma {
    */
 
 
-  /**
-   * Count Type UserCountOutputType
-   */
-
-  export type UserCountOutputType = {
-    activeUsers: number
-  }
-
-  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    activeUsers?: boolean | UserCountOutputTypeCountActiveUsersArgs
-  }
-
-  // Custom InputTypes
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the UserCountOutputType
-     */
-    select?: UserCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountActiveUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ActiveUserWhereInput
-  }
-
 
   /**
    * Models
@@ -981,35 +823,20 @@ export namespace Prisma {
 
   export type UserMinAggregateOutputType = {
     id: number | null
-    email: string | null
     username: string | null
-    password: string | null
-    dob: Date | null
-    gender: string | null
-    createdAt: Date | null
-    updatedAt: Date | null
+    image: string | null
   }
 
   export type UserMaxAggregateOutputType = {
     id: number | null
-    email: string | null
     username: string | null
-    password: string | null
-    dob: Date | null
-    gender: string | null
-    createdAt: Date | null
-    updatedAt: Date | null
+    image: string | null
   }
 
   export type UserCountAggregateOutputType = {
     id: number
-    email: number
     username: number
-    password: number
-    dob: number
-    gender: number
-    createdAt: number
-    updatedAt: number
+    image: number
     _all: number
   }
 
@@ -1024,35 +851,20 @@ export namespace Prisma {
 
   export type UserMinAggregateInputType = {
     id?: true
-    email?: true
     username?: true
-    password?: true
-    dob?: true
-    gender?: true
-    createdAt?: true
-    updatedAt?: true
+    image?: true
   }
 
   export type UserMaxAggregateInputType = {
     id?: true
-    email?: true
     username?: true
-    password?: true
-    dob?: true
-    gender?: true
-    createdAt?: true
-    updatedAt?: true
+    image?: true
   }
 
   export type UserCountAggregateInputType = {
     id?: true
-    email?: true
     username?: true
-    password?: true
-    dob?: true
-    gender?: true
-    createdAt?: true
-    updatedAt?: true
+    image?: true
     _all?: true
   }
 
@@ -1144,13 +956,8 @@ export namespace Prisma {
 
   export type UserGroupByOutputType = {
     id: number
-    email: string
     username: string
-    password: string
-    dob: Date
-    gender: string
-    createdAt: Date
-    updatedAt: Date
+    image: string
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
     _sum: UserSumAggregateOutputType | null
@@ -1174,59 +981,25 @@ export namespace Prisma {
 
   export type UserSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    email?: boolean
     username?: boolean
-    password?: boolean
-    dob?: boolean
-    gender?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    activeUsers?: boolean | User$activeUsersArgs<ExtArgs>
-    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
+    image?: boolean
   }, ExtArgs["result"]["user"]>
 
-  export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    email?: boolean
-    username?: boolean
-    password?: boolean
-    dob?: boolean
-    gender?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
     id?: boolean
-    email?: boolean
     username?: boolean
-    password?: boolean
-    dob?: boolean
-    gender?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
+    image?: boolean
   }
 
-  export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    activeUsers?: boolean | User$activeUsersArgs<ExtArgs>
-    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
-  }
-  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
-    objects: {
-      activeUsers: Prisma.$ActiveUserPayload<ExtArgs>[]
-    }
+    objects: {}
     scalars: $Extensions.GetPayloadResult<{
       id: number
-      email: string
       username: string
-      password: string
-      dob: Date
-      gender: string
-      createdAt: Date
-      updatedAt: Date
+      image: string
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -1345,30 +1118,6 @@ export namespace Prisma {
     createMany<T extends UserCreateManyArgs>(args?: SelectSubset<T, UserCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many Users and returns the data saved in the database.
-     * @param {UserCreateManyAndReturnArgs} args - Arguments to create many Users.
-     * @example
-     * // Create many Users
-     * const user = await prisma.user.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many Users and only return the `id`
-     * const userWithIdOnly = await prisma.user.createManyAndReturn({ 
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends UserCreateManyAndReturnArgs>(args?: SelectSubset<T, UserCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "createManyAndReturn">>
-
-    /**
      * Delete a User.
      * @param {UserDeleteArgs} args - Arguments to delete one User.
      * @example
@@ -1450,6 +1199,29 @@ export namespace Prisma {
      * })
      */
     upsert<T extends UserUpsertArgs>(args: SelectSubset<T, UserUpsertArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+    /**
+     * Find zero or more Users that matches the filter.
+     * @param {UserFindRawArgs} args - Select which filters you would like to apply.
+     * @example
+     * const user = await prisma.user.findRaw({
+     *   filter: { age: { $gt: 25 } } 
+     * })
+     */
+    findRaw(args?: UserFindRawArgs): Prisma.PrismaPromise<JsonObject>
+
+    /**
+     * Perform aggregation operations on a User.
+     * @param {UserAggregateRawArgs} args - Select which aggregations you would like to apply.
+     * @example
+     * const user = await prisma.user.aggregateRaw({
+     *   pipeline: [
+     *     { $match: { status: "registered" } },
+     *     { $group: { _id: "$country", total: { $sum: 1 } } }
+     *   ]
+     * })
+     */
+    aggregateRaw(args?: UserAggregateRawArgs): Prisma.PrismaPromise<JsonObject>
 
 
     /**
@@ -1591,7 +1363,6 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    activeUsers<T extends User$activeUsersArgs<ExtArgs> = {}>(args?: Subset<T, User$activeUsersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActiveUserPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1622,13 +1393,8 @@ export namespace Prisma {
    */ 
   interface UserFieldRefs {
     readonly id: FieldRef<"User", 'Int'>
-    readonly email: FieldRef<"User", 'String'>
     readonly username: FieldRef<"User", 'String'>
-    readonly password: FieldRef<"User", 'String'>
-    readonly dob: FieldRef<"User", 'DateTime'>
-    readonly gender: FieldRef<"User", 'String'>
-    readonly createdAt: FieldRef<"User", 'DateTime'>
-    readonly updatedAt: FieldRef<"User", 'DateTime'>
+    readonly image: FieldRef<"User", 'String'>
   }
     
 
@@ -1641,10 +1407,6 @@ export namespace Prisma {
      * Select specific fields to fetch from the User
      */
     select?: UserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -1660,10 +1422,6 @@ export namespace Prisma {
      */
     select?: UserSelect<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -1677,10 +1435,6 @@ export namespace Prisma {
      * Select specific fields to fetch from the User
      */
     select?: UserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -1726,10 +1480,6 @@ export namespace Prisma {
      */
     select?: UserSelect<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which User to fetch.
      */
     where?: UserWhereInput
@@ -1774,10 +1524,6 @@ export namespace Prisma {
      */
     select?: UserSelect<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which Users to fetch.
      */
     where?: UserWhereInput
@@ -1817,10 +1563,6 @@ export namespace Prisma {
      */
     select?: UserSelect<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * The data needed to create a User.
      */
     data: XOR<UserCreateInput, UserUncheckedCreateInput>
@@ -1834,22 +1576,6 @@ export namespace Prisma {
      * The data used to create many Users.
      */
     data: UserCreateManyInput | UserCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * User createManyAndReturn
-   */
-  export type UserCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the User
-     */
-    select?: UserSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * The data used to create many Users.
-     */
-    data: UserCreateManyInput | UserCreateManyInput[]
-    skipDuplicates?: boolean
   }
 
   /**
@@ -1860,10 +1586,6 @@ export namespace Prisma {
      * Select specific fields to fetch from the User
      */
     select?: UserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to update a User.
      */
@@ -1897,10 +1619,6 @@ export namespace Prisma {
      */
     select?: UserSelect<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * The filter to search for the User to update in case it exists.
      */
     where: UserWhereUniqueInput
@@ -1923,10 +1641,6 @@ export namespace Prisma {
      */
     select?: UserSelect<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter which User to delete.
      */
     where: UserWhereUniqueInput
@@ -1943,23 +1657,31 @@ export namespace Prisma {
   }
 
   /**
-   * User.activeUsers
+   * User findRaw
    */
-  export type User$activeUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserFindRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ActiveUser
+     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
      */
-    select?: ActiveUserSelect<ExtArgs> | null
+    filter?: InputJsonValue
     /**
-     * Choose, which related nodes to fetch as well
+     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
      */
-    include?: ActiveUserInclude<ExtArgs> | null
-    where?: ActiveUserWhereInput
-    orderBy?: ActiveUserOrderByWithRelationInput | ActiveUserOrderByWithRelationInput[]
-    cursor?: ActiveUserWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: ActiveUserScalarFieldEnum | ActiveUserScalarFieldEnum[]
+    options?: InputJsonValue
+  }
+
+  /**
+   * User aggregateRaw
+   */
+  export type UserAggregateRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
+     */
+    pipeline?: InputJsonValue[]
+    /**
+     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
   }
 
   /**
@@ -1970,1001 +1692,6 @@ export namespace Prisma {
      * Select specific fields to fetch from the User
      */
     select?: UserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-  }
-
-
-  /**
-   * Model ActiveUser
-   */
-
-  export type AggregateActiveUser = {
-    _count: ActiveUserCountAggregateOutputType | null
-    _avg: ActiveUserAvgAggregateOutputType | null
-    _sum: ActiveUserSumAggregateOutputType | null
-    _min: ActiveUserMinAggregateOutputType | null
-    _max: ActiveUserMaxAggregateOutputType | null
-  }
-
-  export type ActiveUserAvgAggregateOutputType = {
-    id: number | null
-  }
-
-  export type ActiveUserSumAggregateOutputType = {
-    id: number | null
-  }
-
-  export type ActiveUserMinAggregateOutputType = {
-    id: number | null
-    socketId: string | null
-    username: string | null
-    duoSocketId: string | null
-    duoUsername: string | null
-    createdAt: Date | null
-    updatedAt: Date | null
-  }
-
-  export type ActiveUserMaxAggregateOutputType = {
-    id: number | null
-    socketId: string | null
-    username: string | null
-    duoSocketId: string | null
-    duoUsername: string | null
-    createdAt: Date | null
-    updatedAt: Date | null
-  }
-
-  export type ActiveUserCountAggregateOutputType = {
-    id: number
-    socketId: number
-    username: number
-    duoSocketId: number
-    duoUsername: number
-    createdAt: number
-    updatedAt: number
-    _all: number
-  }
-
-
-  export type ActiveUserAvgAggregateInputType = {
-    id?: true
-  }
-
-  export type ActiveUserSumAggregateInputType = {
-    id?: true
-  }
-
-  export type ActiveUserMinAggregateInputType = {
-    id?: true
-    socketId?: true
-    username?: true
-    duoSocketId?: true
-    duoUsername?: true
-    createdAt?: true
-    updatedAt?: true
-  }
-
-  export type ActiveUserMaxAggregateInputType = {
-    id?: true
-    socketId?: true
-    username?: true
-    duoSocketId?: true
-    duoUsername?: true
-    createdAt?: true
-    updatedAt?: true
-  }
-
-  export type ActiveUserCountAggregateInputType = {
-    id?: true
-    socketId?: true
-    username?: true
-    duoSocketId?: true
-    duoUsername?: true
-    createdAt?: true
-    updatedAt?: true
-    _all?: true
-  }
-
-  export type ActiveUserAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which ActiveUser to aggregate.
-     */
-    where?: ActiveUserWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of ActiveUsers to fetch.
-     */
-    orderBy?: ActiveUserOrderByWithRelationInput | ActiveUserOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: ActiveUserWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` ActiveUsers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` ActiveUsers.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned ActiveUsers
-    **/
-    _count?: true | ActiveUserCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: ActiveUserAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: ActiveUserSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: ActiveUserMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: ActiveUserMaxAggregateInputType
-  }
-
-  export type GetActiveUserAggregateType<T extends ActiveUserAggregateArgs> = {
-        [P in keyof T & keyof AggregateActiveUser]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateActiveUser[P]>
-      : GetScalarType<T[P], AggregateActiveUser[P]>
-  }
-
-
-
-
-  export type ActiveUserGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ActiveUserWhereInput
-    orderBy?: ActiveUserOrderByWithAggregationInput | ActiveUserOrderByWithAggregationInput[]
-    by: ActiveUserScalarFieldEnum[] | ActiveUserScalarFieldEnum
-    having?: ActiveUserScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: ActiveUserCountAggregateInputType | true
-    _avg?: ActiveUserAvgAggregateInputType
-    _sum?: ActiveUserSumAggregateInputType
-    _min?: ActiveUserMinAggregateInputType
-    _max?: ActiveUserMaxAggregateInputType
-  }
-
-  export type ActiveUserGroupByOutputType = {
-    id: number
-    socketId: string
-    username: string
-    duoSocketId: string | null
-    duoUsername: string | null
-    createdAt: Date
-    updatedAt: Date
-    _count: ActiveUserCountAggregateOutputType | null
-    _avg: ActiveUserAvgAggregateOutputType | null
-    _sum: ActiveUserSumAggregateOutputType | null
-    _min: ActiveUserMinAggregateOutputType | null
-    _max: ActiveUserMaxAggregateOutputType | null
-  }
-
-  type GetActiveUserGroupByPayload<T extends ActiveUserGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<ActiveUserGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof ActiveUserGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], ActiveUserGroupByOutputType[P]>
-            : GetScalarType<T[P], ActiveUserGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type ActiveUserSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    socketId?: boolean
-    username?: boolean
-    duoSocketId?: boolean
-    duoUsername?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["activeUser"]>
-
-  export type ActiveUserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    socketId?: boolean
-    username?: boolean
-    duoSocketId?: boolean
-    duoUsername?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["activeUser"]>
-
-  export type ActiveUserSelectScalar = {
-    id?: boolean
-    socketId?: boolean
-    username?: boolean
-    duoSocketId?: boolean
-    duoUsername?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-  }
-
-  export type ActiveUserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }
-  export type ActiveUserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }
-
-  export type $ActiveUserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "ActiveUser"
-    objects: {
-      user: Prisma.$UserPayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: number
-      socketId: string
-      username: string
-      duoSocketId: string | null
-      duoUsername: string | null
-      createdAt: Date
-      updatedAt: Date
-    }, ExtArgs["result"]["activeUser"]>
-    composites: {}
-  }
-
-  type ActiveUserGetPayload<S extends boolean | null | undefined | ActiveUserDefaultArgs> = $Result.GetResult<Prisma.$ActiveUserPayload, S>
-
-  type ActiveUserCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<ActiveUserFindManyArgs, 'select' | 'include' | 'distinct'> & {
-      select?: ActiveUserCountAggregateInputType | true
-    }
-
-  export interface ActiveUserDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ActiveUser'], meta: { name: 'ActiveUser' } }
-    /**
-     * Find zero or one ActiveUser that matches the filter.
-     * @param {ActiveUserFindUniqueArgs} args - Arguments to find a ActiveUser
-     * @example
-     * // Get one ActiveUser
-     * const activeUser = await prisma.activeUser.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends ActiveUserFindUniqueArgs>(args: SelectSubset<T, ActiveUserFindUniqueArgs<ExtArgs>>): Prisma__ActiveUserClient<$Result.GetResult<Prisma.$ActiveUserPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
-
-    /**
-     * Find one ActiveUser that matches the filter or throw an error with `error.code='P2025'` 
-     * if no matches were found.
-     * @param {ActiveUserFindUniqueOrThrowArgs} args - Arguments to find a ActiveUser
-     * @example
-     * // Get one ActiveUser
-     * const activeUser = await prisma.activeUser.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends ActiveUserFindUniqueOrThrowArgs>(args: SelectSubset<T, ActiveUserFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ActiveUserClient<$Result.GetResult<Prisma.$ActiveUserPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
-
-    /**
-     * Find the first ActiveUser that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ActiveUserFindFirstArgs} args - Arguments to find a ActiveUser
-     * @example
-     * // Get one ActiveUser
-     * const activeUser = await prisma.activeUser.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends ActiveUserFindFirstArgs>(args?: SelectSubset<T, ActiveUserFindFirstArgs<ExtArgs>>): Prisma__ActiveUserClient<$Result.GetResult<Prisma.$ActiveUserPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
-
-    /**
-     * Find the first ActiveUser that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ActiveUserFindFirstOrThrowArgs} args - Arguments to find a ActiveUser
-     * @example
-     * // Get one ActiveUser
-     * const activeUser = await prisma.activeUser.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends ActiveUserFindFirstOrThrowArgs>(args?: SelectSubset<T, ActiveUserFindFirstOrThrowArgs<ExtArgs>>): Prisma__ActiveUserClient<$Result.GetResult<Prisma.$ActiveUserPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
-
-    /**
-     * Find zero or more ActiveUsers that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ActiveUserFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all ActiveUsers
-     * const activeUsers = await prisma.activeUser.findMany()
-     * 
-     * // Get first 10 ActiveUsers
-     * const activeUsers = await prisma.activeUser.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const activeUserWithIdOnly = await prisma.activeUser.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends ActiveUserFindManyArgs>(args?: SelectSubset<T, ActiveUserFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActiveUserPayload<ExtArgs>, T, "findMany">>
-
-    /**
-     * Create a ActiveUser.
-     * @param {ActiveUserCreateArgs} args - Arguments to create a ActiveUser.
-     * @example
-     * // Create one ActiveUser
-     * const ActiveUser = await prisma.activeUser.create({
-     *   data: {
-     *     // ... data to create a ActiveUser
-     *   }
-     * })
-     * 
-     */
-    create<T extends ActiveUserCreateArgs>(args: SelectSubset<T, ActiveUserCreateArgs<ExtArgs>>): Prisma__ActiveUserClient<$Result.GetResult<Prisma.$ActiveUserPayload<ExtArgs>, T, "create">, never, ExtArgs>
-
-    /**
-     * Create many ActiveUsers.
-     * @param {ActiveUserCreateManyArgs} args - Arguments to create many ActiveUsers.
-     * @example
-     * // Create many ActiveUsers
-     * const activeUser = await prisma.activeUser.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends ActiveUserCreateManyArgs>(args?: SelectSubset<T, ActiveUserCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many ActiveUsers and returns the data saved in the database.
-     * @param {ActiveUserCreateManyAndReturnArgs} args - Arguments to create many ActiveUsers.
-     * @example
-     * // Create many ActiveUsers
-     * const activeUser = await prisma.activeUser.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many ActiveUsers and only return the `id`
-     * const activeUserWithIdOnly = await prisma.activeUser.createManyAndReturn({ 
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends ActiveUserCreateManyAndReturnArgs>(args?: SelectSubset<T, ActiveUserCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActiveUserPayload<ExtArgs>, T, "createManyAndReturn">>
-
-    /**
-     * Delete a ActiveUser.
-     * @param {ActiveUserDeleteArgs} args - Arguments to delete one ActiveUser.
-     * @example
-     * // Delete one ActiveUser
-     * const ActiveUser = await prisma.activeUser.delete({
-     *   where: {
-     *     // ... filter to delete one ActiveUser
-     *   }
-     * })
-     * 
-     */
-    delete<T extends ActiveUserDeleteArgs>(args: SelectSubset<T, ActiveUserDeleteArgs<ExtArgs>>): Prisma__ActiveUserClient<$Result.GetResult<Prisma.$ActiveUserPayload<ExtArgs>, T, "delete">, never, ExtArgs>
-
-    /**
-     * Update one ActiveUser.
-     * @param {ActiveUserUpdateArgs} args - Arguments to update one ActiveUser.
-     * @example
-     * // Update one ActiveUser
-     * const activeUser = await prisma.activeUser.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends ActiveUserUpdateArgs>(args: SelectSubset<T, ActiveUserUpdateArgs<ExtArgs>>): Prisma__ActiveUserClient<$Result.GetResult<Prisma.$ActiveUserPayload<ExtArgs>, T, "update">, never, ExtArgs>
-
-    /**
-     * Delete zero or more ActiveUsers.
-     * @param {ActiveUserDeleteManyArgs} args - Arguments to filter ActiveUsers to delete.
-     * @example
-     * // Delete a few ActiveUsers
-     * const { count } = await prisma.activeUser.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends ActiveUserDeleteManyArgs>(args?: SelectSubset<T, ActiveUserDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more ActiveUsers.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ActiveUserUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many ActiveUsers
-     * const activeUser = await prisma.activeUser.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends ActiveUserUpdateManyArgs>(args: SelectSubset<T, ActiveUserUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create or update one ActiveUser.
-     * @param {ActiveUserUpsertArgs} args - Arguments to update or create a ActiveUser.
-     * @example
-     * // Update or create a ActiveUser
-     * const activeUser = await prisma.activeUser.upsert({
-     *   create: {
-     *     // ... data to create a ActiveUser
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the ActiveUser we want to update
-     *   }
-     * })
-     */
-    upsert<T extends ActiveUserUpsertArgs>(args: SelectSubset<T, ActiveUserUpsertArgs<ExtArgs>>): Prisma__ActiveUserClient<$Result.GetResult<Prisma.$ActiveUserPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
-
-
-    /**
-     * Count the number of ActiveUsers.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ActiveUserCountArgs} args - Arguments to filter ActiveUsers to count.
-     * @example
-     * // Count the number of ActiveUsers
-     * const count = await prisma.activeUser.count({
-     *   where: {
-     *     // ... the filter for the ActiveUsers we want to count
-     *   }
-     * })
-    **/
-    count<T extends ActiveUserCountArgs>(
-      args?: Subset<T, ActiveUserCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], ActiveUserCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a ActiveUser.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ActiveUserAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends ActiveUserAggregateArgs>(args: Subset<T, ActiveUserAggregateArgs>): Prisma.PrismaPromise<GetActiveUserAggregateType<T>>
-
-    /**
-     * Group by ActiveUser.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ActiveUserGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends ActiveUserGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: ActiveUserGroupByArgs['orderBy'] }
-        : { orderBy?: ActiveUserGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, ActiveUserGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetActiveUserGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the ActiveUser model
-   */
-  readonly fields: ActiveUserFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for ActiveUser.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__ActiveUserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the ActiveUser model
-   */ 
-  interface ActiveUserFieldRefs {
-    readonly id: FieldRef<"ActiveUser", 'Int'>
-    readonly socketId: FieldRef<"ActiveUser", 'String'>
-    readonly username: FieldRef<"ActiveUser", 'String'>
-    readonly duoSocketId: FieldRef<"ActiveUser", 'String'>
-    readonly duoUsername: FieldRef<"ActiveUser", 'String'>
-    readonly createdAt: FieldRef<"ActiveUser", 'DateTime'>
-    readonly updatedAt: FieldRef<"ActiveUser", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * ActiveUser findUnique
-   */
-  export type ActiveUserFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ActiveUser
-     */
-    select?: ActiveUserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ActiveUserInclude<ExtArgs> | null
-    /**
-     * Filter, which ActiveUser to fetch.
-     */
-    where: ActiveUserWhereUniqueInput
-  }
-
-  /**
-   * ActiveUser findUniqueOrThrow
-   */
-  export type ActiveUserFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ActiveUser
-     */
-    select?: ActiveUserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ActiveUserInclude<ExtArgs> | null
-    /**
-     * Filter, which ActiveUser to fetch.
-     */
-    where: ActiveUserWhereUniqueInput
-  }
-
-  /**
-   * ActiveUser findFirst
-   */
-  export type ActiveUserFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ActiveUser
-     */
-    select?: ActiveUserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ActiveUserInclude<ExtArgs> | null
-    /**
-     * Filter, which ActiveUser to fetch.
-     */
-    where?: ActiveUserWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of ActiveUsers to fetch.
-     */
-    orderBy?: ActiveUserOrderByWithRelationInput | ActiveUserOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for ActiveUsers.
-     */
-    cursor?: ActiveUserWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` ActiveUsers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` ActiveUsers.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of ActiveUsers.
-     */
-    distinct?: ActiveUserScalarFieldEnum | ActiveUserScalarFieldEnum[]
-  }
-
-  /**
-   * ActiveUser findFirstOrThrow
-   */
-  export type ActiveUserFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ActiveUser
-     */
-    select?: ActiveUserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ActiveUserInclude<ExtArgs> | null
-    /**
-     * Filter, which ActiveUser to fetch.
-     */
-    where?: ActiveUserWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of ActiveUsers to fetch.
-     */
-    orderBy?: ActiveUserOrderByWithRelationInput | ActiveUserOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for ActiveUsers.
-     */
-    cursor?: ActiveUserWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` ActiveUsers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` ActiveUsers.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of ActiveUsers.
-     */
-    distinct?: ActiveUserScalarFieldEnum | ActiveUserScalarFieldEnum[]
-  }
-
-  /**
-   * ActiveUser findMany
-   */
-  export type ActiveUserFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ActiveUser
-     */
-    select?: ActiveUserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ActiveUserInclude<ExtArgs> | null
-    /**
-     * Filter, which ActiveUsers to fetch.
-     */
-    where?: ActiveUserWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of ActiveUsers to fetch.
-     */
-    orderBy?: ActiveUserOrderByWithRelationInput | ActiveUserOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing ActiveUsers.
-     */
-    cursor?: ActiveUserWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` ActiveUsers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` ActiveUsers.
-     */
-    skip?: number
-    distinct?: ActiveUserScalarFieldEnum | ActiveUserScalarFieldEnum[]
-  }
-
-  /**
-   * ActiveUser create
-   */
-  export type ActiveUserCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ActiveUser
-     */
-    select?: ActiveUserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ActiveUserInclude<ExtArgs> | null
-    /**
-     * The data needed to create a ActiveUser.
-     */
-    data: XOR<ActiveUserCreateInput, ActiveUserUncheckedCreateInput>
-  }
-
-  /**
-   * ActiveUser createMany
-   */
-  export type ActiveUserCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many ActiveUsers.
-     */
-    data: ActiveUserCreateManyInput | ActiveUserCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * ActiveUser createManyAndReturn
-   */
-  export type ActiveUserCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ActiveUser
-     */
-    select?: ActiveUserSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * The data used to create many ActiveUsers.
-     */
-    data: ActiveUserCreateManyInput | ActiveUserCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ActiveUserIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * ActiveUser update
-   */
-  export type ActiveUserUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ActiveUser
-     */
-    select?: ActiveUserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ActiveUserInclude<ExtArgs> | null
-    /**
-     * The data needed to update a ActiveUser.
-     */
-    data: XOR<ActiveUserUpdateInput, ActiveUserUncheckedUpdateInput>
-    /**
-     * Choose, which ActiveUser to update.
-     */
-    where: ActiveUserWhereUniqueInput
-  }
-
-  /**
-   * ActiveUser updateMany
-   */
-  export type ActiveUserUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update ActiveUsers.
-     */
-    data: XOR<ActiveUserUpdateManyMutationInput, ActiveUserUncheckedUpdateManyInput>
-    /**
-     * Filter which ActiveUsers to update
-     */
-    where?: ActiveUserWhereInput
-  }
-
-  /**
-   * ActiveUser upsert
-   */
-  export type ActiveUserUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ActiveUser
-     */
-    select?: ActiveUserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ActiveUserInclude<ExtArgs> | null
-    /**
-     * The filter to search for the ActiveUser to update in case it exists.
-     */
-    where: ActiveUserWhereUniqueInput
-    /**
-     * In case the ActiveUser found by the `where` argument doesn't exist, create a new ActiveUser with this data.
-     */
-    create: XOR<ActiveUserCreateInput, ActiveUserUncheckedCreateInput>
-    /**
-     * In case the ActiveUser was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<ActiveUserUpdateInput, ActiveUserUncheckedUpdateInput>
-  }
-
-  /**
-   * ActiveUser delete
-   */
-  export type ActiveUserDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ActiveUser
-     */
-    select?: ActiveUserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ActiveUserInclude<ExtArgs> | null
-    /**
-     * Filter which ActiveUser to delete.
-     */
-    where: ActiveUserWhereUniqueInput
-  }
-
-  /**
-   * ActiveUser deleteMany
-   */
-  export type ActiveUserDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which ActiveUsers to delete
-     */
-    where?: ActiveUserWhereInput
-  }
-
-  /**
-   * ActiveUser without action
-   */
-  export type ActiveUserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ActiveUser
-     */
-    select?: ActiveUserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ActiveUserInclude<ExtArgs> | null
   }
 
 
@@ -2972,41 +1699,13 @@ export namespace Prisma {
    * Enums
    */
 
-  export const TransactionIsolationLevel: {
-    ReadUncommitted: 'ReadUncommitted',
-    ReadCommitted: 'ReadCommitted',
-    RepeatableRead: 'RepeatableRead',
-    Serializable: 'Serializable'
-  };
-
-  export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
-
-
   export const UserScalarFieldEnum: {
     id: 'id',
-    email: 'email',
     username: 'username',
-    password: 'password',
-    dob: 'dob',
-    gender: 'gender',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    image: 'image'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
-
-
-  export const ActiveUserScalarFieldEnum: {
-    id: 'id',
-    socketId: 'socketId',
-    username: 'username',
-    duoSocketId: 'duoSocketId',
-    duoUsername: 'duoUsername',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
-  };
-
-  export type ActiveUserScalarFieldEnum = (typeof ActiveUserScalarFieldEnum)[keyof typeof ActiveUserScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -3023,14 +1722,6 @@ export namespace Prisma {
   };
 
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
-
-
-  export const NullsOrder: {
-    first: 'first',
-    last: 'last'
-  };
-
-  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
   /**
@@ -3067,20 +1758,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'DateTime'
-   */
-  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-  /**
-   * Reference to a field of type 'DateTime[]'
-   */
-  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -3102,52 +1779,29 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     id?: IntFilter<"User"> | number
-    email?: StringFilter<"User"> | string
     username?: StringFilter<"User"> | string
-    password?: StringFilter<"User"> | string
-    dob?: DateTimeFilter<"User"> | Date | string
-    gender?: StringFilter<"User"> | string
-    createdAt?: DateTimeFilter<"User"> | Date | string
-    updatedAt?: DateTimeFilter<"User"> | Date | string
-    activeUsers?: ActiveUserListRelationFilter
+    image?: StringFilter<"User"> | string
   }
 
   export type UserOrderByWithRelationInput = {
     id?: SortOrder
-    email?: SortOrder
     username?: SortOrder
-    password?: SortOrder
-    dob?: SortOrder
-    gender?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    activeUsers?: ActiveUserOrderByRelationAggregateInput
+    image?: SortOrder
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: number
-    email?: string
-    username?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
-    password?: StringFilter<"User"> | string
-    dob?: DateTimeFilter<"User"> | Date | string
-    gender?: StringFilter<"User"> | string
-    createdAt?: DateTimeFilter<"User"> | Date | string
-    updatedAt?: DateTimeFilter<"User"> | Date | string
-    activeUsers?: ActiveUserListRelationFilter
-  }, "id" | "email" | "username">
+    username?: StringFilter<"User"> | string
+    image?: StringFilter<"User"> | string
+  }, "id">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
-    email?: SortOrder
     username?: SortOrder
-    password?: SortOrder
-    dob?: SortOrder
-    gender?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
+    image?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -3160,224 +1814,46 @@ export namespace Prisma {
     OR?: UserScalarWhereWithAggregatesInput[]
     NOT?: UserScalarWhereWithAggregatesInput | UserScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"User"> | number
-    email?: StringWithAggregatesFilter<"User"> | string
     username?: StringWithAggregatesFilter<"User"> | string
-    password?: StringWithAggregatesFilter<"User"> | string
-    dob?: DateTimeWithAggregatesFilter<"User"> | Date | string
-    gender?: StringWithAggregatesFilter<"User"> | string
-    createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
-  }
-
-  export type ActiveUserWhereInput = {
-    AND?: ActiveUserWhereInput | ActiveUserWhereInput[]
-    OR?: ActiveUserWhereInput[]
-    NOT?: ActiveUserWhereInput | ActiveUserWhereInput[]
-    id?: IntFilter<"ActiveUser"> | number
-    socketId?: StringFilter<"ActiveUser"> | string
-    username?: StringFilter<"ActiveUser"> | string
-    duoSocketId?: StringNullableFilter<"ActiveUser"> | string | null
-    duoUsername?: StringNullableFilter<"ActiveUser"> | string | null
-    createdAt?: DateTimeFilter<"ActiveUser"> | Date | string
-    updatedAt?: DateTimeFilter<"ActiveUser"> | Date | string
-    user?: XOR<UserRelationFilter, UserWhereInput>
-  }
-
-  export type ActiveUserOrderByWithRelationInput = {
-    id?: SortOrder
-    socketId?: SortOrder
-    username?: SortOrder
-    duoSocketId?: SortOrderInput | SortOrder
-    duoUsername?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    user?: UserOrderByWithRelationInput
-  }
-
-  export type ActiveUserWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
-    socketId?: string
-    username?: string
-    AND?: ActiveUserWhereInput | ActiveUserWhereInput[]
-    OR?: ActiveUserWhereInput[]
-    NOT?: ActiveUserWhereInput | ActiveUserWhereInput[]
-    duoSocketId?: StringNullableFilter<"ActiveUser"> | string | null
-    duoUsername?: StringNullableFilter<"ActiveUser"> | string | null
-    createdAt?: DateTimeFilter<"ActiveUser"> | Date | string
-    updatedAt?: DateTimeFilter<"ActiveUser"> | Date | string
-    user?: XOR<UserRelationFilter, UserWhereInput>
-  }, "id" | "socketId" | "username">
-
-  export type ActiveUserOrderByWithAggregationInput = {
-    id?: SortOrder
-    socketId?: SortOrder
-    username?: SortOrder
-    duoSocketId?: SortOrderInput | SortOrder
-    duoUsername?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    _count?: ActiveUserCountOrderByAggregateInput
-    _avg?: ActiveUserAvgOrderByAggregateInput
-    _max?: ActiveUserMaxOrderByAggregateInput
-    _min?: ActiveUserMinOrderByAggregateInput
-    _sum?: ActiveUserSumOrderByAggregateInput
-  }
-
-  export type ActiveUserScalarWhereWithAggregatesInput = {
-    AND?: ActiveUserScalarWhereWithAggregatesInput | ActiveUserScalarWhereWithAggregatesInput[]
-    OR?: ActiveUserScalarWhereWithAggregatesInput[]
-    NOT?: ActiveUserScalarWhereWithAggregatesInput | ActiveUserScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"ActiveUser"> | number
-    socketId?: StringWithAggregatesFilter<"ActiveUser"> | string
-    username?: StringWithAggregatesFilter<"ActiveUser"> | string
-    duoSocketId?: StringNullableWithAggregatesFilter<"ActiveUser"> | string | null
-    duoUsername?: StringNullableWithAggregatesFilter<"ActiveUser"> | string | null
-    createdAt?: DateTimeWithAggregatesFilter<"ActiveUser"> | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter<"ActiveUser"> | Date | string
+    image?: StringWithAggregatesFilter<"User"> | string
   }
 
   export type UserCreateInput = {
-    email: string
+    id: number
     username: string
-    password: string
-    dob: Date | string
-    gender: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    activeUsers?: ActiveUserCreateNestedManyWithoutUserInput
+    image: string
   }
 
   export type UserUncheckedCreateInput = {
-    id?: number
-    email: string
+    id: number
     username: string
-    password: string
-    dob: Date | string
-    gender: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    activeUsers?: ActiveUserUncheckedCreateNestedManyWithoutUserInput
+    image: string
   }
 
   export type UserUpdateInput = {
-    email?: StringFieldUpdateOperationsInput | string
     username?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    dob?: DateTimeFieldUpdateOperationsInput | Date | string
-    gender?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeUsers?: ActiveUserUpdateManyWithoutUserNestedInput
+    image?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    email?: StringFieldUpdateOperationsInput | string
     username?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    dob?: DateTimeFieldUpdateOperationsInput | Date | string
-    gender?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activeUsers?: ActiveUserUncheckedUpdateManyWithoutUserNestedInput
+    image?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserCreateManyInput = {
-    id?: number
-    email: string
+    id: number
     username: string
-    password: string
-    dob: Date | string
-    gender: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
+    image: string
   }
 
   export type UserUpdateManyMutationInput = {
-    email?: StringFieldUpdateOperationsInput | string
     username?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    dob?: DateTimeFieldUpdateOperationsInput | Date | string
-    gender?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    image?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    email?: StringFieldUpdateOperationsInput | string
     username?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    dob?: DateTimeFieldUpdateOperationsInput | Date | string
-    gender?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ActiveUserCreateInput = {
-    socketId: string
-    duoSocketId?: string | null
-    duoUsername?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutActiveUsersInput
-  }
-
-  export type ActiveUserUncheckedCreateInput = {
-    id?: number
-    socketId: string
-    username: string
-    duoSocketId?: string | null
-    duoUsername?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type ActiveUserUpdateInput = {
-    socketId?: StringFieldUpdateOperationsInput | string
-    duoSocketId?: NullableStringFieldUpdateOperationsInput | string | null
-    duoUsername?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutActiveUsersNestedInput
-  }
-
-  export type ActiveUserUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    socketId?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
-    duoSocketId?: NullableStringFieldUpdateOperationsInput | string | null
-    duoUsername?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ActiveUserCreateManyInput = {
-    id?: number
-    socketId: string
-    username: string
-    duoSocketId?: string | null
-    duoUsername?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type ActiveUserUpdateManyMutationInput = {
-    socketId?: StringFieldUpdateOperationsInput | string
-    duoSocketId?: NullableStringFieldUpdateOperationsInput | string | null
-    duoUsername?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ActiveUserUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    socketId?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
-    duoSocketId?: NullableStringFieldUpdateOperationsInput | string | null
-    duoUsername?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    image?: StringFieldUpdateOperationsInput | string
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -3406,36 +1882,10 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type DateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
-  export type ActiveUserListRelationFilter = {
-    every?: ActiveUserWhereInput
-    some?: ActiveUserWhereInput
-    none?: ActiveUserWhereInput
-  }
-
-  export type ActiveUserOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
-    email?: SortOrder
     username?: SortOrder
-    password?: SortOrder
-    dob?: SortOrder
-    gender?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
+    image?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
@@ -3444,24 +1894,14 @@ export namespace Prisma {
 
   export type UserMaxOrderByAggregateInput = {
     id?: SortOrder
-    email?: SortOrder
     username?: SortOrder
-    password?: SortOrder
-    dob?: SortOrder
-    gender?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
+    image?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
     id?: SortOrder
-    email?: SortOrder
     username?: SortOrder
-    password?: SortOrder
-    dob?: SortOrder
-    gender?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
+    image?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
@@ -3502,175 +1942,8 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type UserRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
-  }
-
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
-  }
-
-  export type ActiveUserCountOrderByAggregateInput = {
-    id?: SortOrder
-    socketId?: SortOrder
-    username?: SortOrder
-    duoSocketId?: SortOrder
-    duoUsername?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type ActiveUserAvgOrderByAggregateInput = {
-    id?: SortOrder
-  }
-
-  export type ActiveUserMaxOrderByAggregateInput = {
-    id?: SortOrder
-    socketId?: SortOrder
-    username?: SortOrder
-    duoSocketId?: SortOrder
-    duoUsername?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type ActiveUserMinOrderByAggregateInput = {
-    id?: SortOrder
-    socketId?: SortOrder
-    username?: SortOrder
-    duoSocketId?: SortOrder
-    duoUsername?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type ActiveUserSumOrderByAggregateInput = {
-    id?: SortOrder
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type ActiveUserCreateNestedManyWithoutUserInput = {
-    create?: XOR<ActiveUserCreateWithoutUserInput, ActiveUserUncheckedCreateWithoutUserInput> | ActiveUserCreateWithoutUserInput[] | ActiveUserUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: ActiveUserCreateOrConnectWithoutUserInput | ActiveUserCreateOrConnectWithoutUserInput[]
-    createMany?: ActiveUserCreateManyUserInputEnvelope
-    connect?: ActiveUserWhereUniqueInput | ActiveUserWhereUniqueInput[]
-  }
-
-  export type ActiveUserUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<ActiveUserCreateWithoutUserInput, ActiveUserUncheckedCreateWithoutUserInput> | ActiveUserCreateWithoutUserInput[] | ActiveUserUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: ActiveUserCreateOrConnectWithoutUserInput | ActiveUserCreateOrConnectWithoutUserInput[]
-    createMany?: ActiveUserCreateManyUserInputEnvelope
-    connect?: ActiveUserWhereUniqueInput | ActiveUserWhereUniqueInput[]
-  }
-
   export type StringFieldUpdateOperationsInput = {
     set?: string
-  }
-
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
-  }
-
-  export type ActiveUserUpdateManyWithoutUserNestedInput = {
-    create?: XOR<ActiveUserCreateWithoutUserInput, ActiveUserUncheckedCreateWithoutUserInput> | ActiveUserCreateWithoutUserInput[] | ActiveUserUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: ActiveUserCreateOrConnectWithoutUserInput | ActiveUserCreateOrConnectWithoutUserInput[]
-    upsert?: ActiveUserUpsertWithWhereUniqueWithoutUserInput | ActiveUserUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: ActiveUserCreateManyUserInputEnvelope
-    set?: ActiveUserWhereUniqueInput | ActiveUserWhereUniqueInput[]
-    disconnect?: ActiveUserWhereUniqueInput | ActiveUserWhereUniqueInput[]
-    delete?: ActiveUserWhereUniqueInput | ActiveUserWhereUniqueInput[]
-    connect?: ActiveUserWhereUniqueInput | ActiveUserWhereUniqueInput[]
-    update?: ActiveUserUpdateWithWhereUniqueWithoutUserInput | ActiveUserUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: ActiveUserUpdateManyWithWhereWithoutUserInput | ActiveUserUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: ActiveUserScalarWhereInput | ActiveUserScalarWhereInput[]
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
-  export type ActiveUserUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<ActiveUserCreateWithoutUserInput, ActiveUserUncheckedCreateWithoutUserInput> | ActiveUserCreateWithoutUserInput[] | ActiveUserUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: ActiveUserCreateOrConnectWithoutUserInput | ActiveUserCreateOrConnectWithoutUserInput[]
-    upsert?: ActiveUserUpsertWithWhereUniqueWithoutUserInput | ActiveUserUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: ActiveUserCreateManyUserInputEnvelope
-    set?: ActiveUserWhereUniqueInput | ActiveUserWhereUniqueInput[]
-    disconnect?: ActiveUserWhereUniqueInput | ActiveUserWhereUniqueInput[]
-    delete?: ActiveUserWhereUniqueInput | ActiveUserWhereUniqueInput[]
-    connect?: ActiveUserWhereUniqueInput | ActiveUserWhereUniqueInput[]
-    update?: ActiveUserUpdateWithWhereUniqueWithoutUserInput | ActiveUserUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: ActiveUserUpdateManyWithWhereWithoutUserInput | ActiveUserUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: ActiveUserScalarWhereInput | ActiveUserScalarWhereInput[]
-  }
-
-  export type UserCreateNestedOneWithoutActiveUsersInput = {
-    create?: XOR<UserCreateWithoutActiveUsersInput, UserUncheckedCreateWithoutActiveUsersInput>
-    connectOrCreate?: UserCreateOrConnectWithoutActiveUsersInput
-    connect?: UserWhereUniqueInput
-  }
-
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
-  }
-
-  export type UserUpdateOneRequiredWithoutActiveUsersNestedInput = {
-    create?: XOR<UserCreateWithoutActiveUsersInput, UserUncheckedCreateWithoutActiveUsersInput>
-    connectOrCreate?: UserCreateOrConnectWithoutActiveUsersInput
-    upsert?: UserUpsertWithoutActiveUsersInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutActiveUsersInput, UserUpdateWithoutActiveUsersInput>, UserUncheckedUpdateWithoutActiveUsersInput>
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -3696,17 +1969,6 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringFilter<$PrismaModel> | string
-  }
-
-  export type NestedDateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -3753,228 +2015,15 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type ActiveUserCreateWithoutUserInput = {
-    socketId: string
-    duoSocketId?: string | null
-    duoUsername?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type ActiveUserUncheckedCreateWithoutUserInput = {
-    id?: number
-    socketId: string
-    duoSocketId?: string | null
-    duoUsername?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type ActiveUserCreateOrConnectWithoutUserInput = {
-    where: ActiveUserWhereUniqueInput
-    create: XOR<ActiveUserCreateWithoutUserInput, ActiveUserUncheckedCreateWithoutUserInput>
-  }
-
-  export type ActiveUserCreateManyUserInputEnvelope = {
-    data: ActiveUserCreateManyUserInput | ActiveUserCreateManyUserInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type ActiveUserUpsertWithWhereUniqueWithoutUserInput = {
-    where: ActiveUserWhereUniqueInput
-    update: XOR<ActiveUserUpdateWithoutUserInput, ActiveUserUncheckedUpdateWithoutUserInput>
-    create: XOR<ActiveUserCreateWithoutUserInput, ActiveUserUncheckedCreateWithoutUserInput>
-  }
-
-  export type ActiveUserUpdateWithWhereUniqueWithoutUserInput = {
-    where: ActiveUserWhereUniqueInput
-    data: XOR<ActiveUserUpdateWithoutUserInput, ActiveUserUncheckedUpdateWithoutUserInput>
-  }
-
-  export type ActiveUserUpdateManyWithWhereWithoutUserInput = {
-    where: ActiveUserScalarWhereInput
-    data: XOR<ActiveUserUpdateManyMutationInput, ActiveUserUncheckedUpdateManyWithoutUserInput>
-  }
-
-  export type ActiveUserScalarWhereInput = {
-    AND?: ActiveUserScalarWhereInput | ActiveUserScalarWhereInput[]
-    OR?: ActiveUserScalarWhereInput[]
-    NOT?: ActiveUserScalarWhereInput | ActiveUserScalarWhereInput[]
-    id?: IntFilter<"ActiveUser"> | number
-    socketId?: StringFilter<"ActiveUser"> | string
-    username?: StringFilter<"ActiveUser"> | string
-    duoSocketId?: StringNullableFilter<"ActiveUser"> | string | null
-    duoUsername?: StringNullableFilter<"ActiveUser"> | string | null
-    createdAt?: DateTimeFilter<"ActiveUser"> | Date | string
-    updatedAt?: DateTimeFilter<"ActiveUser"> | Date | string
-  }
-
-  export type UserCreateWithoutActiveUsersInput = {
-    email: string
-    username: string
-    password: string
-    dob: Date | string
-    gender: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type UserUncheckedCreateWithoutActiveUsersInput = {
-    id?: number
-    email: string
-    username: string
-    password: string
-    dob: Date | string
-    gender: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type UserCreateOrConnectWithoutActiveUsersInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutActiveUsersInput, UserUncheckedCreateWithoutActiveUsersInput>
-  }
-
-  export type UserUpsertWithoutActiveUsersInput = {
-    update: XOR<UserUpdateWithoutActiveUsersInput, UserUncheckedUpdateWithoutActiveUsersInput>
-    create: XOR<UserCreateWithoutActiveUsersInput, UserUncheckedCreateWithoutActiveUsersInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutActiveUsersInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutActiveUsersInput, UserUncheckedUpdateWithoutActiveUsersInput>
-  }
-
-  export type UserUpdateWithoutActiveUsersInput = {
-    email?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    dob?: DateTimeFieldUpdateOperationsInput | Date | string
-    gender?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type UserUncheckedUpdateWithoutActiveUsersInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    email?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    dob?: DateTimeFieldUpdateOperationsInput | Date | string
-    gender?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ActiveUserCreateManyUserInput = {
-    id?: number
-    socketId: string
-    duoSocketId?: string | null
-    duoUsername?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type ActiveUserUpdateWithoutUserInput = {
-    socketId?: StringFieldUpdateOperationsInput | string
-    duoSocketId?: NullableStringFieldUpdateOperationsInput | string | null
-    duoUsername?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ActiveUserUncheckedUpdateWithoutUserInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    socketId?: StringFieldUpdateOperationsInput | string
-    duoSocketId?: NullableStringFieldUpdateOperationsInput | string | null
-    duoUsername?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ActiveUserUncheckedUpdateManyWithoutUserInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    socketId?: StringFieldUpdateOperationsInput | string
-    duoSocketId?: NullableStringFieldUpdateOperationsInput | string | null
-    duoUsername?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
 
 
   /**
    * Aliases for legacy arg types
    */
     /**
-     * @deprecated Use UserCountOutputTypeDefaultArgs instead
-     */
-    export type UserCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = UserCountOutputTypeDefaultArgs<ExtArgs>
-    /**
      * @deprecated Use UserDefaultArgs instead
      */
     export type UserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = UserDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use ActiveUserDefaultArgs instead
-     */
-    export type ActiveUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ActiveUserDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

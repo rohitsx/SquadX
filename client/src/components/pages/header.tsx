@@ -1,9 +1,21 @@
-import { useState } from "react";
-import logo from "../../assets/img/btc.png"
+import { useEffect, useState } from "react";
+import defaultPfp from "@/assets/img/defaultPfp.jpeg";
+import logo from "@/assets/img/btc.png";
 import { User, Settings, HelpCircle, LogOut, ChevronDown } from "lucide-react";
+import axios from "axios";
 
 export default function Header() {
   const [isNavOpen, setIsNavOpen] = useState<boolean>(false);
+  const [pfp, setPfp] = useState<string | undefined>();
+  useEffect(() => {
+    axios
+      .post(import.meta.env.VITE_API_URL + "/getPfp", {
+        username: localStorage.getItem("username"),
+      })
+      .then((res) => {
+        res.data !== "default" ? setPfp(res.data) : setPfp(defaultPfp);
+      });
+  }, []);
 
   return (
     <header className="bg-gray-800 shadow-md p-4 flex justify-between items-center">
@@ -17,7 +29,7 @@ export default function Header() {
           className="flex items-center space-x-2 bg-gray-700 rounded-full py-2 px-4 hover:bg-gray-600 transition duration-200"
         >
           <img
-            src={logo}
+            src={pfp}
             alt="User"
             className="w-8 h-8 rounded-full border-2 border-blue-400"
           />
