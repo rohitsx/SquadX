@@ -23,7 +23,7 @@ app.use(express.json());
 app.use("/", authRoutes);
 
 io.on("connection", (socket) => {
-//  handleSocketConnection(socket, io);
+  handleSocketConnection(socket, io);
 });
 
 httpServer.listen(PORT, () => {

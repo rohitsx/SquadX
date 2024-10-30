@@ -12,15 +12,19 @@ export interface remoteCallProps {
   stream: MediaStream | null;
   handleCallEnd: () => void;
   stranger: strangerProp | null;
+  duo?: boolean;
 }
 
 export default function RemoteCall({
   stream,
   handleCallEnd,
   stranger,
+  duo,
 }: remoteCallProps) {
-  const { peerConnection, start, sendOffer, handleOffer, resetPc } =
-    useWebRTC(stream);
+  const { peerConnection, start, sendOffer, handleOffer, resetPc } = useWebRTC(
+    stream,
+    duo,
+  );
   const socket = useSocket();
 
   useEffect(() => {
@@ -35,6 +39,17 @@ export default function RemoteCall({
     if (!stranger || !socket) return;
     sendOffer(socket, stranger.pairId);
     socket.on("message", (m) => {
+      console.log("message recvied on", !duo ? "message" : "duoMessage");
+      handleOffer({
+        socket: socket,
+        message: m,
+        strangerId: stranger.pairId,
+        polite: stranger.polite,
+      });
+    });
+
+    socket.on("duoMessage", (m) => {
+      console.log("message recvied on", !duo ? "message" : "duoMessage");
       handleOffer({
         socket: socket,
         message: m,
@@ -44,7 +59,7 @@ export default function RemoteCall({
     });
 
     return () => {
-      socket.off("message");
+      socket.off(!duo ? "message" : "duoMessage");
     };
   }, [stranger, socket, peerConnection, stream]);
 
@@ -62,7 +77,9 @@ export default function RemoteCall({
       <div>
         <RemoteVid pc={peerConnection} />
         <div className="bg-gradient-to-t from-black to-transparent p-4">
-          <p className="text-xl font-semibold text-white">{stranger?.pairName}</p>
+          <p className="text-xl font-semibold text-white">
+            {stranger?.pairName}
+          </p>
         </div>
       </div>
     </>

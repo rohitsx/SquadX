@@ -20,22 +20,19 @@ export default class socketServices {
 
   async handleUserJoin(user: handleUserJoinProp): Promise<void> {
     try {
-      const delay = Math.floor(Math.random() * (1000 - 0 + 1)) + 0;
+      await this.dbHelper.updateActiveUser(user);
+      const activeUsersLen = await this.dbHelper.getActiveUsersLength();
+
+      if (activeUsersLen === 0) {
+        await this.dbHelper.addToActiveUsers(user);
+        return;
+      }
+      const delay = Math.floor(Math.random() * (3000 - 0 + 1)) + 0;
       let pairFound = false;
       let attempts = 0;
       const maxAttempts = 3;
 
       while (!pairFound && attempts < maxAttempts) {
-        await this.dbHelper.updateActiveUser(user);
-
-        console.log("connected", user.username, user.duoUsername);
-        const activeUsersLen = await this.dbHelper.getActiveUsersLength();
-
-        console.log("active users length", activeUsersLen);
-        if (activeUsersLen === 0) {
-          await this.dbHelper.addToActiveUsers(user);
-          break;
-        }
         const check = await makePair(user, this.io);
         if (check === true) {
           pairFound = true;

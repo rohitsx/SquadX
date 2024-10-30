@@ -1,35 +1,18 @@
-import { console } from "inspector";
-import client from "../config/database";
+import { PrismaClient } from "../../prisma/generated/client1";
+import { psqlClient } from "../config/database";
 
-type handleUserJoinProp = {
+type HandleUserJoinProp = {
   socketId: string;
   username: string;
   duoSocketId?: string;
   duoUsername?: string;
 };
 
-export default class socketDatabaseHelper {
-  async getActiveUsers(): Promise<any[] | void> {
-    try {
-      const result = await client.query("SELECT * FROM active_users");
-      console.log(result.rows);
-      return result.rows;
-    } catch (err) {
-      console.log(err);
-    }
-  }
+export default class SocketDatabaseHelper {
+  private prisma: PrismaClient;
 
-  async addToActiveUsers(user: handleUserJoinProp): Promise<void> {
-    try {
-		console.log(user)
-      await client.query(
-        "INSERT INTO active_users (socket_id, username, duo_socket_id, duo_username) VALUES ($1, $2, $3, $4)",
-        [user.socketId, user.username, user.duoSocketId, user.duoUsername],
-      );
-      console.log("user", user.username, "added to db");
-    } catch (err) {
-      console.log("err, while added the user", err);
-    }
+  constructor() {
+    this.prisma = psqlClient;
   }
 
   async updateActiveUser({
@@ -37,71 +20,98 @@ export default class socketDatabaseHelper {
     username,
     duoSocketId,
     duoUsername,
-  }: handleUserJoinProp): Promise<void> {
+  }: HandleUserJoinProp): Promise<void> {
     try {
-      //check if user exits
-      const result = await client.query(
-        "SELECT * FROM active_users WHERE username = $1",
-        [username],
-      );
-      if (result.rows.length === 0) return;
+      const existingUser = await this.checkUserExists(username);
+      if (!existingUser) return;
 
-      //update
-      await client.query(
-        "UPDATE active_users SET socket_id = $1, duo_socket_id = $2, duo_username = $3 WHERE username = $4",
-        [socketId, duoSocketId, duoUsername, username],
-      );
+      const result = await this.prisma.activeUser.update({
+        where: { username },
+        data: {
+          socketId: socketId,
+          duoSocketId: duoSocketId || null,
+          duoUsername: duoUsername || null,
+        },
+      });
+      result && console.log("user", username, "updated in db");
     } catch (err) {
       console.log("updateActiveUser error", err);
+    }
+  }
+
+  async addToActiveUsers(user: HandleUserJoinProp): Promise<void> {
+    try {
+      await this.prisma.activeUser.create({
+        data: {
+          socketId: user.socketId,
+          username: user.username,
+          duoSocketId: user.duoSocketId || null,
+          duoUsername: user.duoUsername || null,
+        },
+      });
+      console.log("user", user.username, "added to db");
+    } catch (err) {
+      console.log("err, while added the user", err);
+    }
+  }
+
+  async getActiveUsersLength(): Promise<number | null> {
+    try {
+      const count = await this.prisma.activeUser.count();
+      return count;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  async getActiveUsers() {
+    try {
+      const result = await this.prisma.activeUser.findMany({
+        include: {
+          user: true,
+        },
+      });
+      console.log(result);
+      return result;
+    } catch (err) {
+      console.log(err);
     }
   }
 
   async deleteFromActiveUsers(
     username: string,
     socketId: string,
-  ): Promise<any> {
-    const result = await client.query(
-      "DELETE FROM active_users WHERE username = $1 OR socket_id = $2",
-      [username, socketId],
-    );
-    return result.rowCount;
+  ): Promise<number> {
+    const result = await this.prisma.activeUser.deleteMany({
+      where: {
+        OR: [{ username }, { socketId }],
+      },
+    });
+    return result.count;
   }
 
-  async removeUserBySocketId(socketId: string): Promise<any> {
-    const result = await client.query(
-      "DELETE FROM active_users WHERE socket_id = $1",
-      [socketId],
-    );
-    return result.rowCount;
+  async removeUserBySocketId(socketId: string): Promise<number> {
+    const result = await this.prisma.activeUser.delete({
+      where: { socketId },
+    });
+    return result ? 1 : 0;
   }
 
-  async getActiveUsersLength(): Promise<number | null> {
-    try {
-      const result = await client.query("SELECT COUNT(*) FROM active_users");
+  async getRandomUser(excludeUsername: string) {
+    const result = await this.prisma.$queryRaw`
+    SELECT * FROM "ActiveUser" 
+    WHERE username != ${excludeUsername} 
+    ORDER BY RANDOM() 
+    LIMIT 1
+  `;
 
-      return Number(result.rows[0].count);
-    } catch (err) {
-      return null;
-    }
+    // Since $queryRaw returns an array, we take the first element
+    return Array.isArray(result) ? result[0] : null;
   }
 
-  async getRandomUser(excludeUsername: string): Promise<any> {
-    const result = await client.query(
-      "SELECT * FROM active_users WHERE username != $1 ORDER BY RANDOM() LIMIT 1",
-      [excludeUsername],
-    );
-    return result.rows[0];
-  }
-
-  async checkUserExists(username: string): Promise<any> {
-    try {
-      const result = await client.query(
-        "SELECT * FROM active_users WHERE username = $1",
-        [username],
-      );
-      return result.rows[0];
-    } catch (err) {
-      console.log(err);
-    }
+  async checkUserExists(username: string) {
+      return await this.prisma.activeUser.findUnique({
+        where: { username },
+      });
   }
 }

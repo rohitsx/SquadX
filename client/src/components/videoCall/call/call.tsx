@@ -97,12 +97,14 @@ export default function Call() {
                   stream={stream}
                   handleCallEnd={handlePeer}
                   stranger={duo}
+				  duo={true}
                 />
               )}
               <RemoteCall
                 stream={stream}
                 handleCallEnd={handlePeer}
                 stranger={stranger}
+				duo={false}
               />
               <Controls
                 strangerId={stranger?.pairId}

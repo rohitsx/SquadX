@@ -11,7 +11,7 @@ type HandleOfferProps = {
   polite: boolean;
 };
 
-export const useWebRTC = (stream: MediaStream | null) => {
+export const useWebRTC = (stream: MediaStream | null, duo?: boolean) => {
   const [peerConnection, setPeerConnection] =
     useState<RTCPeerConnection | null>(null);
   const makingOfferRef = useRef(false);
@@ -37,14 +37,17 @@ export const useWebRTC = (stream: MediaStream | null) => {
       });
 
       peerConnection.onicecandidate = ({ candidate }) => {
-        socket.emit("message", { candidate, to: strangerId });
+        socket.emit(!duo ? "message" : "duoMessage", {
+          candidate,
+          to: strangerId,
+        });
       };
 
       peerConnection.onnegotiationneeded = async () => {
         try {
           makingOfferRef.current = true;
           await peerConnection.setLocalDescription();
-          socket.emit("message", {
+          socket.emit(!duo ? "message" : "duoMessage", {
             description: peerConnection.localDescription,
             to: strangerId,
           });
@@ -78,7 +81,7 @@ export const useWebRTC = (stream: MediaStream | null) => {
           await peerConnection.setRemoteDescription(description);
           if (description.type === "offer") {
             await peerConnection.setLocalDescription();
-            socket.emit("message", {
+            socket.emit(!duo ? "message" : "duoMessage", {
               description: peerConnection.localDescription,
               to: strangerId,
             });
