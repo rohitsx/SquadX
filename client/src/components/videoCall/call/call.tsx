@@ -6,6 +6,7 @@ import RemoteCall from "./remoteCall";
 import { useParams } from "react-router-dom";
 import FriendCall from "./friendCall";
 import { useFriend } from "@/context/friendContext";
+import { usePeerState } from "@/context/peerStateContext";
 
 type strangerProp = {
   pairId: string;
@@ -30,10 +31,11 @@ export default function Call() {
   const socket = useSocket();
   const { duoId } = useParams();
   const { friend } = useFriend();
+  const { friendConnectionState, strangerConnectionState } = usePeerState();
 
   const handlePeer = useCallback(
     (data?: userProps) => {
-		console.log("handlePeer", data);
+      console.log("handlePeer", data);
       setIsMatched(!!data);
       if (!data) {
         console.log("data reset");
@@ -65,12 +67,11 @@ export default function Call() {
   useEffect(() => {
     socket?.on("peer", handlePeer);
 
-    if (!socket || stranger) return;
-    !duoId &&
-      socket.emit("connectPeer", {
-        duoSocketId: friend?.pairId,
-        duoUsername: friend?.pairName,
-      });
+    if (!socket || stranger || duoId) return;
+    socket.emit("connectPeer", {
+      duoSocketId: friend?.pairId,
+      duoUsername: friend?.pairName,
+    });
 
     return () => {
       socket.off("peer", handlePeer);
@@ -92,20 +93,23 @@ export default function Call() {
         <div className="flex-1 relative bg-gray-900">
           {isMatched ? (
             <>
-              {duo && (
+              {strangerConnectionState === "connected" && duo && (
                 <RemoteCall
                   stream={stream}
                   handleCallEnd={handlePeer}
                   stranger={duo}
-				  duo={true}
+                  userType="duo"
                 />
               )}
-              <RemoteCall
-                stream={stream}
-                handleCallEnd={handlePeer}
-                stranger={stranger}
-				duo={false}
-              />
+              {(!friend || friendConnectionState === "connected") && (
+                <RemoteCall
+                  stream={stream}
+                  handleCallEnd={handlePeer}
+                  stranger={stranger}
+                  userType={"stranger"}
+                />
+              )}
+
               <Controls
                 strangerId={stranger?.pairId}
                 endCall={handlePeer}

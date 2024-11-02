@@ -1,3 +1,4 @@
+import { usePeerState } from "@/context/peerStateContext";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Socket } from "socket.io-client";
 
@@ -11,12 +12,19 @@ type HandleOfferProps = {
   polite: boolean;
 };
 
-export const useWebRTC = (stream: MediaStream | null, duo?: boolean) => {
+type useWebRTCProp = {
+  stream: MediaStream | null;
+  userType: "friends" | "duo" | "stranger";
+};
+
+export const useWebRTC = ({ stream, userType }: useWebRTCProp) => {
   const [peerConnection, setPeerConnection] =
     useState<RTCPeerConnection | null>(null);
   const makingOfferRef = useRef(false);
   const ignoreOfferRef = useRef(false);
   const politeRef = useRef(false);
+  const { setStrangerConnectionState, setFriendConnectionState } =
+    usePeerState();
 
   const start = useCallback(async () => {
     if (peerConnection && peerConnection.connectionState === "connected") {
@@ -25,7 +33,25 @@ export const useWebRTC = (stream: MediaStream | null, duo?: boolean) => {
     const newPeerConnection = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.mystunserver.tld" }],
     });
+
     setPeerConnection(newPeerConnection);
+  }, [peerConnection]);
+
+  useEffect(() => {
+    peerConnection?.addEventListener("connectionstatechange", () => {
+      if (peerConnection?.connectionState !== "connected") return;
+      console.log(userType, "connected");
+      switch (userType) {
+        case "stranger":
+          setStrangerConnectionState("connected");
+          break;
+        case "friends":
+          setFriendConnectionState("connected");
+          break;
+        default:
+          break;
+      }
+    });
   }, [peerConnection]);
 
   const sendOffer = useCallback(
@@ -37,7 +63,7 @@ export const useWebRTC = (stream: MediaStream | null, duo?: boolean) => {
       });
 
       peerConnection.onicecandidate = ({ candidate }) => {
-        socket.emit(!duo ? "message" : "duoMessage", {
+        socket.emit("message", {
           candidate,
           to: strangerId,
         });
@@ -47,7 +73,7 @@ export const useWebRTC = (stream: MediaStream | null, duo?: boolean) => {
         try {
           makingOfferRef.current = true;
           await peerConnection.setLocalDescription();
-          socket.emit(!duo ? "message" : "duoMessage", {
+          socket.emit("message", {
             description: peerConnection.localDescription,
             to: strangerId,
           });
@@ -81,7 +107,7 @@ export const useWebRTC = (stream: MediaStream | null, duo?: boolean) => {
           await peerConnection.setRemoteDescription(description);
           if (description.type === "offer") {
             await peerConnection.setLocalDescription();
-            socket.emit(!duo ? "message" : "duoMessage", {
+            socket.emit("message", {
               description: peerConnection.localDescription,
               to: strangerId,
             });

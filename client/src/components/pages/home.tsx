@@ -7,6 +7,7 @@ import { SocketProvider } from "@/context/socketContext";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { FriendProvider, useFriend } from "@/context/friendContext";
+import { PeerStateProvider } from "@/context/peerStateContext";
 
 const HomeContent = () => {
   const { startPage, setStartPage } = useStartPage();
@@ -24,7 +25,7 @@ const HomeContent = () => {
     <>
       {startPage === "start" && <StartPage />}
       {startPage === "solo" && <Call />}
-      {startPage === "duo" && <Call/>}
+      {startPage === "duo" && <Call />}
     </>
   );
 };
@@ -36,12 +37,14 @@ export default function Home() {
     <SocketProvider>
       <StartPageProvider>
         <FriendProvider>
-          <div className="flex flex-col h-screen bg-gray-900 text-gray-100">
-            <Header />
-            <div className="flex-1 flex p-6 space-x-6">
-              <HomeContent />
+          <PeerStateProvider>
+            <div className="flex flex-col h-screen bg-gray-900 text-gray-100">
+              <Header />
+              <div className="flex-1 flex p-6 space-x-6">
+                <HomeContent />
+              </div>
             </div>
-          </div>
+          </PeerStateProvider>
         </FriendProvider>
       </StartPageProvider>
     </SocketProvider>

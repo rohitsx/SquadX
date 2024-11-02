@@ -12,19 +12,19 @@ export interface remoteCallProps {
   stream: MediaStream | null;
   handleCallEnd: () => void;
   stranger: strangerProp | null;
-  duo?: boolean;
+  userType: "friends" | "duo" | "stranger";
 }
 
 export default function RemoteCall({
   stream,
   handleCallEnd,
   stranger,
-  duo,
+  userType,
 }: remoteCallProps) {
-  const { peerConnection, start, sendOffer, handleOffer, resetPc } = useWebRTC(
+  const { peerConnection, start, sendOffer, handleOffer, resetPc } = useWebRTC({
     stream,
-    duo,
-  );
+    userType,
+  });
   const socket = useSocket();
 
   useEffect(() => {
@@ -39,17 +39,6 @@ export default function RemoteCall({
     if (!stranger || !socket) return;
     sendOffer(socket, stranger.pairId);
     socket.on("message", (m) => {
-      console.log("message recvied on", !duo ? "message" : "duoMessage");
-      handleOffer({
-        socket: socket,
-        message: m,
-        strangerId: stranger.pairId,
-        polite: stranger.polite,
-      });
-    });
-
-    socket.on("duoMessage", (m) => {
-      console.log("message recvied on", !duo ? "message" : "duoMessage");
       handleOffer({
         socket: socket,
         message: m,
@@ -59,7 +48,7 @@ export default function RemoteCall({
     });
 
     return () => {
-      socket.off(!duo ? "message" : "duoMessage");
+      socket.off("message");
     };
   }, [stranger, socket, peerConnection, stream]);
 
