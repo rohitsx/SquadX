@@ -28,6 +28,6 @@ dist-ssr
 server/.env
 
 
-server/prisma/generator/
-server/prisma/generated/
-server/prisma/migrations/
+prisma/generator/
+prisma/generated/
+prisma/migrations/
