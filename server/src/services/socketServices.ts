@@ -54,14 +54,11 @@ export default class socketServices {
     }
   }
 
-  async handleCallEnd(
-    pairedId: string,
-    username: string,
-    socketId: string,
-  ): Promise<void> {
+  async handleCallEnd({pairId, duoId, username, socketId}:{pairId: string, duoId: string, username: string, socketId: string}): Promise<void> {
     try {
       await this.dbHelper.deleteFromActiveUsers(username, socketId);
-      pairedId && this.io.to(pairedId).emit("strangerLeft");
+      pairId && this.io.to(pairId).emit("strangerLeft");
+	  duoId && this.io.to(duoId).emit("strangerLeft");
       console.log("user", username, "deleted from db");
     } catch (err) {
       console.log(err);

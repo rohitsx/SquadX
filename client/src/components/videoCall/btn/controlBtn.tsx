@@ -5,12 +5,14 @@ import { useSocket } from "@/context/socketContext";
 
 interface ChatBoxProps {
   strangerId: string | undefined;
+  duoId: string | undefined;
   endCall: () => void;
   closeStream: () => void;
 }
 
 export default function Controls({
   strangerId,
+  duoId,
   endCall,
   closeStream,
 }: ChatBoxProps) {
@@ -19,7 +21,7 @@ export default function Controls({
 
   const handleSkip = useCallback(() => {
     endCall();
-    socket?.emit("skip", strangerId);
+    socket?.emit("skip", {strangerId, duoId});
   }, [socket, strangerId]);
 
   const handleEndCall = useCallback(() => {

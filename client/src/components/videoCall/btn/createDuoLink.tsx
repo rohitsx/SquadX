@@ -1,20 +1,16 @@
 import logo from "@/assets/img/btc.png";
-import { useFriend } from "@/context/friendContext";
 import { useSocket } from "@/context/socketContext";
-import { useStartPage } from "@/context/startPageContext";
+import axios from "axios";
 import { Clipboard } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
-interface hostDuoProp {
-  name: string;
-  socketId: string;
-}
+type CreateDuoLinkProp = {
+  setCheckCopied: (copied: boolean) => void;
+};
 
-export default function CreateDuoLink() {
+export default function CreateDuoLink({ setCheckCopied }: CreateDuoLinkProp) {
   const socket = useSocket();
-  const [copied, setCopied] = useState(false);
-  const { setStartPage } = useStartPage();
-  const { setFriend } = useFriend();
+  const [copied, setCopied] = useState<null | boolean>(null);
 
   const copyToClipboard = useCallback(() => {
     if (!socket) return;
@@ -26,24 +22,20 @@ export default function CreateDuoLink() {
         socket.id,
     );
     setCopied(true);
+    setCheckCopied(true);
     setTimeout(() => setCopied(false), 2000);
+
+    axios
+      .post(import.meta.env.VITE_API_URL + "/addToActiveDuoCall", {
+        username: localStorage.getItem("username"),
+        socketId: socket.id,
+        token: localStorage.getItem("token"),
+      })
+      .catch((err) => {
+        console.log(err.response.data.message);
+      });
+    console.log("copied");
   }, []);
-
-  const handleConnectDuoCall = useCallback(
-    (data: hostDuoProp) => {
-      setFriend({ pairName: data.name, pairId: data.socketId, polite: false });
-      setStartPage("solo");
-    },
-    [socket],
-  );
-
-  useEffect(() => {
-    if (!socket) return;
-    socket.on("connectDuoCall", handleConnectDuoCall);
-    return () => {
-      socket.off("connectDuoCall", handleConnectDuoCall);
-    };
-  }, [socket]);
 
   return (
     <>

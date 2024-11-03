@@ -61,7 +61,10 @@ export default function Call() {
   );
 
   const handleBeforeUnload = useCallback(() => {
-    socket?.emit("pairedclosedtab", stranger?.pairId);
+    socket?.emit("pairedclosedtab", {
+      pairId: stranger?.pairId,
+      duoId: duo?.pairId,
+    });
   }, [socket, stranger]);
 
   useEffect(() => {
@@ -112,6 +115,7 @@ export default function Call() {
 
               <Controls
                 strangerId={stranger?.pairId}
+                duoId={duo?.pairId}
                 endCall={handlePeer}
                 closeStream={closeStream}
               />

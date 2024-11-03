@@ -9,18 +9,19 @@ datasource db {
 }
 
 model User {
-  id          Int          @id @default(autoincrement())
-  email       String       @unique
-  username    String       @unique
-  password    String
-  dob         DateTime
-  gender      String
-  pfp         String       @default("default")
-  location    String       @default("default")
-  about       String       @default("default")
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  activeUsers ActiveUser[]
+  id             Int             @id @default(autoincrement())
+  email          String          @unique
+  username       String          @unique
+  password       String
+  dob            DateTime
+  gender         String
+  pfp            String          @default("default")
+  location       String          @default("default")
+  about          String          @default("default")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  activeUsers    ActiveUser[]
+  activeDuoCalls ActiveDuoCall[]
 }
 
 model ActiveUser {
@@ -32,4 +33,13 @@ model ActiveUser {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   user        User     @relation(fields: [username], references: [username])
+}
+
+model ActiveDuoCall {
+  id        Int      @id @default(autoincrement())
+  socketId  String   @unique
+  username  String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [username], references: [username])
 }

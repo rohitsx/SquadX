@@ -14,13 +14,18 @@ export function handleSocketConnection(socket: Socket, io: Server) {
     };
     skService.handleUserJoin(user);
   });
-
+  socket.on("koki", () => console.log("koki"));
   socket.on("message", (m) => io.to(m.to).emit("message", m));
   socket.on("duoMessage", (m) => io.to(m.to).emit("message", m));
 
-  socket.on("skip", (pairedId: string) => io.to(pairedId).emit("strangerLeft"));
-  socket.on("pairedclosedtab", (pairedId: string) =>
-    skService.handleCallEnd(pairedId, username, socket.id),
+  socket.on("skip", ({ strangerId, duoId }) => {
+    io.to(strangerId).emit("strangerLeft");
+    duoId && io.to(duoId).emit("strangerLeft");
+  });
+  socket.on(
+    "pairedclosedtab",
+    ({ pairId, duoId }: { pairId: string; duoId: string }) =>
+      skService.handleCallEnd({ pairId, duoId, username, socketId: socket.id }),
   );
   socket.on("chat", (m: { message: string; to: string }) =>
     io.to(m.to).emit("chat", m.message),
@@ -34,5 +39,8 @@ export function handleSocketConnection(socket: Socket, io: Server) {
     console.log("recived duoLive from", username, "to", to);
     io.to(to).emit("duoLive");
   });
-  socket.on("duoClosedTab", (to: string) => io.to(to).emit("duoClosedTab"));
+  socket.on("duoClosedTab", (to: string) => {
+    console.log("recived duoClosedTab from", username);
+    io.to(to).emit("duoClosedTab");
+  });
 }

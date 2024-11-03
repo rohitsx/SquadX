@@ -146,6 +146,14 @@ exports.Prisma.ActiveUserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ActiveDuoCallScalarFieldEnum = {
+  id: 'id',
+  socketId: 'socketId',
+  username: 'username',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -164,7 +172,8 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.ModelName = {
   User: 'User',
-  ActiveUser: 'ActiveUser'
+  ActiveUser: 'ActiveUser',
+  ActiveDuoCall: 'ActiveDuoCall'
 };
 
 /**

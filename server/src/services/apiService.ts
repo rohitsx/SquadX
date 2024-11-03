@@ -162,6 +162,71 @@ class ApiService {
       console.log("user not found", err);
     }
   }
+
+  static async addToActiveDuoCall(req: express.Request, res: express.Response) {
+    const { username, token, socketId } = req.body;
+    const decoded = jwt.verify(token, JWT_SECRET);
+    let user;
+    if (decoded) {
+      const checkUser = await psqlClient.activeDuoCall.findUnique({
+        where: {
+          username,
+        },
+      });
+      if (checkUser) {
+        user = await psqlClient.activeDuoCall.update({
+          where: {
+            username,
+          },
+          data: {
+            socketId,
+          },
+        });
+      } else {
+        user = await psqlClient.activeDuoCall.create({
+          data: {
+            username,
+            socketId,
+          },
+        });
+      }
+      if (user) res.json("success");
+    }
+  }
+  static async deleteFromActiveDuoCall(
+    req: express.Request,
+    res: express.Response,
+  ) {
+    const { username, token } = req.body;
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded) {
+      const user = await psqlClient.activeDuoCall.deleteMany({
+        where: {
+          username,
+        },
+      });
+      if (user) res.json("success");
+    }
+  }
+
+  static async getActiveDuoCall(req: express.Request, res: express.Response) {
+    const { friendName, socketId, token } = req.body;
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded) {
+      const user = await psqlClient.activeDuoCall.findUnique({
+        where: {
+          username: friendName,
+          socketId: socketId,
+        },
+      });
+      await psqlClient.activeDuoCall.deleteMany({
+        where: {
+          username: friendName,
+        },
+      });
+      user ? res.json("success") : res.json("error");
+    }
+  }
 }
 
 export default ApiService;

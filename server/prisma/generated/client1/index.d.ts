@@ -23,6 +23,11 @@ export type User = $Result.DefaultSelection<Prisma.$UserPayload>
  * 
  */
 export type ActiveUser = $Result.DefaultSelection<Prisma.$ActiveUserPayload>
+/**
+ * Model ActiveDuoCall
+ * 
+ */
+export type ActiveDuoCall = $Result.DefaultSelection<Prisma.$ActiveDuoCallPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -166,6 +171,16 @@ export class PrismaClient<
     * ```
     */
   get activeUser(): Prisma.ActiveUserDelegate<ExtArgs>;
+
+  /**
+   * `prisma.activeDuoCall`: Exposes CRUD operations for the **ActiveDuoCall** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ActiveDuoCalls
+    * const activeDuoCalls = await prisma.activeDuoCall.findMany()
+    * ```
+    */
+  get activeDuoCall(): Prisma.ActiveDuoCallDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -608,7 +623,8 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
-    ActiveUser: 'ActiveUser'
+    ActiveUser: 'ActiveUser',
+    ActiveDuoCall: 'ActiveDuoCall'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -624,7 +640,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "activeUser"
+      modelProps: "user" | "activeUser" | "activeDuoCall"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -765,6 +781,76 @@ export namespace Prisma {
           count: {
             args: Prisma.ActiveUserCountArgs<ExtArgs>
             result: $Utils.Optional<ActiveUserCountAggregateOutputType> | number
+          }
+        }
+      }
+      ActiveDuoCall: {
+        payload: Prisma.$ActiveDuoCallPayload<ExtArgs>
+        fields: Prisma.ActiveDuoCallFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ActiveDuoCallFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActiveDuoCallPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ActiveDuoCallFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActiveDuoCallPayload>
+          }
+          findFirst: {
+            args: Prisma.ActiveDuoCallFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActiveDuoCallPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ActiveDuoCallFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActiveDuoCallPayload>
+          }
+          findMany: {
+            args: Prisma.ActiveDuoCallFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActiveDuoCallPayload>[]
+          }
+          create: {
+            args: Prisma.ActiveDuoCallCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActiveDuoCallPayload>
+          }
+          createMany: {
+            args: Prisma.ActiveDuoCallCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ActiveDuoCallCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActiveDuoCallPayload>[]
+          }
+          delete: {
+            args: Prisma.ActiveDuoCallDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActiveDuoCallPayload>
+          }
+          update: {
+            args: Prisma.ActiveDuoCallUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActiveDuoCallPayload>
+          }
+          deleteMany: {
+            args: Prisma.ActiveDuoCallDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ActiveDuoCallUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ActiveDuoCallUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActiveDuoCallPayload>
+          }
+          aggregate: {
+            args: Prisma.ActiveDuoCallAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateActiveDuoCall>
+          }
+          groupBy: {
+            args: Prisma.ActiveDuoCallGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ActiveDuoCallGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ActiveDuoCallCountArgs<ExtArgs>
+            result: $Utils.Optional<ActiveDuoCallCountAggregateOutputType> | number
           }
         }
       }
@@ -930,10 +1016,12 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     activeUsers: number
+    activeDuoCalls: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     activeUsers?: boolean | UserCountOutputTypeCountActiveUsersArgs
+    activeDuoCalls?: boolean | UserCountOutputTypeCountActiveDuoCallsArgs
   }
 
   // Custom InputTypes
@@ -952,6 +1040,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountActiveUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ActiveUserWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountActiveDuoCallsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ActiveDuoCallWhereInput
   }
 
 
@@ -1206,6 +1301,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     activeUsers?: boolean | User$activeUsersArgs<ExtArgs>
+    activeDuoCalls?: boolean | User$activeDuoCallsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -1239,6 +1335,7 @@ export namespace Prisma {
 
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     activeUsers?: boolean | User$activeUsersArgs<ExtArgs>
+    activeDuoCalls?: boolean | User$activeDuoCallsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -1247,6 +1344,7 @@ export namespace Prisma {
     name: "User"
     objects: {
       activeUsers: Prisma.$ActiveUserPayload<ExtArgs>[]
+      activeDuoCalls: Prisma.$ActiveDuoCallPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -1625,6 +1723,7 @@ export namespace Prisma {
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     activeUsers<T extends User$activeUsersArgs<ExtArgs> = {}>(args?: Subset<T, User$activeUsersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActiveUserPayload<ExtArgs>, T, "findMany"> | Null>
+    activeDuoCalls<T extends User$activeDuoCallsArgs<ExtArgs> = {}>(args?: Subset<T, User$activeDuoCallsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActiveDuoCallPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1996,6 +2095,26 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ActiveUserScalarFieldEnum | ActiveUserScalarFieldEnum[]
+  }
+
+  /**
+   * User.activeDuoCalls
+   */
+  export type User$activeDuoCallsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActiveDuoCall
+     */
+    select?: ActiveDuoCallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActiveDuoCallInclude<ExtArgs> | null
+    where?: ActiveDuoCallWhereInput
+    orderBy?: ActiveDuoCallOrderByWithRelationInput | ActiveDuoCallOrderByWithRelationInput[]
+    cursor?: ActiveDuoCallWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ActiveDuoCallScalarFieldEnum | ActiveDuoCallScalarFieldEnum[]
   }
 
   /**
@@ -3005,6 +3124,973 @@ export namespace Prisma {
 
 
   /**
+   * Model ActiveDuoCall
+   */
+
+  export type AggregateActiveDuoCall = {
+    _count: ActiveDuoCallCountAggregateOutputType | null
+    _avg: ActiveDuoCallAvgAggregateOutputType | null
+    _sum: ActiveDuoCallSumAggregateOutputType | null
+    _min: ActiveDuoCallMinAggregateOutputType | null
+    _max: ActiveDuoCallMaxAggregateOutputType | null
+  }
+
+  export type ActiveDuoCallAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type ActiveDuoCallSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type ActiveDuoCallMinAggregateOutputType = {
+    id: number | null
+    socketId: string | null
+    username: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ActiveDuoCallMaxAggregateOutputType = {
+    id: number | null
+    socketId: string | null
+    username: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ActiveDuoCallCountAggregateOutputType = {
+    id: number
+    socketId: number
+    username: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ActiveDuoCallAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type ActiveDuoCallSumAggregateInputType = {
+    id?: true
+  }
+
+  export type ActiveDuoCallMinAggregateInputType = {
+    id?: true
+    socketId?: true
+    username?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ActiveDuoCallMaxAggregateInputType = {
+    id?: true
+    socketId?: true
+    username?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ActiveDuoCallCountAggregateInputType = {
+    id?: true
+    socketId?: true
+    username?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ActiveDuoCallAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ActiveDuoCall to aggregate.
+     */
+    where?: ActiveDuoCallWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ActiveDuoCalls to fetch.
+     */
+    orderBy?: ActiveDuoCallOrderByWithRelationInput | ActiveDuoCallOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ActiveDuoCallWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ActiveDuoCalls from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ActiveDuoCalls.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ActiveDuoCalls
+    **/
+    _count?: true | ActiveDuoCallCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ActiveDuoCallAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ActiveDuoCallSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ActiveDuoCallMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ActiveDuoCallMaxAggregateInputType
+  }
+
+  export type GetActiveDuoCallAggregateType<T extends ActiveDuoCallAggregateArgs> = {
+        [P in keyof T & keyof AggregateActiveDuoCall]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateActiveDuoCall[P]>
+      : GetScalarType<T[P], AggregateActiveDuoCall[P]>
+  }
+
+
+
+
+  export type ActiveDuoCallGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ActiveDuoCallWhereInput
+    orderBy?: ActiveDuoCallOrderByWithAggregationInput | ActiveDuoCallOrderByWithAggregationInput[]
+    by: ActiveDuoCallScalarFieldEnum[] | ActiveDuoCallScalarFieldEnum
+    having?: ActiveDuoCallScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ActiveDuoCallCountAggregateInputType | true
+    _avg?: ActiveDuoCallAvgAggregateInputType
+    _sum?: ActiveDuoCallSumAggregateInputType
+    _min?: ActiveDuoCallMinAggregateInputType
+    _max?: ActiveDuoCallMaxAggregateInputType
+  }
+
+  export type ActiveDuoCallGroupByOutputType = {
+    id: number
+    socketId: string
+    username: string
+    createdAt: Date
+    updatedAt: Date
+    _count: ActiveDuoCallCountAggregateOutputType | null
+    _avg: ActiveDuoCallAvgAggregateOutputType | null
+    _sum: ActiveDuoCallSumAggregateOutputType | null
+    _min: ActiveDuoCallMinAggregateOutputType | null
+    _max: ActiveDuoCallMaxAggregateOutputType | null
+  }
+
+  type GetActiveDuoCallGroupByPayload<T extends ActiveDuoCallGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ActiveDuoCallGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ActiveDuoCallGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ActiveDuoCallGroupByOutputType[P]>
+            : GetScalarType<T[P], ActiveDuoCallGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ActiveDuoCallSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    socketId?: boolean
+    username?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["activeDuoCall"]>
+
+  export type ActiveDuoCallSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    socketId?: boolean
+    username?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["activeDuoCall"]>
+
+  export type ActiveDuoCallSelectScalar = {
+    id?: boolean
+    socketId?: boolean
+    username?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ActiveDuoCallInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ActiveDuoCallIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $ActiveDuoCallPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ActiveDuoCall"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      socketId: string
+      username: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["activeDuoCall"]>
+    composites: {}
+  }
+
+  type ActiveDuoCallGetPayload<S extends boolean | null | undefined | ActiveDuoCallDefaultArgs> = $Result.GetResult<Prisma.$ActiveDuoCallPayload, S>
+
+  type ActiveDuoCallCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<ActiveDuoCallFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: ActiveDuoCallCountAggregateInputType | true
+    }
+
+  export interface ActiveDuoCallDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ActiveDuoCall'], meta: { name: 'ActiveDuoCall' } }
+    /**
+     * Find zero or one ActiveDuoCall that matches the filter.
+     * @param {ActiveDuoCallFindUniqueArgs} args - Arguments to find a ActiveDuoCall
+     * @example
+     * // Get one ActiveDuoCall
+     * const activeDuoCall = await prisma.activeDuoCall.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ActiveDuoCallFindUniqueArgs>(args: SelectSubset<T, ActiveDuoCallFindUniqueArgs<ExtArgs>>): Prisma__ActiveDuoCallClient<$Result.GetResult<Prisma.$ActiveDuoCallPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one ActiveDuoCall that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {ActiveDuoCallFindUniqueOrThrowArgs} args - Arguments to find a ActiveDuoCall
+     * @example
+     * // Get one ActiveDuoCall
+     * const activeDuoCall = await prisma.activeDuoCall.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ActiveDuoCallFindUniqueOrThrowArgs>(args: SelectSubset<T, ActiveDuoCallFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ActiveDuoCallClient<$Result.GetResult<Prisma.$ActiveDuoCallPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first ActiveDuoCall that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActiveDuoCallFindFirstArgs} args - Arguments to find a ActiveDuoCall
+     * @example
+     * // Get one ActiveDuoCall
+     * const activeDuoCall = await prisma.activeDuoCall.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ActiveDuoCallFindFirstArgs>(args?: SelectSubset<T, ActiveDuoCallFindFirstArgs<ExtArgs>>): Prisma__ActiveDuoCallClient<$Result.GetResult<Prisma.$ActiveDuoCallPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first ActiveDuoCall that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActiveDuoCallFindFirstOrThrowArgs} args - Arguments to find a ActiveDuoCall
+     * @example
+     * // Get one ActiveDuoCall
+     * const activeDuoCall = await prisma.activeDuoCall.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ActiveDuoCallFindFirstOrThrowArgs>(args?: SelectSubset<T, ActiveDuoCallFindFirstOrThrowArgs<ExtArgs>>): Prisma__ActiveDuoCallClient<$Result.GetResult<Prisma.$ActiveDuoCallPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more ActiveDuoCalls that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActiveDuoCallFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ActiveDuoCalls
+     * const activeDuoCalls = await prisma.activeDuoCall.findMany()
+     * 
+     * // Get first 10 ActiveDuoCalls
+     * const activeDuoCalls = await prisma.activeDuoCall.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const activeDuoCallWithIdOnly = await prisma.activeDuoCall.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ActiveDuoCallFindManyArgs>(args?: SelectSubset<T, ActiveDuoCallFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActiveDuoCallPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a ActiveDuoCall.
+     * @param {ActiveDuoCallCreateArgs} args - Arguments to create a ActiveDuoCall.
+     * @example
+     * // Create one ActiveDuoCall
+     * const ActiveDuoCall = await prisma.activeDuoCall.create({
+     *   data: {
+     *     // ... data to create a ActiveDuoCall
+     *   }
+     * })
+     * 
+     */
+    create<T extends ActiveDuoCallCreateArgs>(args: SelectSubset<T, ActiveDuoCallCreateArgs<ExtArgs>>): Prisma__ActiveDuoCallClient<$Result.GetResult<Prisma.$ActiveDuoCallPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many ActiveDuoCalls.
+     * @param {ActiveDuoCallCreateManyArgs} args - Arguments to create many ActiveDuoCalls.
+     * @example
+     * // Create many ActiveDuoCalls
+     * const activeDuoCall = await prisma.activeDuoCall.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ActiveDuoCallCreateManyArgs>(args?: SelectSubset<T, ActiveDuoCallCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ActiveDuoCalls and returns the data saved in the database.
+     * @param {ActiveDuoCallCreateManyAndReturnArgs} args - Arguments to create many ActiveDuoCalls.
+     * @example
+     * // Create many ActiveDuoCalls
+     * const activeDuoCall = await prisma.activeDuoCall.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ActiveDuoCalls and only return the `id`
+     * const activeDuoCallWithIdOnly = await prisma.activeDuoCall.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ActiveDuoCallCreateManyAndReturnArgs>(args?: SelectSubset<T, ActiveDuoCallCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActiveDuoCallPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a ActiveDuoCall.
+     * @param {ActiveDuoCallDeleteArgs} args - Arguments to delete one ActiveDuoCall.
+     * @example
+     * // Delete one ActiveDuoCall
+     * const ActiveDuoCall = await prisma.activeDuoCall.delete({
+     *   where: {
+     *     // ... filter to delete one ActiveDuoCall
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ActiveDuoCallDeleteArgs>(args: SelectSubset<T, ActiveDuoCallDeleteArgs<ExtArgs>>): Prisma__ActiveDuoCallClient<$Result.GetResult<Prisma.$ActiveDuoCallPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one ActiveDuoCall.
+     * @param {ActiveDuoCallUpdateArgs} args - Arguments to update one ActiveDuoCall.
+     * @example
+     * // Update one ActiveDuoCall
+     * const activeDuoCall = await prisma.activeDuoCall.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ActiveDuoCallUpdateArgs>(args: SelectSubset<T, ActiveDuoCallUpdateArgs<ExtArgs>>): Prisma__ActiveDuoCallClient<$Result.GetResult<Prisma.$ActiveDuoCallPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more ActiveDuoCalls.
+     * @param {ActiveDuoCallDeleteManyArgs} args - Arguments to filter ActiveDuoCalls to delete.
+     * @example
+     * // Delete a few ActiveDuoCalls
+     * const { count } = await prisma.activeDuoCall.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ActiveDuoCallDeleteManyArgs>(args?: SelectSubset<T, ActiveDuoCallDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ActiveDuoCalls.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActiveDuoCallUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ActiveDuoCalls
+     * const activeDuoCall = await prisma.activeDuoCall.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ActiveDuoCallUpdateManyArgs>(args: SelectSubset<T, ActiveDuoCallUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ActiveDuoCall.
+     * @param {ActiveDuoCallUpsertArgs} args - Arguments to update or create a ActiveDuoCall.
+     * @example
+     * // Update or create a ActiveDuoCall
+     * const activeDuoCall = await prisma.activeDuoCall.upsert({
+     *   create: {
+     *     // ... data to create a ActiveDuoCall
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ActiveDuoCall we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ActiveDuoCallUpsertArgs>(args: SelectSubset<T, ActiveDuoCallUpsertArgs<ExtArgs>>): Prisma__ActiveDuoCallClient<$Result.GetResult<Prisma.$ActiveDuoCallPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of ActiveDuoCalls.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActiveDuoCallCountArgs} args - Arguments to filter ActiveDuoCalls to count.
+     * @example
+     * // Count the number of ActiveDuoCalls
+     * const count = await prisma.activeDuoCall.count({
+     *   where: {
+     *     // ... the filter for the ActiveDuoCalls we want to count
+     *   }
+     * })
+    **/
+    count<T extends ActiveDuoCallCountArgs>(
+      args?: Subset<T, ActiveDuoCallCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ActiveDuoCallCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ActiveDuoCall.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActiveDuoCallAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ActiveDuoCallAggregateArgs>(args: Subset<T, ActiveDuoCallAggregateArgs>): Prisma.PrismaPromise<GetActiveDuoCallAggregateType<T>>
+
+    /**
+     * Group by ActiveDuoCall.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActiveDuoCallGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ActiveDuoCallGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ActiveDuoCallGroupByArgs['orderBy'] }
+        : { orderBy?: ActiveDuoCallGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ActiveDuoCallGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetActiveDuoCallGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ActiveDuoCall model
+   */
+  readonly fields: ActiveDuoCallFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ActiveDuoCall.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ActiveDuoCallClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ActiveDuoCall model
+   */ 
+  interface ActiveDuoCallFieldRefs {
+    readonly id: FieldRef<"ActiveDuoCall", 'Int'>
+    readonly socketId: FieldRef<"ActiveDuoCall", 'String'>
+    readonly username: FieldRef<"ActiveDuoCall", 'String'>
+    readonly createdAt: FieldRef<"ActiveDuoCall", 'DateTime'>
+    readonly updatedAt: FieldRef<"ActiveDuoCall", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ActiveDuoCall findUnique
+   */
+  export type ActiveDuoCallFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActiveDuoCall
+     */
+    select?: ActiveDuoCallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActiveDuoCallInclude<ExtArgs> | null
+    /**
+     * Filter, which ActiveDuoCall to fetch.
+     */
+    where: ActiveDuoCallWhereUniqueInput
+  }
+
+  /**
+   * ActiveDuoCall findUniqueOrThrow
+   */
+  export type ActiveDuoCallFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActiveDuoCall
+     */
+    select?: ActiveDuoCallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActiveDuoCallInclude<ExtArgs> | null
+    /**
+     * Filter, which ActiveDuoCall to fetch.
+     */
+    where: ActiveDuoCallWhereUniqueInput
+  }
+
+  /**
+   * ActiveDuoCall findFirst
+   */
+  export type ActiveDuoCallFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActiveDuoCall
+     */
+    select?: ActiveDuoCallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActiveDuoCallInclude<ExtArgs> | null
+    /**
+     * Filter, which ActiveDuoCall to fetch.
+     */
+    where?: ActiveDuoCallWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ActiveDuoCalls to fetch.
+     */
+    orderBy?: ActiveDuoCallOrderByWithRelationInput | ActiveDuoCallOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ActiveDuoCalls.
+     */
+    cursor?: ActiveDuoCallWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ActiveDuoCalls from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ActiveDuoCalls.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ActiveDuoCalls.
+     */
+    distinct?: ActiveDuoCallScalarFieldEnum | ActiveDuoCallScalarFieldEnum[]
+  }
+
+  /**
+   * ActiveDuoCall findFirstOrThrow
+   */
+  export type ActiveDuoCallFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActiveDuoCall
+     */
+    select?: ActiveDuoCallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActiveDuoCallInclude<ExtArgs> | null
+    /**
+     * Filter, which ActiveDuoCall to fetch.
+     */
+    where?: ActiveDuoCallWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ActiveDuoCalls to fetch.
+     */
+    orderBy?: ActiveDuoCallOrderByWithRelationInput | ActiveDuoCallOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ActiveDuoCalls.
+     */
+    cursor?: ActiveDuoCallWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ActiveDuoCalls from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ActiveDuoCalls.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ActiveDuoCalls.
+     */
+    distinct?: ActiveDuoCallScalarFieldEnum | ActiveDuoCallScalarFieldEnum[]
+  }
+
+  /**
+   * ActiveDuoCall findMany
+   */
+  export type ActiveDuoCallFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActiveDuoCall
+     */
+    select?: ActiveDuoCallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActiveDuoCallInclude<ExtArgs> | null
+    /**
+     * Filter, which ActiveDuoCalls to fetch.
+     */
+    where?: ActiveDuoCallWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ActiveDuoCalls to fetch.
+     */
+    orderBy?: ActiveDuoCallOrderByWithRelationInput | ActiveDuoCallOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ActiveDuoCalls.
+     */
+    cursor?: ActiveDuoCallWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ActiveDuoCalls from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ActiveDuoCalls.
+     */
+    skip?: number
+    distinct?: ActiveDuoCallScalarFieldEnum | ActiveDuoCallScalarFieldEnum[]
+  }
+
+  /**
+   * ActiveDuoCall create
+   */
+  export type ActiveDuoCallCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActiveDuoCall
+     */
+    select?: ActiveDuoCallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActiveDuoCallInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ActiveDuoCall.
+     */
+    data: XOR<ActiveDuoCallCreateInput, ActiveDuoCallUncheckedCreateInput>
+  }
+
+  /**
+   * ActiveDuoCall createMany
+   */
+  export type ActiveDuoCallCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ActiveDuoCalls.
+     */
+    data: ActiveDuoCallCreateManyInput | ActiveDuoCallCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ActiveDuoCall createManyAndReturn
+   */
+  export type ActiveDuoCallCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActiveDuoCall
+     */
+    select?: ActiveDuoCallSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many ActiveDuoCalls.
+     */
+    data: ActiveDuoCallCreateManyInput | ActiveDuoCallCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActiveDuoCallIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ActiveDuoCall update
+   */
+  export type ActiveDuoCallUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActiveDuoCall
+     */
+    select?: ActiveDuoCallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActiveDuoCallInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ActiveDuoCall.
+     */
+    data: XOR<ActiveDuoCallUpdateInput, ActiveDuoCallUncheckedUpdateInput>
+    /**
+     * Choose, which ActiveDuoCall to update.
+     */
+    where: ActiveDuoCallWhereUniqueInput
+  }
+
+  /**
+   * ActiveDuoCall updateMany
+   */
+  export type ActiveDuoCallUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ActiveDuoCalls.
+     */
+    data: XOR<ActiveDuoCallUpdateManyMutationInput, ActiveDuoCallUncheckedUpdateManyInput>
+    /**
+     * Filter which ActiveDuoCalls to update
+     */
+    where?: ActiveDuoCallWhereInput
+  }
+
+  /**
+   * ActiveDuoCall upsert
+   */
+  export type ActiveDuoCallUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActiveDuoCall
+     */
+    select?: ActiveDuoCallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActiveDuoCallInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ActiveDuoCall to update in case it exists.
+     */
+    where: ActiveDuoCallWhereUniqueInput
+    /**
+     * In case the ActiveDuoCall found by the `where` argument doesn't exist, create a new ActiveDuoCall with this data.
+     */
+    create: XOR<ActiveDuoCallCreateInput, ActiveDuoCallUncheckedCreateInput>
+    /**
+     * In case the ActiveDuoCall was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ActiveDuoCallUpdateInput, ActiveDuoCallUncheckedUpdateInput>
+  }
+
+  /**
+   * ActiveDuoCall delete
+   */
+  export type ActiveDuoCallDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActiveDuoCall
+     */
+    select?: ActiveDuoCallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActiveDuoCallInclude<ExtArgs> | null
+    /**
+     * Filter which ActiveDuoCall to delete.
+     */
+    where: ActiveDuoCallWhereUniqueInput
+  }
+
+  /**
+   * ActiveDuoCall deleteMany
+   */
+  export type ActiveDuoCallDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ActiveDuoCalls to delete
+     */
+    where?: ActiveDuoCallWhereInput
+  }
+
+  /**
+   * ActiveDuoCall without action
+   */
+  export type ActiveDuoCallDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActiveDuoCall
+     */
+    select?: ActiveDuoCallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActiveDuoCallInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -3046,6 +4132,17 @@ export namespace Prisma {
   };
 
   export type ActiveUserScalarFieldEnum = (typeof ActiveUserScalarFieldEnum)[keyof typeof ActiveUserScalarFieldEnum]
+
+
+  export const ActiveDuoCallScalarFieldEnum: {
+    id: 'id',
+    socketId: 'socketId',
+    username: 'username',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ActiveDuoCallScalarFieldEnum = (typeof ActiveDuoCallScalarFieldEnum)[keyof typeof ActiveDuoCallScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -3152,6 +4249,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     activeUsers?: ActiveUserListRelationFilter
+    activeDuoCalls?: ActiveDuoCallListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -3167,6 +4265,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     activeUsers?: ActiveUserOrderByRelationAggregateInput
+    activeDuoCalls?: ActiveDuoCallOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -3185,6 +4284,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     activeUsers?: ActiveUserListRelationFilter
+    activeDuoCalls?: ActiveDuoCallListRelationFilter
   }, "id" | "email" | "username">
 
   export type UserOrderByWithAggregationInput = {
@@ -3290,6 +4390,63 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"ActiveUser"> | Date | string
   }
 
+  export type ActiveDuoCallWhereInput = {
+    AND?: ActiveDuoCallWhereInput | ActiveDuoCallWhereInput[]
+    OR?: ActiveDuoCallWhereInput[]
+    NOT?: ActiveDuoCallWhereInput | ActiveDuoCallWhereInput[]
+    id?: IntFilter<"ActiveDuoCall"> | number
+    socketId?: StringFilter<"ActiveDuoCall"> | string
+    username?: StringFilter<"ActiveDuoCall"> | string
+    createdAt?: DateTimeFilter<"ActiveDuoCall"> | Date | string
+    updatedAt?: DateTimeFilter<"ActiveDuoCall"> | Date | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+  }
+
+  export type ActiveDuoCallOrderByWithRelationInput = {
+    id?: SortOrder
+    socketId?: SortOrder
+    username?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type ActiveDuoCallWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    socketId?: string
+    username?: string
+    AND?: ActiveDuoCallWhereInput | ActiveDuoCallWhereInput[]
+    OR?: ActiveDuoCallWhereInput[]
+    NOT?: ActiveDuoCallWhereInput | ActiveDuoCallWhereInput[]
+    createdAt?: DateTimeFilter<"ActiveDuoCall"> | Date | string
+    updatedAt?: DateTimeFilter<"ActiveDuoCall"> | Date | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+  }, "id" | "socketId" | "username">
+
+  export type ActiveDuoCallOrderByWithAggregationInput = {
+    id?: SortOrder
+    socketId?: SortOrder
+    username?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ActiveDuoCallCountOrderByAggregateInput
+    _avg?: ActiveDuoCallAvgOrderByAggregateInput
+    _max?: ActiveDuoCallMaxOrderByAggregateInput
+    _min?: ActiveDuoCallMinOrderByAggregateInput
+    _sum?: ActiveDuoCallSumOrderByAggregateInput
+  }
+
+  export type ActiveDuoCallScalarWhereWithAggregatesInput = {
+    AND?: ActiveDuoCallScalarWhereWithAggregatesInput | ActiveDuoCallScalarWhereWithAggregatesInput[]
+    OR?: ActiveDuoCallScalarWhereWithAggregatesInput[]
+    NOT?: ActiveDuoCallScalarWhereWithAggregatesInput | ActiveDuoCallScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"ActiveDuoCall"> | number
+    socketId?: StringWithAggregatesFilter<"ActiveDuoCall"> | string
+    username?: StringWithAggregatesFilter<"ActiveDuoCall"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"ActiveDuoCall"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ActiveDuoCall"> | Date | string
+  }
+
   export type UserCreateInput = {
     email: string
     username: string
@@ -3302,6 +4459,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     activeUsers?: ActiveUserCreateNestedManyWithoutUserInput
+    activeDuoCalls?: ActiveDuoCallCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -3317,6 +4475,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     activeUsers?: ActiveUserUncheckedCreateNestedManyWithoutUserInput
+    activeDuoCalls?: ActiveDuoCallUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -3331,6 +4490,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     activeUsers?: ActiveUserUpdateManyWithoutUserNestedInput
+    activeDuoCalls?: ActiveDuoCallUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -3346,6 +4506,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     activeUsers?: ActiveUserUncheckedUpdateManyWithoutUserNestedInput
+    activeDuoCalls?: ActiveDuoCallUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -3455,6 +4616,58 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ActiveDuoCallCreateInput = {
+    socketId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutActiveDuoCallsInput
+  }
+
+  export type ActiveDuoCallUncheckedCreateInput = {
+    id?: number
+    socketId: string
+    username: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ActiveDuoCallUpdateInput = {
+    socketId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutActiveDuoCallsNestedInput
+  }
+
+  export type ActiveDuoCallUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    socketId?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActiveDuoCallCreateManyInput = {
+    id?: number
+    socketId: string
+    username: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ActiveDuoCallUpdateManyMutationInput = {
+    socketId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActiveDuoCallUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    socketId?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -3498,7 +4711,17 @@ export namespace Prisma {
     none?: ActiveUserWhereInput
   }
 
+  export type ActiveDuoCallListRelationFilter = {
+    every?: ActiveDuoCallWhereInput
+    some?: ActiveDuoCallWhereInput
+    none?: ActiveDuoCallWhereInput
+  }
+
   export type ActiveUserOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ActiveDuoCallOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -3681,6 +4904,38 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type ActiveDuoCallCountOrderByAggregateInput = {
+    id?: SortOrder
+    socketId?: SortOrder
+    username?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ActiveDuoCallAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type ActiveDuoCallMaxOrderByAggregateInput = {
+    id?: SortOrder
+    socketId?: SortOrder
+    username?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ActiveDuoCallMinOrderByAggregateInput = {
+    id?: SortOrder
+    socketId?: SortOrder
+    username?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ActiveDuoCallSumOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
   export type ActiveUserCreateNestedManyWithoutUserInput = {
     create?: XOR<ActiveUserCreateWithoutUserInput, ActiveUserUncheckedCreateWithoutUserInput> | ActiveUserCreateWithoutUserInput[] | ActiveUserUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ActiveUserCreateOrConnectWithoutUserInput | ActiveUserCreateOrConnectWithoutUserInput[]
@@ -3688,11 +4943,25 @@ export namespace Prisma {
     connect?: ActiveUserWhereUniqueInput | ActiveUserWhereUniqueInput[]
   }
 
+  export type ActiveDuoCallCreateNestedManyWithoutUserInput = {
+    create?: XOR<ActiveDuoCallCreateWithoutUserInput, ActiveDuoCallUncheckedCreateWithoutUserInput> | ActiveDuoCallCreateWithoutUserInput[] | ActiveDuoCallUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ActiveDuoCallCreateOrConnectWithoutUserInput | ActiveDuoCallCreateOrConnectWithoutUserInput[]
+    createMany?: ActiveDuoCallCreateManyUserInputEnvelope
+    connect?: ActiveDuoCallWhereUniqueInput | ActiveDuoCallWhereUniqueInput[]
+  }
+
   export type ActiveUserUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<ActiveUserCreateWithoutUserInput, ActiveUserUncheckedCreateWithoutUserInput> | ActiveUserCreateWithoutUserInput[] | ActiveUserUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ActiveUserCreateOrConnectWithoutUserInput | ActiveUserCreateOrConnectWithoutUserInput[]
     createMany?: ActiveUserCreateManyUserInputEnvelope
     connect?: ActiveUserWhereUniqueInput | ActiveUserWhereUniqueInput[]
+  }
+
+  export type ActiveDuoCallUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ActiveDuoCallCreateWithoutUserInput, ActiveDuoCallUncheckedCreateWithoutUserInput> | ActiveDuoCallCreateWithoutUserInput[] | ActiveDuoCallUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ActiveDuoCallCreateOrConnectWithoutUserInput | ActiveDuoCallCreateOrConnectWithoutUserInput[]
+    createMany?: ActiveDuoCallCreateManyUserInputEnvelope
+    connect?: ActiveDuoCallWhereUniqueInput | ActiveDuoCallWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -3717,6 +4986,20 @@ export namespace Prisma {
     deleteMany?: ActiveUserScalarWhereInput | ActiveUserScalarWhereInput[]
   }
 
+  export type ActiveDuoCallUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ActiveDuoCallCreateWithoutUserInput, ActiveDuoCallUncheckedCreateWithoutUserInput> | ActiveDuoCallCreateWithoutUserInput[] | ActiveDuoCallUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ActiveDuoCallCreateOrConnectWithoutUserInput | ActiveDuoCallCreateOrConnectWithoutUserInput[]
+    upsert?: ActiveDuoCallUpsertWithWhereUniqueWithoutUserInput | ActiveDuoCallUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ActiveDuoCallCreateManyUserInputEnvelope
+    set?: ActiveDuoCallWhereUniqueInput | ActiveDuoCallWhereUniqueInput[]
+    disconnect?: ActiveDuoCallWhereUniqueInput | ActiveDuoCallWhereUniqueInput[]
+    delete?: ActiveDuoCallWhereUniqueInput | ActiveDuoCallWhereUniqueInput[]
+    connect?: ActiveDuoCallWhereUniqueInput | ActiveDuoCallWhereUniqueInput[]
+    update?: ActiveDuoCallUpdateWithWhereUniqueWithoutUserInput | ActiveDuoCallUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ActiveDuoCallUpdateManyWithWhereWithoutUserInput | ActiveDuoCallUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ActiveDuoCallScalarWhereInput | ActiveDuoCallScalarWhereInput[]
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -3739,6 +5022,20 @@ export namespace Prisma {
     deleteMany?: ActiveUserScalarWhereInput | ActiveUserScalarWhereInput[]
   }
 
+  export type ActiveDuoCallUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ActiveDuoCallCreateWithoutUserInput, ActiveDuoCallUncheckedCreateWithoutUserInput> | ActiveDuoCallCreateWithoutUserInput[] | ActiveDuoCallUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ActiveDuoCallCreateOrConnectWithoutUserInput | ActiveDuoCallCreateOrConnectWithoutUserInput[]
+    upsert?: ActiveDuoCallUpsertWithWhereUniqueWithoutUserInput | ActiveDuoCallUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ActiveDuoCallCreateManyUserInputEnvelope
+    set?: ActiveDuoCallWhereUniqueInput | ActiveDuoCallWhereUniqueInput[]
+    disconnect?: ActiveDuoCallWhereUniqueInput | ActiveDuoCallWhereUniqueInput[]
+    delete?: ActiveDuoCallWhereUniqueInput | ActiveDuoCallWhereUniqueInput[]
+    connect?: ActiveDuoCallWhereUniqueInput | ActiveDuoCallWhereUniqueInput[]
+    update?: ActiveDuoCallUpdateWithWhereUniqueWithoutUserInput | ActiveDuoCallUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ActiveDuoCallUpdateManyWithWhereWithoutUserInput | ActiveDuoCallUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ActiveDuoCallScalarWhereInput | ActiveDuoCallScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutActiveUsersInput = {
     create?: XOR<UserCreateWithoutActiveUsersInput, UserUncheckedCreateWithoutActiveUsersInput>
     connectOrCreate?: UserCreateOrConnectWithoutActiveUsersInput
@@ -3755,6 +5052,20 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutActiveUsersInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutActiveUsersInput, UserUpdateWithoutActiveUsersInput>, UserUncheckedUpdateWithoutActiveUsersInput>
+  }
+
+  export type UserCreateNestedOneWithoutActiveDuoCallsInput = {
+    create?: XOR<UserCreateWithoutActiveDuoCallsInput, UserUncheckedCreateWithoutActiveDuoCallsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutActiveDuoCallsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutActiveDuoCallsNestedInput = {
+    create?: XOR<UserCreateWithoutActiveDuoCallsInput, UserUncheckedCreateWithoutActiveDuoCallsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutActiveDuoCallsInput
+    upsert?: UserUpsertWithoutActiveDuoCallsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutActiveDuoCallsInput, UserUpdateWithoutActiveDuoCallsInput>, UserUncheckedUpdateWithoutActiveDuoCallsInput>
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -3920,6 +5231,29 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ActiveDuoCallCreateWithoutUserInput = {
+    socketId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ActiveDuoCallUncheckedCreateWithoutUserInput = {
+    id?: number
+    socketId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ActiveDuoCallCreateOrConnectWithoutUserInput = {
+    where: ActiveDuoCallWhereUniqueInput
+    create: XOR<ActiveDuoCallCreateWithoutUserInput, ActiveDuoCallUncheckedCreateWithoutUserInput>
+  }
+
+  export type ActiveDuoCallCreateManyUserInputEnvelope = {
+    data: ActiveDuoCallCreateManyUserInput | ActiveDuoCallCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ActiveUserUpsertWithWhereUniqueWithoutUserInput = {
     where: ActiveUserWhereUniqueInput
     update: XOR<ActiveUserUpdateWithoutUserInput, ActiveUserUncheckedUpdateWithoutUserInput>
@@ -3949,6 +5283,33 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"ActiveUser"> | Date | string
   }
 
+  export type ActiveDuoCallUpsertWithWhereUniqueWithoutUserInput = {
+    where: ActiveDuoCallWhereUniqueInput
+    update: XOR<ActiveDuoCallUpdateWithoutUserInput, ActiveDuoCallUncheckedUpdateWithoutUserInput>
+    create: XOR<ActiveDuoCallCreateWithoutUserInput, ActiveDuoCallUncheckedCreateWithoutUserInput>
+  }
+
+  export type ActiveDuoCallUpdateWithWhereUniqueWithoutUserInput = {
+    where: ActiveDuoCallWhereUniqueInput
+    data: XOR<ActiveDuoCallUpdateWithoutUserInput, ActiveDuoCallUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ActiveDuoCallUpdateManyWithWhereWithoutUserInput = {
+    where: ActiveDuoCallScalarWhereInput
+    data: XOR<ActiveDuoCallUpdateManyMutationInput, ActiveDuoCallUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ActiveDuoCallScalarWhereInput = {
+    AND?: ActiveDuoCallScalarWhereInput | ActiveDuoCallScalarWhereInput[]
+    OR?: ActiveDuoCallScalarWhereInput[]
+    NOT?: ActiveDuoCallScalarWhereInput | ActiveDuoCallScalarWhereInput[]
+    id?: IntFilter<"ActiveDuoCall"> | number
+    socketId?: StringFilter<"ActiveDuoCall"> | string
+    username?: StringFilter<"ActiveDuoCall"> | string
+    createdAt?: DateTimeFilter<"ActiveDuoCall"> | Date | string
+    updatedAt?: DateTimeFilter<"ActiveDuoCall"> | Date | string
+  }
+
   export type UserCreateWithoutActiveUsersInput = {
     email: string
     username: string
@@ -3960,6 +5321,7 @@ export namespace Prisma {
     about?: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    activeDuoCalls?: ActiveDuoCallCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutActiveUsersInput = {
@@ -3974,6 +5336,7 @@ export namespace Prisma {
     about?: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    activeDuoCalls?: ActiveDuoCallUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutActiveUsersInput = {
@@ -4003,6 +5366,7 @@ export namespace Prisma {
     about?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activeDuoCalls?: ActiveDuoCallUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActiveUsersInput = {
@@ -4017,6 +5381,81 @@ export namespace Prisma {
     about?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activeDuoCalls?: ActiveDuoCallUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutActiveDuoCallsInput = {
+    email: string
+    username: string
+    password: string
+    dob: Date | string
+    gender: string
+    pfp?: string
+    location?: string
+    about?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    activeUsers?: ActiveUserCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutActiveDuoCallsInput = {
+    id?: number
+    email: string
+    username: string
+    password: string
+    dob: Date | string
+    gender: string
+    pfp?: string
+    location?: string
+    about?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    activeUsers?: ActiveUserUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutActiveDuoCallsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutActiveDuoCallsInput, UserUncheckedCreateWithoutActiveDuoCallsInput>
+  }
+
+  export type UserUpsertWithoutActiveDuoCallsInput = {
+    update: XOR<UserUpdateWithoutActiveDuoCallsInput, UserUncheckedUpdateWithoutActiveDuoCallsInput>
+    create: XOR<UserCreateWithoutActiveDuoCallsInput, UserUncheckedCreateWithoutActiveDuoCallsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutActiveDuoCallsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutActiveDuoCallsInput, UserUncheckedUpdateWithoutActiveDuoCallsInput>
+  }
+
+  export type UserUpdateWithoutActiveDuoCallsInput = {
+    email?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    dob?: DateTimeFieldUpdateOperationsInput | Date | string
+    gender?: StringFieldUpdateOperationsInput | string
+    pfp?: StringFieldUpdateOperationsInput | string
+    location?: StringFieldUpdateOperationsInput | string
+    about?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activeUsers?: ActiveUserUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutActiveDuoCallsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    email?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    dob?: DateTimeFieldUpdateOperationsInput | Date | string
+    gender?: StringFieldUpdateOperationsInput | string
+    pfp?: StringFieldUpdateOperationsInput | string
+    location?: StringFieldUpdateOperationsInput | string
+    about?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activeUsers?: ActiveUserUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ActiveUserCreateManyUserInput = {
@@ -4024,6 +5463,13 @@ export namespace Prisma {
     socketId: string
     duoSocketId?: string | null
     duoUsername?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ActiveDuoCallCreateManyUserInput = {
+    id?: number
+    socketId: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -4054,6 +5500,26 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ActiveDuoCallUpdateWithoutUserInput = {
+    socketId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActiveDuoCallUncheckedUpdateWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    socketId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActiveDuoCallUncheckedUpdateManyWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    socketId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
 
 
   /**
@@ -4071,6 +5537,10 @@ export namespace Prisma {
      * @deprecated Use ActiveUserDefaultArgs instead
      */
     export type ActiveUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ActiveUserDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use ActiveDuoCallDefaultArgs instead
+     */
+    export type ActiveDuoCallArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ActiveDuoCallDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

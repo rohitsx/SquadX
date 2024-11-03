@@ -22,6 +22,7 @@ model User {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   activeUsers ActiveUser[]
+  activeDuoCalls ActiveDuoCall[] 
 }
 
 model ActiveUser {
@@ -33,4 +34,13 @@ model ActiveUser {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   user        User      @relation(fields: [username], references: [username])
+}
+
+model ActiveDuoCall {
+  id        Int       @id @default(autoincrement())
+  socketId  String    @unique
+  username  String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [username], references: [username])
 }
