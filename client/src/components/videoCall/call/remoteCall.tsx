@@ -1,7 +1,8 @@
 import { useWebRTC } from "@/hooks/useWebRTC";
 import RemoteVid from "../videoElement/remotevidElement";
 import { useSocket } from "@/context/socketContext";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { usePeerState } from "@/context/peerStateContext";
 type strangerProp = {
   pairId: string;
   pairName: string;
@@ -12,7 +13,7 @@ export interface remoteCallProps {
   stream: MediaStream | null;
   handleCallEnd: () => void;
   stranger: strangerProp | null;
-  userType: "friends" | "duo" | "stranger";
+  userType: "friend" | "duo" | "stranger";
 }
 
 export default function RemoteCall({
@@ -21,11 +22,18 @@ export default function RemoteCall({
   stranger,
   userType,
 }: remoteCallProps) {
+  const signalingMessage = useMemo(() => {
+    if (userType === "friend") return "messageFriend";
+    if (userType === "stranger") return "messageStranger";
+    if (userType === "duo") return "messageDuo";
+    return "messageStranger";
+  }, [userType]);
   const { peerConnection, start, sendOffer, handleOffer, resetPc } = useWebRTC({
     stream,
-    userType,
+    signalingMessage,
   });
   const socket = useSocket();
+  const { peerState, updatePeerState } = usePeerState();
 
   useEffect(() => {
     start();
@@ -38,7 +46,8 @@ export default function RemoteCall({
   useEffect(() => {
     if (!stranger || !socket) return;
     sendOffer(socket, stranger.pairId);
-    socket.on("message", (m) => {
+	console.log('username', stranger.pairName, 'polite', stranger.polite)
+    socket.on(signalingMessage, (m) => {
       handleOffer({
         socket: socket,
         message: m,
@@ -48,7 +57,8 @@ export default function RemoteCall({
     });
 
     return () => {
-      socket.off("message");
+      socket.off(signalingMessage);
+	  socket.off('startDuoSignaling')
     };
   }, [stranger, socket, peerConnection, stream]);
 
@@ -60,6 +70,28 @@ export default function RemoteCall({
       socket.off("strangerLeft", handleCallEnd);
     };
   }, [socket, stranger]);
+
+  useEffect(() => {
+    peerConnection?.addEventListener("connectionstatechange", () => {
+      if (peerConnection?.connectionState !== "connected") return;
+      switch (userType) {
+        case "stranger":
+          updatePeerState("stranger", "connected");
+          break;
+        case "friend":
+          updatePeerState("friend", "connected");
+          break;
+        case "duo":
+          updatePeerState("duo", "connected");
+          break;
+        default:
+          break;
+      }
+    });
+  }, [peerConnection]);
+
+  useEffect(() => {
+  }, [peerState]);
 
   return (
     <>

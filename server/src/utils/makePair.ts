@@ -59,10 +59,6 @@ async function sendPair(
 ) {
   let currentUserDuoEmit: emitUserProp | null;
   let randomUserDuoEmit: emitUserProp | null;
-  console.log({
-    currentUser: currentUser.username,
-    randomUser: randomUser.username,
-  });
 
   const currentUserEmit: emitUserProp = {
     currentUserId: currentUser.socketId,
@@ -82,6 +78,19 @@ async function sendPair(
     polite: true,
   };
 
+  console.log({
+    currentUserEmit: {
+      username: currentUserEmit.pairName,
+	  duoName: currentUserEmit.duoName,
+      polite: currentUserEmit.polite,
+    },
+    randomUserEmit: {
+      username: randomUserEmit.pairName,
+	  duoName: randomUserEmit.duoName,
+      poite: randomUserEmit.polite,
+    },
+  });
+
   const deleteSuccess = await dbHelper.deleteFromActiveUsers(
     randomUser.username,
     randomUser.socketId,
@@ -90,7 +99,7 @@ async function sendPair(
 
   io.to(currentUserEmit.currentUserId).emit("peer", currentUserEmit);
   io.to(randomUserEmit.currentUserId).emit("peer", randomUserEmit);
-  console.log("users paired successfully", currentUserEmit, randomUserEmit);
+  //  console.log("users paired successfully", currentUserEmit, randomUserEmit);
 
   if (currentUser.duoSocketId && currentUser.duoUsername) {
     currentUserDuoEmit = {
@@ -99,10 +108,15 @@ async function sendPair(
       pairName: randomUser.username,
       duoId: randomUser.duoSocketId,
       duoName: randomUser.duoUsername,
-      polite: false,
+      polite: true,
     };
 
     io.to(currentUserDuoEmit.currentUserId).emit("peer", currentUserDuoEmit);
+    console.log("currentUserDuoEmit", {
+      username: currentUserDuoEmit.pairName,
+	  duoName: currentUserDuoEmit.duoName,
+      polite: currentUserDuoEmit.polite,
+    });
   }
 
   if (randomUser.duoSocketId && randomUser.duoUsername) {
@@ -115,5 +129,10 @@ async function sendPair(
       polite: true,
     };
     io.to(randomUserDuoEmit.currentUserId).emit("peer", randomUserDuoEmit);
+    console.log("randomUserDuoEmit", {
+      username: randomUserDuoEmit.pairName,
+	  duoName: randomUserDuoEmit.duoName,
+      polite: randomUserDuoEmit.polite,
+    });
   }
 }

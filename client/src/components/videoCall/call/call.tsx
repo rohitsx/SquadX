@@ -31,12 +31,12 @@ export default function Call() {
   const socket = useSocket();
   const { duoId } = useParams();
   const { friend } = useFriend();
-  const { friendConnectionState, strangerConnectionState } = usePeerState();
+  const { peerState } = usePeerState();
 
   const handlePeer = useCallback(
     (data?: userProps) => {
-      console.log("handlePeer", data);
       setIsMatched(!!data);
+	  console.log("handlePeer", data);
       if (!data) {
         console.log("data reset");
         setStranger(null);
@@ -70,7 +70,13 @@ export default function Call() {
   useEffect(() => {
     socket?.on("peer", handlePeer);
 
-    if (!socket || stranger || duoId) return;
+    if (
+      !socket ||
+      stranger ||
+      duoId ||
+      (friend && peerState.friend === "disconnected")
+    )
+      return;
     socket.emit("connectPeer", {
       duoSocketId: friend?.pairId,
       duoUsername: friend?.pairName,
@@ -79,7 +85,7 @@ export default function Call() {
     return () => {
       socket.off("peer", handlePeer);
     };
-  }, [socket, stranger]);
+  }, [socket, stranger, peerState]);
 
   useEffect(() => {
     if (!socket) return;
@@ -96,15 +102,15 @@ export default function Call() {
         <div className="flex-1 relative bg-gray-900">
           {isMatched ? (
             <>
-              {strangerConnectionState === "connected" && duo && (
+              {duo && peerState.stranger === "connected" && (
                 <RemoteCall
                   stream={stream}
                   handleCallEnd={handlePeer}
                   stranger={duo}
-                  userType="duo"
+                  userType={"stranger"}
                 />
               )}
-              {(!friend || friendConnectionState === "connected") && (
+              {((friend && peerState.friend === "connected") || !friend) && (
                 <RemoteCall
                   stream={stream}
                   handleCallEnd={handlePeer}

@@ -14,10 +14,17 @@ export function handleSocketConnection(socket: Socket, io: Server) {
     };
     skService.handleUserJoin(user);
   });
-  socket.on("koki", () => console.log("koki"));
-  socket.on("message", (m) => io.to(m.to).emit("message", m));
-  socket.on("duoMessage", (m) => io.to(m.to).emit("message", m));
-
+  socket.on("message", (m) => {
+    if (m.description)
+      console.log(
+        "recived messageFriend by",
+        username,
+        m.description.type,
+        m.to,
+      );
+    const emitValue: string = m.emitValue;
+    io.to(m.to).emit(emitValue, m);
+  });
   socket.on("skip", ({ strangerId, duoId }) => {
     io.to(strangerId).emit("strangerLeft");
     duoId && io.to(duoId).emit("strangerLeft");

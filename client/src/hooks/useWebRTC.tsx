@@ -1,5 +1,4 @@
-import { usePeerState } from "@/context/peerStateContext";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Socket } from "socket.io-client";
 
 type HandleOfferProps = {
@@ -14,44 +13,24 @@ type HandleOfferProps = {
 
 type useWebRTCProp = {
   stream: MediaStream | null;
-  userType: "friends" | "duo" | "stranger";
+  signalingMessage: "messageFriend" | "messageStranger" | "messageDuo";
 };
 
-export const useWebRTC = ({ stream, userType }: useWebRTCProp) => {
+export const useWebRTC = ({ stream, signalingMessage }: useWebRTCProp) => {
   const [peerConnection, setPeerConnection] =
     useState<RTCPeerConnection | null>(null);
   const makingOfferRef = useRef(false);
   const ignoreOfferRef = useRef(false);
   const politeRef = useRef(false);
-  const { setStrangerConnectionState, setFriendConnectionState } =
-    usePeerState();
+  const iceCandidatesQueue = useRef<RTCIceCandidateInit[]>([]);
 
   const start = useCallback(async () => {
-    if (peerConnection && peerConnection.connectionState === "connected") {
-      peerConnection.close();
-    }
+    if (peerConnection?.connectionState === "connected") peerConnection.close();
+
     const newPeerConnection = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.mystunserver.tld" }],
     });
-
     setPeerConnection(newPeerConnection);
-  }, [peerConnection]);
-
-  useEffect(() => {
-    peerConnection?.addEventListener("connectionstatechange", () => {
-      if (peerConnection?.connectionState !== "connected") return;
-      console.log(userType, "connected");
-      switch (userType) {
-        case "stranger":
-          setStrangerConnectionState("connected");
-          break;
-        case "friends":
-          setFriendConnectionState("connected");
-          break;
-        default:
-          break;
-      }
-    });
   }, [peerConnection]);
 
   const sendOffer = useCallback(
@@ -66,6 +45,7 @@ export const useWebRTC = ({ stream, userType }: useWebRTCProp) => {
         socket.emit("message", {
           candidate,
           to: strangerId,
+          emitValue: signalingMessage,
         });
       };
 
@@ -76,6 +56,7 @@ export const useWebRTC = ({ stream, userType }: useWebRTCProp) => {
           socket.emit("message", {
             description: peerConnection.localDescription,
             to: strangerId,
+            emitValue: signalingMessage,
           });
         } catch (err) {
           console.error("error sending offer", err);
@@ -87,6 +68,18 @@ export const useWebRTC = ({ stream, userType }: useWebRTCProp) => {
     [peerConnection, stream],
   );
 
+  const processIceCandidateQueue = useCallback(async () => {
+    if (!peerConnection) return;
+
+    while (iceCandidatesQueue.current.length) {
+      const candidate = iceCandidatesQueue.current.shift();
+      try {
+        await peerConnection.addIceCandidate(candidate!);
+      } catch (err) {
+        console.error("Error adding queued ICE candidate:", err);
+      }
+    }
+  }, [peerConnection]);
   const handleOffer = useCallback(
     async ({ socket, message, strangerId, polite }: HandleOfferProps) => {
       if (!peerConnection) return;
@@ -105,16 +98,24 @@ export const useWebRTC = ({ stream, userType }: useWebRTCProp) => {
           if (ignoreOfferRef.current) return;
 
           await peerConnection.setRemoteDescription(description);
+
+          await processIceCandidateQueue();
+
           if (description.type === "offer") {
             await peerConnection.setLocalDescription();
             socket.emit("message", {
               description: peerConnection.localDescription,
               to: strangerId,
+              emitValue: signalingMessage,
             });
           }
         } else if (candidate) {
           try {
-            await peerConnection.addIceCandidate(candidate);
+            if (peerConnection.remoteDescription) {
+              await peerConnection.addIceCandidate(candidate);
+            } else {
+              iceCandidatesQueue.current.push(candidate);
+            }
           } catch (err) {
             if (!ignoreOfferRef.current) {
               throw err;
@@ -125,20 +126,19 @@ export const useWebRTC = ({ stream, userType }: useWebRTCProp) => {
         console.error("error in handle offer", err);
       }
     },
-    [peerConnection],
+    [peerConnection, processIceCandidateQueue],
   );
 
   const resetPc = useCallback(() => {
     if (!peerConnection) return;
     peerConnection.close();
     setPeerConnection(null);
-    console.log("reseting pc");
+    iceCandidatesQueue.current = [];
     start();
-  }, [peerConnection]);
 
-  useEffect(() => {
     return () => {
-      peerConnection?.close();
+      peerConnection.close();
+      iceCandidatesQueue.current = [];
     };
   }, [peerConnection]);
 

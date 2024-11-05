@@ -1,25 +1,47 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useCallback } from "react";
 
-type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
+type ConnectionState = {
+  stranger: "connected" | "disconnected";
+  friend: "connected" | "disconnected";
+  duo: "connected" | "disconnected";
+};
 
 interface WebRTCContextType {
-  friendConnectionState: ConnectionState;
-  setFriendConnectionState: React.Dispatch<React.SetStateAction<ConnectionState>>;
-  strangerConnectionState: ConnectionState;
-  setStrangerConnectionState: React.Dispatch<React.SetStateAction<ConnectionState>>;
+  peerState: ConnectionState;
+  setPeerState: React.Dispatch<React.SetStateAction<ConnectionState>>;
+  updatePeerState: (
+    key: keyof ConnectionState,
+    status: "connected" | "disconnected",
+  ) => void;
 }
 
-const peerStateContext  = createContext<WebRTCContextType | undefined>(undefined);
+const peerStateContext = createContext<WebRTCContextType | undefined>(
+  undefined,
+);
 
-export const PeerStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [friendConnectionState, setFriendConnectionState] = useState<ConnectionState>('disconnected');
-  const [strangerConnectionState, setStrangerConnectionState] = useState<ConnectionState>('disconnected');
+export const PeerStateProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [peerState, setPeerState] = useState<ConnectionState>({
+    stranger: "disconnected",
+    friend: "disconnected",
+    duo: "disconnected",
+  });
+
+  const updatePeerState = useCallback(
+    (key: keyof ConnectionState, status: "connected" | "disconnected") => {
+      setPeerState((prevState) => ({
+        ...prevState,
+        [key]: status,
+      }));
+    },
+    [setPeerState],
+  );
 
   const value = {
-    friendConnectionState,
-    setFriendConnectionState,
-	strangerConnectionState,
-	setStrangerConnectionState
+    peerState,
+    setPeerState,
+    updatePeerState,
   };
 
   return (
@@ -32,7 +54,7 @@ export const PeerStateProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 export const usePeerState = () => {
   const context = useContext(peerStateContext);
   if (context === undefined) {
-    throw new Error('useWebRTC must be used within a RTCPeerStateProvider');
+    throw new Error("useWebRTC must be used within a RTCPeerStateProvider");
   }
   return context;
 };

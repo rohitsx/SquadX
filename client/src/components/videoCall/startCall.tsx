@@ -1,6 +1,6 @@
 import { useStartPage } from "@/context/startPageContext";
 import SwitchSoloDuo from "./btn/modeSwitch";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CreateDuoLink from "./btn/createDuoLink";
 import { useFriendConnect } from "@/hooks/useFriendConnect";
 

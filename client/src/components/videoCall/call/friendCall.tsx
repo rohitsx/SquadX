@@ -78,7 +78,7 @@ export default function FriendCall({
           stream={stream}
           handleCallEnd={handleCallEnd}
           stranger={friend}
-          userType="friends"
+          userType="friend"
         />
       )}
       <LocalVid stream={stream} />

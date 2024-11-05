@@ -34,7 +34,6 @@ export default function CreateDuoLink({ setCheckCopied }: CreateDuoLinkProp) {
       .catch((err) => {
         console.log(err.response.data.message);
       });
-    console.log("copied");
   }, []);
 
   return (
