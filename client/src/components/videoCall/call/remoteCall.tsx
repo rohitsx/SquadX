@@ -1,7 +1,7 @@
 import { useWebRTC } from "@/hooks/useWebRTC";
 import RemoteVid from "../videoElement/remotevidElement";
 import { useSocket } from "@/context/socketContext";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { usePeerState } from "@/context/peerStateContext";
 import { useFriend } from "@/context/friendContext";
 type strangerProp = {
@@ -14,8 +14,7 @@ export interface remoteCallProps {
   stream: MediaStream | null;
   handleCallEnd: () => void;
   stranger: strangerProp | null;
-  userType: "friend" | "stranger";
-  duo?: boolean;
+  userType: "friend" | "stranger" | "duo";
 }
 
 export default function RemoteCall({
@@ -23,7 +22,6 @@ export default function RemoteCall({
   handleCallEnd,
   stranger,
   userType,
-  duo,
 }: remoteCallProps) {
   const signalingMessage = useMemo(
     () => (userType === "friend" ? "messageFriend" : "messageStranger"),
@@ -46,15 +44,17 @@ export default function RemoteCall({
     if (
       !stranger ||
       !socket ||
-      (userType === "stranger" && friend && peerState.friend !== "connected") ||
-      (duo && peerState.stranger !== "connected")
+      !peerConnection ||
+      !stream ||
+      (userType === "stranger" && friend && peerState.friend !== "connected")
     ) {
-      console.log("Returning early from useEffect");
       return;
     }
     if (!hasSentOffer.current) {
-      console.log("sendOffer");
+      console.log(userType, peerState.stranger);
+
       sendOffer(socket, stranger.pairId);
+      hasSentOffer.current = true;
     }
   }, [stranger, socket, peerConnection, stream, peerState]);
 
@@ -62,7 +62,6 @@ export default function RemoteCall({
     if (!socket || !stranger) return;
     socket.on("strangerLeft", handleCallEnd);
     socket.on(signalingMessage, (m) => {
-      console.log("Handling offer message in useEffect");
       handleOffer({
         socket: socket,
         message: m,
@@ -80,7 +79,6 @@ export default function RemoteCall({
   useEffect(() => {
     const connectionStateChangeHandler = () => {
       if (peerConnection?.connectionState !== "connected") return;
-      hasSentOffer.current = true;
       userType === "stranger"
         ? updatePeerState("stranger", "connected")
         : updatePeerState("friend", "connected");

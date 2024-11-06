@@ -87,6 +87,7 @@ export const useWebRTC = ({ stream, signalingMessage }: useWebRTCProp) => {
       }
     }
   }, [peerConnection]);
+
   const handleOffer = useCallback(
     async ({ socket, message, strangerId, polite }: HandleOfferProps) => {
       if (!peerConnection) return;
