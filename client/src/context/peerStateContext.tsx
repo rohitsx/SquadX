@@ -3,7 +3,6 @@ import React, { createContext, useState, useContext, useCallback } from "react";
 type ConnectionState = {
   stranger: "connected" | "disconnected";
   friend: "connected" | "disconnected";
-  duo: "connected" | "disconnected";
 };
 
 interface WebRTCContextType {
@@ -25,7 +24,6 @@ export const PeerStateProvider: React.FC<{ children: React.ReactNode }> = ({
   const [peerState, setPeerState] = useState<ConnectionState>({
     stranger: "disconnected",
     friend: "disconnected",
-    duo: "disconnected",
   });
 
   const updatePeerState = useCallback(

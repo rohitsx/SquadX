@@ -100,22 +100,21 @@ export default function Call() {
         <div className="flex-1 relative bg-gray-900">
           {isMatched ? (
             <>
-              {duo && peerState.stranger === "connected" && (
+              {duo && (
                 <RemoteCall
                   stream={stream}
                   handleCallEnd={handlePeer}
                   stranger={duo}
                   userType={"stranger"}
+                  duo={true}
                 />
               )}
-              {((friend && peerState.friend === "connected") || !friend) && (
-                <RemoteCall
-                  stream={stream}
-                  handleCallEnd={handlePeer}
-                  stranger={stranger}
-                  userType={"stranger"}
-                />
-              )}
+              <RemoteCall
+                stream={stream}
+                handleCallEnd={handlePeer}
+                stranger={stranger}
+                userType={"stranger"}
+              />
 
               <Controls
                 strangerId={stranger?.pairId}

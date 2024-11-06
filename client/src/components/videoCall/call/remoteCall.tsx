@@ -1,8 +1,9 @@
 import { useWebRTC } from "@/hooks/useWebRTC";
 import RemoteVid from "../videoElement/remotevidElement";
 import { useSocket } from "@/context/socketContext";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePeerState } from "@/context/peerStateContext";
+import { useFriend } from "@/context/friendContext";
 type strangerProp = {
   pairId: string;
   pairName: string;
@@ -13,7 +14,8 @@ export interface remoteCallProps {
   stream: MediaStream | null;
   handleCallEnd: () => void;
   stranger: strangerProp | null;
-  userType: "friend" | "duo" | "stranger";
+  userType: "friend" | "stranger";
+  duo?: boolean;
 }
 
 export default function RemoteCall({
@@ -21,28 +23,46 @@ export default function RemoteCall({
   handleCallEnd,
   stranger,
   userType,
+  duo,
 }: remoteCallProps) {
-  const signalingMessage = useMemo(() => {
-    if (userType === "friend") return "messageFriend";
-    if (userType === "stranger") return "messageStranger";
-    if (userType === "duo") return "messageDuo";
-    return "messageStranger";
-  }, [userType]);
+  const signalingMessage = useMemo(
+    () => (userType === "friend" ? "messageFriend" : "messageStranger"),
+    [userType],
+  );
   const { peerConnection, start, sendOffer, handleOffer } = useWebRTC({
     stream,
     signalingMessage,
   });
   const socket = useSocket();
   const { peerState, updatePeerState } = usePeerState();
+  const { friend } = useFriend();
 
   useEffect(() => {
     start();
   }, []);
+  const hasSentOffer = useRef(false);
 
   useEffect(() => {
-    if (!stranger || !socket) return;
-    sendOffer(socket, stranger.pairId);
+    if (
+      !stranger ||
+      !socket ||
+      (userType === "stranger" && friend && peerState.friend !== "connected") ||
+      (duo && peerState.stranger !== "connected")
+    ) {
+      console.log("Returning early from useEffect");
+      return;
+    }
+    if (!hasSentOffer.current) {
+      console.log("sendOffer");
+      sendOffer(socket, stranger.pairId);
+    }
+  }, [stranger, socket, peerConnection, stream, peerState]);
+
+  useEffect(() => {
+    if (!socket || !stranger) return;
+    socket.on("strangerLeft", handleCallEnd);
     socket.on(signalingMessage, (m) => {
+      console.log("Handling offer message in useEffect");
       handleOffer({
         socket: socket,
         message: m,
@@ -52,39 +72,32 @@ export default function RemoteCall({
     });
 
     return () => {
+      socket.off("strangerLeft", handleCallEnd);
       socket.off(signalingMessage);
     };
-  }, [stranger, socket, peerConnection, stream]);
+  }, [socket, stranger, peerState, peerConnection]);
 
   useEffect(() => {
-    if (!socket) return;
-    socket.on("strangerLeft", handleCallEnd);
+    const connectionStateChangeHandler = () => {
+      if (peerConnection?.connectionState !== "connected") return;
+      hasSentOffer.current = true;
+      userType === "stranger"
+        ? updatePeerState("stranger", "connected")
+        : updatePeerState("friend", "connected");
+    };
+
+    peerConnection?.addEventListener(
+      "connectionstatechange",
+      connectionStateChangeHandler,
+    );
 
     return () => {
-      socket.off("strangerLeft", handleCallEnd);
+      peerConnection?.removeEventListener(
+        "connectionstatechange",
+        connectionStateChangeHandler,
+      );
     };
-  }, [socket, stranger]);
-
-  useEffect(() => {
-    peerConnection?.addEventListener("connectionstatechange", () => {
-      if (peerConnection?.connectionState !== "connected") return;
-      switch (userType) {
-        case "stranger":
-          updatePeerState("stranger", "connected");
-          break;
-        case "friend":
-          updatePeerState("friend", "connected");
-          break;
-        case "duo":
-          updatePeerState("duo", "connected");
-          break;
-        default:
-          break;
-      }
-    });
   }, [peerConnection]);
-
-  useEffect(() => {}, [peerState]);
 
   return (
     <>

@@ -40,23 +40,25 @@ export const useWebRTC = ({ stream, signalingMessage }: useWebRTCProp) => {
     (socket: Socket, strangerId: string) => {
       if (!peerConnection || !stream) return;
 
-      console.log("runnign sendOffer", peerConnection.connectionState);
-      stream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, stream);
-      });
-
-      peerConnection.onicecandidate = ({ candidate }) => {
-        socket.emit("message", {
-          candidate,
-          to: strangerId,
-          emitValue: signalingMessage,
+      try {
+        stream.getTracks().forEach((track) => {
+          peerConnection.addTrack(track, stream);
         });
-      };
+
+        peerConnection.onicecandidate = ({ candidate }) => {
+          socket.emit("message", {
+            candidate,
+            to: strangerId,
+            emitValue: signalingMessage,
+          });
+        };
+      } catch (err) {
+        console.log("err adding track or sending Ice", err);
+      }
 
       peerConnection.onnegotiationneeded = async () => {
         try {
           makingOfferRef.current = true;
-          console.log("runnign onnegotiationneeded for", strangerId);
           await peerConnection.setLocalDescription();
           socket.emit("message", {
             description: peerConnection.localDescription,
