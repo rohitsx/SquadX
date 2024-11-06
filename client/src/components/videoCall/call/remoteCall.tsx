@@ -28,7 +28,7 @@ export default function RemoteCall({
     if (userType === "duo") return "messageDuo";
     return "messageStranger";
   }, [userType]);
-  const { peerConnection, start, sendOffer, handleOffer, resetPc } = useWebRTC({
+  const { peerConnection, start, sendOffer, handleOffer } = useWebRTC({
     stream,
     signalingMessage,
   });
@@ -40,13 +40,8 @@ export default function RemoteCall({
   }, []);
 
   useEffect(() => {
-    resetPc();
-  }, [stranger]);
-
-  useEffect(() => {
     if (!stranger || !socket) return;
     sendOffer(socket, stranger.pairId);
-	console.log('username', stranger.pairName, 'polite', stranger.polite)
     socket.on(signalingMessage, (m) => {
       handleOffer({
         socket: socket,
@@ -58,7 +53,6 @@ export default function RemoteCall({
 
     return () => {
       socket.off(signalingMessage);
-	  socket.off('startDuoSignaling')
     };
   }, [stranger, socket, peerConnection, stream]);
 
@@ -90,8 +84,7 @@ export default function RemoteCall({
     });
   }, [peerConnection]);
 
-  useEffect(() => {
-  }, [peerState]);
+  useEffect(() => {}, [peerState]);
 
   return (
     <>

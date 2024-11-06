@@ -24,21 +24,19 @@ interface userProps {
   polite: boolean;
 }
 export default function Call() {
-  const [stranger, setStranger] = useState<strangerProp | null>(null);
-  const [duo, setDuo] = useState<strangerProp | null>(null);
-  const [isMatched, setIsMatched] = useState(false);
-  const { stream, closeStream } = useMedia();
   const socket = useSocket();
   const { duoId } = useParams();
   const { friend } = useFriend();
   const { peerState } = usePeerState();
+  const { stream, closeStream } = useMedia();
+  const [isMatched, setIsMatched] = useState(false);
+  const [duo, setDuo] = useState<strangerProp | null>(null);
+  const [stranger, setStranger] = useState<strangerProp | null>(null);
 
   const handlePeer = useCallback(
     (data?: userProps) => {
       setIsMatched(!!data);
-	  console.log("handlePeer", data);
       if (!data) {
-        console.log("data reset");
         setStranger(null);
         setDuo(null);
         return;

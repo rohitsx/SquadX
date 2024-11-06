@@ -25,7 +25,10 @@ export const useWebRTC = ({ stream, signalingMessage }: useWebRTCProp) => {
   const iceCandidatesQueue = useRef<RTCIceCandidateInit[]>([]);
 
   const start = useCallback(async () => {
-    if (peerConnection?.connectionState === "connected") peerConnection.close();
+    if (peerConnection?.connectionState === "connected") {
+      peerConnection.close();
+      iceCandidatesQueue.current = [];
+    }
 
     const newPeerConnection = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.mystunserver.tld" }],
@@ -37,6 +40,7 @@ export const useWebRTC = ({ stream, signalingMessage }: useWebRTCProp) => {
     (socket: Socket, strangerId: string) => {
       if (!peerConnection || !stream) return;
 
+      console.log("runnign sendOffer", peerConnection.connectionState);
       stream.getTracks().forEach((track) => {
         peerConnection.addTrack(track, stream);
       });
@@ -52,6 +56,7 @@ export const useWebRTC = ({ stream, signalingMessage }: useWebRTCProp) => {
       peerConnection.onnegotiationneeded = async () => {
         try {
           makingOfferRef.current = true;
+          console.log("runnign onnegotiationneeded for", strangerId);
           await peerConnection.setLocalDescription();
           socket.emit("message", {
             description: peerConnection.localDescription,
@@ -59,7 +64,7 @@ export const useWebRTC = ({ stream, signalingMessage }: useWebRTCProp) => {
             emitValue: signalingMessage,
           });
         } catch (err) {
-          console.error("error sending offer", err);
+          console.error("error sending offer");
         } finally {
           makingOfferRef.current = false;
         }
@@ -129,24 +134,10 @@ export const useWebRTC = ({ stream, signalingMessage }: useWebRTCProp) => {
     [peerConnection, processIceCandidateQueue],
   );
 
-  const resetPc = useCallback(() => {
-    if (!peerConnection) return;
-    peerConnection.close();
-    setPeerConnection(null);
-    iceCandidatesQueue.current = [];
-    start();
-
-    return () => {
-      peerConnection.close();
-      iceCandidatesQueue.current = [];
-    };
-  }, [peerConnection]);
-
   return {
     peerConnection,
     start,
     sendOffer,
     handleOffer,
-    resetPc,
   };
 };
