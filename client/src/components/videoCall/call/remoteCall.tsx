@@ -1,7 +1,7 @@
 import { useWebRTC } from "@/hooks/useWebRTC";
 import RemoteVid from "../videoElement/remotevidElement";
 import { useSocket } from "@/context/socketContext";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePeerState } from "@/context/peerStateContext";
 import { useFriend } from "@/context/friendContext";
 type strangerProp = {
@@ -34,11 +34,12 @@ export default function RemoteCall({
   const socket = useSocket();
   const { peerState, updatePeerState } = usePeerState();
   const { friend } = useFriend();
+  const hasSentOffer = useRef(false);
+  const [sendOfferCheck, setSendOfferCheck] = useState(false);
 
   useEffect(() => {
     start();
   }, []);
-  const hasSentOffer = useRef(false);
 
   useEffect(() => {
     if (
@@ -46,29 +47,62 @@ export default function RemoteCall({
       !socket ||
       !peerConnection ||
       !stream ||
-      (userType === "stranger" && friend && peerState.friend !== "connected")
-    ) {
+      hasSentOffer.current ||
+      (userType === "stranger" && friend && peerState.friend === "disconnected")
+    )
       return;
-    }
-    if (!hasSentOffer.current) {
-      console.log(userType, peerState.stranger);
 
-      sendOffer(socket, stranger.pairId);
-      hasSentOffer.current = true;
-    }
-  }, [stranger, socket, peerConnection, stream, peerState]);
+    console.log(
+      localStorage.getItem("username"),
+      "sent offer to",
+      stranger.pairName,
+      stranger.polite,
+    );
+    sendOffer(socket, stranger.pairId);
+    hasSentOffer.current = true;
+    setSendOfferCheck(true);
+  }, [
+    stranger,
+    socket,
+    peerConnection,
+    stream,
+    peerState,
+    friend,
+    userType,
+    sendOfferCheck,
+  ]);
+
+  useEffect(() => {
+    sendOfferCheck &&
+      socket &&
+      stranger &&
+      socket.on(signalingMessage, (m) => {
+        if (m.description?.type === "offer")
+          console.log(
+            localStorage.getItem("username"),
+            "recived offer from",
+            stranger.pairName,
+            stranger.polite,
+          );
+        if (m.description?.type === "answer")
+          console.log(
+            localStorage.getItem("username"),
+            "recived answer from",
+            stranger.pairName,
+            stranger.polite,
+          );
+        handleOffer({
+          socket: socket,
+          message: m,
+          strangerId: stranger.pairId,
+          polite: stranger.polite,
+        });
+      });
+  }, [stranger, socket, sendOfferCheck]);
 
   useEffect(() => {
     if (!socket || !stranger) return;
     socket.on("strangerLeft", handleCallEnd);
-    socket.on(signalingMessage, (m) => {
-      handleOffer({
-        socket: socket,
-        message: m,
-        strangerId: stranger.pairId,
-        polite: stranger.polite,
-      });
-    });
 
     return () => {
       socket.off("strangerLeft", handleCallEnd);
@@ -78,10 +112,11 @@ export default function RemoteCall({
 
   useEffect(() => {
     const connectionStateChangeHandler = () => {
-      if (peerConnection?.connectionState !== "connected") return;
-      userType === "stranger"
-        ? updatePeerState("stranger", "connected")
-        : updatePeerState("friend", "connected");
+      if (peerConnection?.connectionState === "connected") {
+        userType === "stranger"
+          ? updatePeerState("stranger", "connected")
+          : updatePeerState("friend", "connected");
+      }
     };
 
     peerConnection?.addEventListener(

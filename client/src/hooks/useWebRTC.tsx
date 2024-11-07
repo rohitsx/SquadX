@@ -13,7 +13,7 @@ type HandleOfferProps = {
 
 type useWebRTCProp = {
   stream: MediaStream | null;
-  signalingMessage: "messageFriend" | "messageStranger" | "messageDuo";
+  signalingMessage: "messageFriend" | "messageStranger";
 };
 
 export const useWebRTC = ({ stream, signalingMessage }: useWebRTCProp) => {
