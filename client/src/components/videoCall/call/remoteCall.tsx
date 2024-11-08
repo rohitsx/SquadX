@@ -23,10 +23,18 @@ export default function RemoteCall({
   stranger,
   userType,
 }: remoteCallProps) {
-  const signalingMessage = useMemo(
-    () => (userType === "friend" ? "messageFriend" : "messageStranger"),
-    [userType],
-  );
+  const signalingMessage = useMemo(() => {
+    switch (userType) {
+      case "friend":
+        return "messageFriend";
+      case "stranger":
+        return "messageStranger";
+      case "duo":
+        return "messageDuo";
+      default:
+        return "messageStranger";
+    }
+  }, [userType]);
   const { peerConnection, start, sendOffer, handleOffer } = useWebRTC({
     stream,
     signalingMessage,

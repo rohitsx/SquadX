@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect,  useState } from "react";
 import Controls from "../btn/controlBtn";
 import useMedia from "@/hooks/useMedia";
 import { useSocket } from "@/context/socketContext";
@@ -32,6 +32,7 @@ export default function Call() {
   const [isMatched, setIsMatched] = useState(false);
   const [duo, setDuo] = useState<strangerProp | null>(null);
   const [stranger, setStranger] = useState<strangerProp | null>(null);
+
 
   const handlePeer = useCallback(
     (data?: userProps) => {
@@ -104,7 +105,7 @@ export default function Call() {
                 stream={stream}
                 handleCallEnd={handlePeer}
                 stranger={stranger}
-                userType={"stranger"}
+                userType={duoId ? "duo" : "stranger"}
               />
               {duo && peerState.stranger === "connected" && (
                 <RemoteCall
