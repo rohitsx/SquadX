@@ -2,6 +2,7 @@ import { Flag, PhoneOff, SkipForward } from "lucide-react";
 import { useCallback } from "react";
 import { useStartPage } from "@/context/startPageContext";
 import { useSocket } from "@/context/socketContext";
+import { useParams } from "react-router-dom";
 
 interface ChatBoxProps {
   strangerId: string | undefined;
@@ -20,10 +21,10 @@ export default function Controls({
 }: ChatBoxProps) {
   const { setStartPage } = useStartPage();
   const socket = useSocket();
+  const { duoId: checkFriend } = useParams();
 
   const handleSkip = useCallback(() => {
     endCall();
-    console.log("send skip");
     socket?.emit("skip", { strangerId, duoId, friendId });
   }, [socket, strangerId]);
 
@@ -56,12 +57,14 @@ export default function Controls({
         >
           <PhoneOff size={28} />
         </button>
-        <button
-          onClick={handleSkip}
-          className="bg-gray-600 hover:bg-gray-700 text-white rounded-full p-3 transition duration-200 shadow-md"
-        >
-          <SkipForward size={18} />
-        </button>
+        {!checkFriend && (
+          <button
+            onClick={handleSkip}
+            className="bg-gray-600 hover:bg-gray-700 text-white rounded-full p-3 transition duration-200 shadow-md"
+          >
+            <SkipForward size={18} />
+          </button>
+        )}
       </div>
     </>
   );

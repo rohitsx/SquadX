@@ -35,7 +35,7 @@ export default function RemoteCall({
         return "messageStranger";
     }
   }, [userType]);
-  const { peerConnection, start, sendOffer, handleOffer } = useWebRTC({
+  const { peerConnection, start, sendOffer, handleOffer, resetPc } = useWebRTC({
     stream,
     signalingMessage,
   });
@@ -46,6 +46,7 @@ export default function RemoteCall({
   const [sendOfferCheck, setSendOfferCheck] = useState(false);
 
   useEffect(() => {
+    resetPc();
     start();
   }, []);
 
@@ -76,9 +77,8 @@ export default function RemoteCall({
   ]);
 
   useEffect(() => {
-    sendOfferCheck &&
-      socket &&
-      stranger &&
+    if (sendOfferCheck && socket && stranger) {
+      console.log("signalingMessage", signalingMessage);
       socket.on(signalingMessage, (m) => {
         handleOffer({
           socket: socket,
@@ -87,6 +87,7 @@ export default function RemoteCall({
           polite: stranger.polite,
         });
       });
+    }
   }, [stranger, socket, sendOfferCheck]);
 
   useEffect(() => {

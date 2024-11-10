@@ -1,5 +1,6 @@
 import { Server, Socket } from "socket.io";
 import socketServices from "../services/socketServices";
+import { freemem } from "os";
 
 export function handleSocketConnection(socket: Socket, io: Server) {
   const skService = new socketServices(io);
@@ -18,10 +19,12 @@ export function handleSocketConnection(socket: Socket, io: Server) {
     const emitValue: string = m.emitValue;
     io.to(m.to).emit(emitValue, m);
   });
-  socket.on("skip", ({ strangerId, duoId }) => {
+  socket.on("skip", ({ strangerId, duoId, friendId }) => {
 	  console.log("\n")
+	  console.log(friendId)
     io.to(strangerId).emit("strangerLeft");
     duoId && io.to(duoId).emit("strangerLeft");
+	friendId && io.to(friendId).emit("strangerLeft");
   });
   socket.on(
     "pairedclosedtab",

@@ -26,8 +26,7 @@ export const useWebRTC = ({ stream, signalingMessage }: useWebRTCProp) => {
 
   const start = useCallback(async () => {
     if (peerConnection?.connectionState === "connected") {
-      peerConnection.close();
-      iceCandidatesQueue.current = [];
+      resetPc();
     }
 
     const newPeerConnection = new RTCPeerConnection({
@@ -137,10 +136,34 @@ export const useWebRTC = ({ stream, signalingMessage }: useWebRTCProp) => {
     [peerConnection, processIceCandidateQueue],
   );
 
+  const resetPc = useCallback(() => {
+    if (peerConnection) {
+      // Close all tracks
+      peerConnection.getSenders().forEach((sender) => {
+        if (sender.track) {
+          sender.track.stop();
+        }
+      });
+
+      // Close the connection
+      peerConnection.close();
+
+      // Reset all refs
+      makingOfferRef.current = false;
+      ignoreOfferRef.current = false;
+      politeRef.current = false;
+      iceCandidatesQueue.current = [];
+
+      // Reset the state
+      setPeerConnection(null);
+    }
+  }, [peerConnection]);
+
   return {
     peerConnection,
     start,
     sendOffer,
     handleOffer,
+	resetPc
   };
 };

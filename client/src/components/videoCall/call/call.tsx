@@ -119,7 +119,7 @@ export default function Call() {
             <Controls
               strangerId={stranger?.pairId}
               duoId={duo?.pairId}
-              friendId={friend?.pairName}
+              friendId={friend?.pairId}
               endCall={handlePeer}
               closeStream={closeStream}
             />
