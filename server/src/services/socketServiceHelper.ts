@@ -110,8 +110,8 @@ export default class SocketDatabaseHelper {
   }
 
   async checkUserExists(username: string) {
-      return await this.prisma.activeUser.findUnique({
-        where: { username },
-      });
+    return await this.prisma.activeUser.findUnique({
+      where: { username },
+    });
   }
 }

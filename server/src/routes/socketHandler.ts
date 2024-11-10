@@ -15,17 +15,11 @@ export function handleSocketConnection(socket: Socket, io: Server) {
     skService.handleUserJoin(user);
   });
   socket.on("message", (m) => {
-    if (m.description)
-      console.log(
-        "recived messageFriend by",
-        username,
-        m.description.type,
-        m.to,
-      );
     const emitValue: string = m.emitValue;
     io.to(m.to).emit(emitValue, m);
   });
   socket.on("skip", ({ strangerId, duoId }) => {
+	  console.log("\n")
     io.to(strangerId).emit("strangerLeft");
     duoId && io.to(duoId).emit("strangerLeft");
   });
@@ -43,11 +37,9 @@ export function handleSocketConnection(socket: Socket, io: Server) {
   });
 
   socket.on("duoLive", (to: string) => {
-    console.log("recived duoLive from", username, "to", to);
     io.to(to).emit("duoLive");
   });
   socket.on("duoClosedTab", (to: string) => {
-    console.log("recived duoClosedTab from", username);
     io.to(to).emit("duoClosedTab");
   });
 }

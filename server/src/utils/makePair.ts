@@ -36,15 +36,14 @@ export default async function makePair(
   io: Server,
 ): Promise<boolean | undefined> {
   const dbHelper = new socketDatabaseHelper();
-
   try {
     // Get random user to pair with
     const randomUser: RandomUser = await dbHelper.getRandomUser(user.username);
     if (!randomUser) return false;
-
-    sendPair(randomUser, user, dbHelper, io);
-
-    return true;
+    
+    // Add await here to wait for sendPair to complete
+    const pairResult = await sendPair(randomUser, user, dbHelper, io);
+    return pairResult; // Return the actual result from sendPair
   } catch (error) {
     console.error(`Error making pair for user ${user.username}:`, error);
     return undefined;
@@ -56,10 +55,10 @@ async function sendPair(
   currentUser: MakePairProps,
   dbHelper: socketDatabaseHelper,
   io: Server,
-) {
+): Promise<boolean> { // Add explicit return type
   let currentUserDuoEmit: emitUserProp | null;
   let randomUserDuoEmit: emitUserProp | null;
-
+  
   const currentUserEmit: emitUserProp = {
     currentUserId: currentUser.socketId,
     pairId: randomUser.socketId,
@@ -68,7 +67,7 @@ async function sendPair(
     duoName: randomUser.duoUsername,
     polite: false,
   };
-
+  
   const randomUserEmit: emitUserProp = {
     currentUserId: randomUser.socketId,
     pairId: currentUser.socketId,
@@ -77,30 +76,18 @@ async function sendPair(
     duoName: currentUser.duoUsername,
     polite: true,
   };
-
-  console.log({
-    currentUserEmit: {
-      username: currentUserEmit.pairName,
-	  duoName: currentUserEmit.duoName,
-      polite: currentUserEmit.polite,
-    },
-    randomUserEmit: {
-      username: randomUserEmit.pairName,
-	  duoName: randomUserEmit.duoName,
-      poite: randomUserEmit.polite,
-    },
-  });
-
+  
   const deleteSuccess = await dbHelper.deleteFromActiveUsers(
     randomUser.username,
     randomUser.socketId,
   );
-  if (deleteSuccess === 0) return false;
-
+  
+  console.log("deleteSuccess", deleteSuccess);
+  if (!deleteSuccess) return false;
+  
   io.to(currentUserEmit.currentUserId).emit("peer", currentUserEmit);
   io.to(randomUserEmit.currentUserId).emit("peer", randomUserEmit);
-  //  console.log("users paired successfully", currentUserEmit, randomUserEmit);
-
+  
   if (currentUser.duoSocketId && currentUser.duoUsername) {
     currentUserDuoEmit = {
       currentUserId: currentUser.duoSocketId,
@@ -110,15 +97,9 @@ async function sendPair(
       duoName: randomUser.duoUsername,
       polite: true,
     };
-
     io.to(currentUserDuoEmit.currentUserId).emit("peer", currentUserDuoEmit);
-    console.log("currentUserDuoEmit", {
-      username: currentUserDuoEmit.pairName,
-	  duoName: currentUserDuoEmit.duoName,
-      polite: currentUserDuoEmit.polite,
-    });
   }
-
+  
   if (randomUser.duoSocketId && randomUser.duoUsername) {
     randomUserDuoEmit = {
       currentUserId: randomUser.duoSocketId,
@@ -129,10 +110,14 @@ async function sendPair(
       polite: true,
     };
     io.to(randomUserDuoEmit.currentUserId).emit("peer", randomUserDuoEmit);
-    console.log("randomUserDuoEmit", {
-      username: randomUserDuoEmit.pairName,
-	  duoName: randomUserDuoEmit.duoName,
-      polite: randomUserDuoEmit.polite,
-    });
   }
+  
+  console.log(
+    "select user",
+    currentUser.username,
+    "paired with",
+    randomUser.username,
+  );
+  
+  return deleteSuccess === 1; // Return true only if deleteSuccess is 1
 }

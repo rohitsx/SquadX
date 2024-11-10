@@ -57,15 +57,10 @@ export default function RemoteCall({
       !stream ||
       hasSentOffer.current ||
       (userType === "stranger" && friend && peerState.friend === "disconnected")
-    )
+    ) {
       return;
+    }
 
-    console.log(
-      localStorage.getItem("username"),
-      "sent offer to",
-      stranger.pairName,
-      stranger.polite,
-    );
     sendOffer(socket, stranger.pairId);
     hasSentOffer.current = true;
     setSendOfferCheck(true);
@@ -85,20 +80,6 @@ export default function RemoteCall({
       socket &&
       stranger &&
       socket.on(signalingMessage, (m) => {
-        if (m.description?.type === "offer")
-          console.log(
-            localStorage.getItem("username"),
-            "recived offer from",
-            stranger.pairName,
-            stranger.polite,
-          );
-        if (m.description?.type === "answer")
-          console.log(
-            localStorage.getItem("username"),
-            "recived answer from",
-            stranger.pairName,
-            stranger.polite,
-          );
         handleOffer({
           socket: socket,
           message: m,
@@ -110,7 +91,7 @@ export default function RemoteCall({
 
   useEffect(() => {
     if (!socket || !stranger) return;
-    socket.on("strangerLeft", handleCallEnd);
+    userType !== "friend" && socket.on("strangerLeft", handleCallEnd);
 
     return () => {
       socket.off("strangerLeft", handleCallEnd);
@@ -142,7 +123,7 @@ export default function RemoteCall({
 
   return (
     <>
-      <div>
+      <div className="w-full h-full">
         <RemoteVid pc={peerConnection} />
         <div className="bg-gradient-to-t from-black to-transparent p-4">
           <p className="text-xl font-semibold text-white">

@@ -1,11 +1,12 @@
 import { Flag, PhoneOff, SkipForward } from "lucide-react";
-import {  useCallback } from "react";
+import { useCallback } from "react";
 import { useStartPage } from "@/context/startPageContext";
 import { useSocket } from "@/context/socketContext";
 
 interface ChatBoxProps {
   strangerId: string | undefined;
   duoId: string | undefined;
+  friendId: string | undefined;
   endCall: () => void;
   closeStream: () => void;
 }
@@ -14,6 +15,7 @@ export default function Controls({
   strangerId,
   duoId,
   endCall,
+  friendId,
   closeStream,
 }: ChatBoxProps) {
   const { setStartPage } = useStartPage();
@@ -21,13 +23,14 @@ export default function Controls({
 
   const handleSkip = useCallback(() => {
     endCall();
-    socket?.emit("skip", {strangerId, duoId});
+    console.log("send skip");
+    socket?.emit("skip", { strangerId, duoId, friendId });
   }, [socket, strangerId]);
 
   const handleEndCall = useCallback(() => {
     socket?.emit("pairedclosedtab", strangerId);
     endCall();
-    setStartPage('start');
+    setStartPage("start");
     closeStream();
   }, [socket, strangerId]);
 

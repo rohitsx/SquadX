@@ -27,18 +27,17 @@ export default class socketServices {
         await this.dbHelper.addToActiveUsers(user);
         return;
       }
-      const delay = Math.floor(Math.random() * (3000 - 0 + 1)) + 0;
       let pairFound = false;
       let attempts = 0;
       const maxAttempts = 3;
 
       while (!pairFound && attempts < maxAttempts) {
         const check = await makePair(user, this.io);
+		console.log("running loop for", user.username, check);
         if (check === true) {
           pairFound = true;
         } else {
           attempts++;
-          await new Promise((resolve) => setTimeout(resolve, delay));
         }
       }
 
@@ -59,7 +58,6 @@ export default class socketServices {
       await this.dbHelper.deleteFromActiveUsers(username, socketId);
       pairId && this.io.to(pairId).emit("strangerLeft");
 	  duoId && this.io.to(duoId).emit("strangerLeft");
-      console.log("user", username, "deleted from db");
     } catch (err) {
       console.log(err);
     }
