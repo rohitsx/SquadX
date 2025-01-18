@@ -9,14 +9,14 @@ export const useValidateToken = () => {
 	console.log('logging out')
     localStorage.removeItem("token");
     localStorage.removeItem("username");
-    navigate("/login");
+    navigate("/auth");
   }
   useEffect(() => {
     const token = localStorage.getItem("token");
     const username = localStorage.getItem("username");
 
     if (!token || !username) {
-      navigate("/login");
+      navigate("/auth");
       return;
     }
 

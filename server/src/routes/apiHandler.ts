@@ -3,9 +3,7 @@ import ApiService from "../services/apiService";
 
 const router = express.Router();
 
-router.post("/api/login", ApiService.login);
-
-router.post("/api/signup", ApiService.signup);
+router.post("/api/auth", ApiService.auth);
 
 router.post("/api/validateToken", ApiService.validateToken);
 
