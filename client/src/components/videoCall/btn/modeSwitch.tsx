@@ -23,7 +23,7 @@ export default function SwitchSoloDuo({
         }`}
         onClick={() => setSwitchMode("duo")}
       >
-        DUO
+	  SQUAD
       </button>
     </div>
   );

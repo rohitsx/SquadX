@@ -1,8 +1,8 @@
-import logo from "@/assets/img/btc.png";
+import defaultPfp from "@/assets/img/defaultPfp.jpeg";
 import { useSocket } from "@/context/socketContext";
 import axios from "axios";
 import { Clipboard } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type CreateDuoLinkProp = {
   setCheckCopied: (copied: boolean) => void;
@@ -11,6 +11,16 @@ type CreateDuoLinkProp = {
 export default function CreateDuoLink({ setCheckCopied }: CreateDuoLinkProp) {
   const socket = useSocket();
   const [copied, setCopied] = useState<null | boolean>(null);
+  const [pfp, setPfp] = useState<string | undefined>();
+  useEffect(() => {
+    axios
+      .post(import.meta.env.VITE_API_URL + "/getPfp", {
+        username: localStorage.getItem("username"),
+      })
+      .then((res) => {
+        res.data !== "default" ? setPfp(res.data) : setPfp(defaultPfp);
+      });
+  }, []);
 
   const copyToClipboard = useCallback(() => {
     if (!socket) return;
@@ -47,7 +57,7 @@ export default function CreateDuoLink({ setCheckCopied }: CreateDuoLinkProp) {
             <div className="flex items-center justify-center space-x-4 mb-6">
               <div className="w-16 h-16 bg-gray-600 rounded-full overflow-hidden">
                 <img
-                  src={logo}
+                  src={pfp}
                   alt="Me"
                   className="w-full h-full object-cover"
                 />

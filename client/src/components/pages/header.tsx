@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import defaultPfp from "@/assets/img/defaultPfp.jpeg";
-import logo from "@/assets/img/btc.png";
-import { User, Settings, HelpCircle, LogOut, ChevronDown } from "lucide-react";
+import { ChevronDown, HelpCircle, LogOut, Settings, User } from "lucide-react";
 import axios from "axios";
 
 export default function Header() {
@@ -18,10 +17,9 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="bg-gray-800 shadow-md p-4 flex justify-between items-center">
+    <header className="bg-gray-800 shadow-md p-2 px-6	 flex justify-between items-center">
       <div className="flex items-center">
-        <img src={logo} alt="Logo" className="h-10 w-10 mr-3 rounded-md" />
-        <span className="font-bold text-2xl text-blue-400">Criminal.lol</span>
+        <span className="font-bold text-2xl text-blue-400">SquadX</span>
       </div>
       <div className="relative">
         <button
