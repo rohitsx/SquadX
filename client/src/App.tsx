@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./components/pages/home";
-import Register from "./components/signupSingin/auth";
 import Logout from "./components/signupSingin/logout";
 import Dashboard from "./components/pages/dashboard";
 import ErrorPage from "./utils/passcode";
@@ -10,6 +9,8 @@ import AboutSection from "./components/pages/about";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import env from "./utils/enviroment";
 import "./index.css";
+import Auth from "./components/signupSingin/auth";
+import Username from "./components/signupSingin/username";
 
 function App() {
   return (
@@ -18,7 +19,11 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/duo/:duoName/:duoId" element={<Home />} />
-          <Route path="/auth" element={<Register />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route
+            path="/username/:access_token/:credential"
+            element={<Username />}
+          />
           <Route path="/logout" element={<Logout />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="profile" element={<ProfilePage />} />

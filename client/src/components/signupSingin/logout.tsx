@@ -3,19 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { useValidateToken } from "../../hooks/useValidateToken";
 
 export default function Logout() {
-    useValidateToken();
+  useValidateToken();
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("username");
-        navigate("/login");
-    }),[];
+  useEffect(() => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    navigate("/auth");
+  }), [];
 
-    return (
-        <>
-            <div></div>
-        </>
-    );
+  return <div></div>;
 }
