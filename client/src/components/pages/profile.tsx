@@ -244,7 +244,7 @@ const ProfilePage = () => {
         }
 
         const data = await profileService.getUserInfo(username, token);
-        setProfile((prev) => ({
+        setProfile(() => ({
           ...data,
           avatarUrl: data.avatarUrl === "default" ? defaultPfp : data.avatarUrl,
         }));

@@ -11,6 +11,7 @@ import env from "./utils/enviroment";
 import "./index.css";
 import Auth from "./components/signupSingin/auth";
 import Username from "./components/signupSingin/username";
+import Privacypolicy from "./components/signupSingin/privacypolicy";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="/Settings" element={<SettingsPage />} />
           <Route path="/about" element={<AboutSection />} />
           <Route path="*" element={<ErrorPage />} />
+		  <Route path="privacypolicy" element={<Privacypolicy/>}/>
         </Routes>
       </Router>
     </GoogleOAuthProvider>
