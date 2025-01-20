@@ -1,3 +1,3 @@
-# [SquadX](https://criminal.lol)
+# [SquadX](https://squax.devrohit.tech)
 
-Criminal.lol is a social media platform that lets you connect with strangers via video chat, alongside other engaging social media features. 
+SquadX is a social media platform that lets you connect with strangers via video chat, alongside other engaging social media features. 
