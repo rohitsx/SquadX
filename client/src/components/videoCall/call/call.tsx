@@ -74,13 +74,14 @@ export default function Call() {
       stranger ||
       duoId ||
       (friend && peerState.friend === "disconnected")
-    )
+    ) {
       return;
+    }
     socket.emit("connectPeer", {
       duoSocketId: friend?.pairId,
       duoUsername: friend?.pairName,
     });
-	console.log('send connectPeer');
+    console.log("send connectPeer");
 
     return () => {
       socket.off("peer", handlePeer);
@@ -99,38 +100,40 @@ export default function Call() {
   return (
     <>
       <div className="w-1/2 flex flex-col bg-gray-800 rounded-2xl shadow-xl overflow-hidden relative">
-        {isMatched ? (
-          <>
-            <RemoteCall
-              stream={stream}
-              handleCallEnd={handlePeer}
-              stranger={stranger}
-              userType={duoId ? "duo" : "stranger"}
-            />
-            {duo && peerState.stranger === "connected" && (
+        {isMatched
+          ? (
+            <>
               <RemoteCall
                 stream={stream}
                 handleCallEnd={handlePeer}
-                stranger={duo}
-                userType={"duo"}
+                stranger={stranger}
+                userType={duoId ? "duo" : "stranger"}
               />
-            )}
+              {duo && peerState.stranger === "connected" && (
+                <RemoteCall
+                  stream={stream}
+                  handleCallEnd={handlePeer}
+                  stranger={duo}
+                  userType={"duo"}
+                />
+              )}
 
-            <Controls
-              strangerId={stranger?.pairId}
-              duoId={duo?.pairId}
-              friendId={friend?.pairId}
-              endCall={handlePeer}
-              closeStream={closeStream}
-            />
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-700">
-            <p className="text-3xl text-white font-semibold">
-              Finding your match...
-            </p>
-          </div>
-        )}
+              <Controls
+                strangerId={stranger?.pairId}
+                duoId={duo?.pairId}
+                friendId={friend?.pairId}
+                endCall={handlePeer}
+                closeStream={closeStream}
+              />
+            </>
+          )
+          : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-700">
+              <p className="text-3xl text-white font-semibold">
+                Finding your match...
+              </p>
+            </div>
+          )}
       </div>
       <FriendCall
         stranger={stranger}

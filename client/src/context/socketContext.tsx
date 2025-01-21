@@ -16,6 +16,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     let newSocket: Socket | null = null;
 
     if (localStorage.getItem("username")) {
+		console.log("connecting to ", import.meta.env.VITE_APP_WEBSOCKET_URL);
       newSocket = io(import.meta.env.VITE_APP_WEBSOCKET_URL, {
         transports: ["websocket"],
         auth: { username: localStorage.getItem("username") },

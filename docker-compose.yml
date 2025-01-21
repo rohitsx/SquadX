@@ -38,30 +38,11 @@ services:
     environment:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: dummyPass
-      POSTGRES_DB: criminalLol
+      POSTGRES_DB: mydb
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  mongodb:
-    image: mongo:latest
-    container_name: criminalLol_mongoDb
-    ports:
-      - "27017:27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=myuser
-      - MONGO_INITDB_ROOT_PASSWORD=dummyPass
-      - MONGO_INITDB_DATABASE=criminalLol
-    volumes:
-      - mongodata:/data/db 
-    healthcheck: 
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
-
 volumes:
   pgdata:
-  mongodata:

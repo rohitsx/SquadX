@@ -12,6 +12,7 @@ interface Notification {
 
 export default function Username() {
   const { access_token, credential } = useParams();
+  console.log({access_token, credential})
   const navigate = useNavigate();
   const [notification, setNotification] = useState<Notification | null>(null);
   const [username, setUsername] = useState<string | null>(null);
@@ -36,8 +37,8 @@ export default function Username() {
     setIsLoading(true);
     try {
       const response = await axios.post(env.apiUrl + "/auth", {
-        credential,
-        access_token,
+        credential: credential === "undefined" ? null : credential,
+        access_token: access_token === "undefined" ? null : access_token,
         username,
       });
       const { token } = response.data;

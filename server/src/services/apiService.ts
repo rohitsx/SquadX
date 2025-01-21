@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/environment";
 import { psqlClient } from "../config/database";
 import axios from "axios";
-import { throws } from "assert";
 
 class ApiService {
   static async auth(req: express.Request, res: express.Response) {
@@ -12,12 +11,15 @@ class ApiService {
     let userData: any;
 
     try {
-      if (credential) userData = await ApiService.decodeJWT(credential);
-      else if (access_token) {
-        userData = await ApiService.useAccess_Token(access_token);
-      } else {return res.status(401).send({
+      userData = credential
+        ? await ApiService.decodeJWT(credential)
+        : await ApiService.useAccess_Token(access_token);
+
+      if (!userData) {
+        return res.status(401).send({
           message: "User not found, please check your email",
-        });}
+        });
+      }
 
       user = {
         name: userData.name,
@@ -63,6 +65,7 @@ class ApiService {
   }
   static async useAccess_Token(token: string) {
     try {
+      console.log("working on useAccess_Token");
       const response = await axios.get(
         "https://www.googleapis.com/oauth2/v3/userinfo",
         {
