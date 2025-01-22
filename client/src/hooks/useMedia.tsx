@@ -10,7 +10,7 @@ export default function useMedia() {
           width: { max: 1920 },
           height: { max: 1080 },
         },
-        audio: true,
+        audio: { echoCancellation: true, noiseSuppression: true },
       });
       setStream(streamInstance);
     } catch (err) {
