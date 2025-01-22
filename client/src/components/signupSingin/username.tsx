@@ -12,7 +12,6 @@ interface Notification {
 
 export default function Username() {
   const { access_token, credential } = useParams();
-  console.log({access_token, credential})
   const navigate = useNavigate();
   const [notification, setNotification] = useState<Notification | null>(null);
   const [username, setUsername] = useState<string | null>(null);

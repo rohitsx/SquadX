@@ -40,9 +40,11 @@ export default function Home() {
           <PeerStateProvider>
             <div className="flex flex-col h-screen bg-gray-900 text-gray-100">
               <Header />
-              <div className="flex-1 flex p-6 space-x-6">
-                <HomeContent />
-              </div>
+              <main className="flex-1 overflow-auto ">
+                <div className="flex-1 h-full flex p-6 space-x-4">
+                  <HomeContent />
+                </div>
+              </main>
             </div>
           </PeerStateProvider>
         </FriendProvider>

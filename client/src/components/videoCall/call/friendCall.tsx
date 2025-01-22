@@ -72,16 +72,20 @@ export default function FriendCall({
   }, [socket, stream]);
 
   return (
-    <div className="w-1/2 flex flex-col bg-gray-800 rounded-2xl shadow-xl overflow-hidden relative">
-      {friend && (
-        <RemoteCall
-          stream={stream}
-          handleCallEnd={handleCallEnd}
-          stranger={friend}
-          userType="friend"
-        />
+    <div className="w-1/2 flex flex-col bg-gray-800 rounded-2xl shadow-xl overflow-hidden relative"> {friend && (
+        <div className="h-1/2">
+          <RemoteCall
+            stream={stream}
+            handleCallEnd={handleCallEnd}
+            stranger={friend}
+            userType="friend"
+          />
+        </div>
       )}
-      <LocalVid stream={stream} />
+
+      <div className={friend ? "h-1/2" : "h-full"}>
+        <LocalVid stream={stream} />
+      </div>
       <ChatBox strangerId={stranger?.pairId} />
     </div>
   );
