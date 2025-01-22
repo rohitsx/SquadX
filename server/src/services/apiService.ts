@@ -89,9 +89,8 @@ class ApiService {
   }
 
   static async validateToken(req: express.Request, res: express.Response) {
-    const { token } = req.body;
-
     try {
+      const { token } = req.body;
       const decoded = jwt.verify(token, JWT_SECRET);
       if (decoded) res.json({ valid: true });
     } catch (error) {
