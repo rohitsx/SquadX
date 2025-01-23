@@ -2,7 +2,7 @@
 
 SquadX is a social media platform that lets you connect with strangers via video chat, alongside other engaging social media features. 
 
-🔴 **[Live Demo (currently broke)](http://SquadX.devrohit.tech/)** - Or checkout demo video below
+🔴 **[Live Demo](http://SquadX.devrohit.tech/)** - Or checkout demo video below
 [![SquadX Demo](https://img.youtube.com/vi/vMq3I2Ey6Uc/0.jpg)](https://www.youtube.com/watch?v=vMq3I2Ey6Uc)
 
 ## Prisma Migration
