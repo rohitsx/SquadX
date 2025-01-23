@@ -163,7 +163,7 @@ const Auth = () => {
               <div className="aspect-video w-full overflow-hidden rounded-b-lg">
                 <iframe
                   className="h-full w-full"
-                  src="https://www.youtube.com/embed/DlcM5WlSlDs"
+                  src="https://www.youtube.com/embed/vMq3I2Ey6Uc"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   loading="lazy"
                   allowFullScreen
