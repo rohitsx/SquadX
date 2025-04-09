@@ -12,3 +12,7 @@ To run Prisma migrations, execute the following commands:
 ```bash
 sudo docker exec -it squadx-backend-1 sh
 npx prisma migrate dev
+
+
+---
+Keywords: omegle clone github, random video chat app, omegle alternative, open source video chat, webrtc video chat, omegle like, omegle clone, random video chat, omegle alternative, open source omegle, video chat app, random chat application, webrtc video chat, react video chat, omegle like app github, video chat github, omegle clone github, random video chat open source
